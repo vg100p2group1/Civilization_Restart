@@ -27,9 +27,10 @@ playerDemonstrate model =
         -- meTemp = model.myself
     in
         -- Html.Styled.div[Html.Styled.Attributes.style "background-color" "yellow"][
-        Html.Styled.div [Html.Styled.Attributes.style "margin" "20%", Html.Styled.Attributes.style "border-color" "black",
-                        Html.Styled.Attributes.style "border-width" "15px",
-                        Html.Styled.Attributes.style "border-style" "solid"]
+        Html.Styled.div [Html.Styled.Attributes.style "margin" "20%"]
+                        -- , Html.Styled.Attributes.style "border-color" "black",
+                        -- Html.Styled.Attributes.style "border-width" "15px",
+                        -- Html.Styled.Attributes.style "border-style" "solid"]
             [ Svg.Styled.svg [Svg.Styled.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
               (List.append  (walls model.viewbox) [me model.myself])
             ]
@@ -39,6 +40,8 @@ playerDemonstrate model =
 walls : List Rectangle -> List (Svg.Styled.Svg msg)
 walls obstacle =
     let
+        
+        -- d=Debug.log "wall" obstacle
         createBricksFormat model =
            Svg.Styled.rect 
                 [ x <| String.fromFloat model.x

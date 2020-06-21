@@ -141,4 +141,7 @@ updateViewbox me model =
 
     --     -- viewRec = List.map viewUpdate viewedRecTemp
     -- in
+    let
+        d=Debug.log "recs" model.viewbox
+    in
         List.map (viewUpdate me) model.viewbox

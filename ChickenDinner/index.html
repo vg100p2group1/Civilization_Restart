@@ -5216,10 +5216,20 @@ var $author$project$Config$initMapUpdate = F2(
 			},
 			model);
 	});
+var $author$project$Model$Rectangle = F5(
+	function (x, y, width, height, edge) {
+		return {edge: edge, height: height, width: width, x: x, y: y};
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $author$project$Model$Rec = F4(
 	function (cx, cy, halfWidth, halfHeight) {
 		return {cx: cx, cy: cy, halfHeight: halfHeight, halfWidth: halfWidth};
 	});
+var $author$project$Map$recInit = A4($author$project$Model$Rec, 0, 0, 0, 0);
+var $author$project$Map$bottom = A5($author$project$Model$Rectangle, -500, 4000, 5000, 500, $author$project$Map$recInit);
+var $author$project$Map$left = A5($author$project$Model$Rectangle, -500, -500, 500, 5000, $author$project$Map$recInit);
 var $author$project$Model$recUpdate = function (model) {
 	var halfy = model.height / 2;
 	var newy = model.y + halfy;
@@ -5230,20 +5240,16 @@ var $author$project$Model$recUpdate = function (model) {
 		model,
 		{edge: newRec});
 };
-var $author$project$Model$Rectangle = F5(
-	function (x, y, width, height, edge) {
-		return {edge: edge, height: height, width: width, x: x, y: y};
-	});
-var $author$project$Map$recInit = A4($author$project$Model$Rec, 0, 0, 0, 0);
+var $author$project$Map$right = A5($author$project$Model$Rectangle, 4000, -500, 500, 5000, $author$project$Map$recInit);
+var $author$project$Map$top = A5($author$project$Model$Rectangle, -500, -500, 5000, 500, $author$project$Map$recInit);
 var $author$project$Map$wall1 = A5($author$project$Model$Rectangle, 500, 500, 1000, 400, $author$project$Map$recInit);
 var $author$project$Map$wall2 = A5($author$project$Model$Rectangle, 2000, 1000, 900, 500, $author$project$Map$recInit);
 var $author$project$Map$wall3 = A5($author$project$Model$Rectangle, 1500, 2500, 1000, 1000, $author$project$Map$recInit);
-var $author$project$Map$mapWalls = _List_fromArray(
-	[
-		$author$project$Model$recUpdate($author$project$Map$wall1),
-		$author$project$Model$recUpdate($author$project$Map$wall2),
-		$author$project$Model$recUpdate($author$project$Map$wall3)
-	]);
+var $author$project$Map$mapWalls = A2(
+	$elm$core$List$map,
+	$author$project$Model$recUpdate,
+	_List_fromArray(
+		[$author$project$Map$wall1, $author$project$Map$wall2, $author$project$Map$wall3, $author$project$Map$left, $author$project$Map$right, $author$project$Map$top, $author$project$Map$bottom]));
 var $author$project$Model$Me = function (x) {
 	return function (y) {
 		return function (r) {
@@ -7093,9 +7099,6 @@ var $Skinney$murmur3$Murmur3$hashString = F2(
 	});
 var $rtfeldman$elm_css$Hash$murmurSeed = 15739;
 var $elm$core$String$fromList = _String_fromList;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $rtfeldman$elm_hex$Hex$unsafeToDigit = function (num) {
 	unsafeToDigit:
@@ -8099,6 +8102,7 @@ var $author$project$Update$speedCase = function (me) {
 		me,
 		{edge: recTemp, x: newX, xSpeed: xSpeedFinal, y: newY, ySpeed: ySpeedFinal});
 };
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Update$viewUpdate = F2(
 	function (me, oneWall) {
 		var yTemp = oneWall.y - me.ySpeed;
@@ -8108,6 +8112,7 @@ var $author$project$Update$viewUpdate = F2(
 	});
 var $author$project$Update$updateViewbox = F2(
 	function (me, model) {
+		var d = A2($elm$core$Debug$log, 'recs', model.viewbox);
 		return A2(
 			$elm$core$List$map,
 			$author$project$Update$viewUpdate(me),
@@ -8284,10 +8289,7 @@ var $author$project$View$playerDemonstrate = function (model) {
 		$rtfeldman$elm_css$Html$Styled$div,
 		_List_fromArray(
 			[
-				A2($rtfeldman$elm_css$Html$Styled$Attributes$style, 'margin', '20%'),
-				A2($rtfeldman$elm_css$Html$Styled$Attributes$style, 'border-color', 'black'),
-				A2($rtfeldman$elm_css$Html$Styled$Attributes$style, 'border-width', '15px'),
-				A2($rtfeldman$elm_css$Html$Styled$Attributes$style, 'border-style', 'solid')
+				A2($rtfeldman$elm_css$Html$Styled$Attributes$style, 'margin', '20%')
 			]),
 		_List_fromArray(
 			[

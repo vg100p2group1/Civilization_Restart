@@ -13,8 +13,21 @@ wall2 = Rectangle 2000 1000 900 500 recInit
 wall3 : Rectangle
 wall3 = Rectangle 1500 2500 1000 1000 recInit
 
+left : Rectangle
+left = Rectangle -500 -500 500 5000 recInit
+
+
+right : Rectangle
+right = Rectangle 4000 -500 500 5000 recInit
+
+top : Rectangle
+top = Rectangle -500 -500 5000 500 recInit
+
+bottom : Rectangle
+bottom = Rectangle -500 4000 5000 500 recInit
+
 mapWalls : List Rectangle
-mapWalls = [recUpdate wall1, recUpdate wall2,recUpdate wall3]
+mapWalls = List.map recUpdate [wall1,wall2,wall3,left,right,top,bottom]
 
 mapMax : Float
 mapMax = 4000
