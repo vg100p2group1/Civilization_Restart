@@ -1,6 +1,13 @@
 module Model exposing (Rectangle,Rec,Player,Me,Model,recCollisionTest,recUpdate)
 
 
+-- type alias MouseMoveData =
+--     { offsetX : Int
+--     , offsetY : Int
+--     , offsetHeight : Float
+--     , offsetWidth : Float
+--     }
+
 type alias Rec =
     { cx : Float
     , cy : Float
@@ -35,7 +42,8 @@ type alias Me =
       , moveLeft : Bool
       , moveDown : Bool
       , edge : Rec
-      
+      , mouseData : (Float,Float)
+      , fire : Bool -- 到时候用sum type
     }
 
 type alias Model =

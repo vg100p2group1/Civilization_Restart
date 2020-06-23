@@ -15,6 +15,7 @@
             "elm/svg": "1.0.1",
             "elm/virtual-dom": "1.0.2",
             "elm-explorations/markdown": "1.0.0",
+            "mpizenberg/elm-pointer-events": "4.0.2",
             "rtfeldman/elm-css": "16.0.1"
         },
         "indirect": {

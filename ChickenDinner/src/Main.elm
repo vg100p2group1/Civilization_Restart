@@ -10,15 +10,15 @@ import View exposing (view)
 import Update
 import Config exposing (init)
 import Model exposing (Model)
-import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (..)
+-- import Html.Styled exposing (..)
+-- import Html.Styled.Attributes exposing (..)
 
 -- import Debug
 -- import Model exposing (Model)
 main : Program Value Model Msg
 main =
     Browser.element
-        { view =  View.view >> toUnstyled
+        { view =  View.view 
         , init = \value -> (init, Cmd.none)
         , update = Update.update
         
