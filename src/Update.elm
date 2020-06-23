@@ -1,4 +1,5 @@
-module Update exposing (..)
+module Update exposing (update)
+
 import Messages exposing (Msg(..))
 import Model exposing (Model,Me,Rec,Rectangle,recCollisionTest,recUpdate)
 import Config exposing (playerSpeed,viewBoxMax,bulletConfig,bulletSpeed)
@@ -6,6 +7,8 @@ import Map exposing (recInit)
 import Debug
 import Model exposing (Bullet)
 import Svg.Attributes exposing (viewBox)
+
+-- TODO: rewrite this function and classify the messages
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of

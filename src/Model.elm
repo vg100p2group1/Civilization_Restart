@@ -1,4 +1,4 @@
-module Model exposing (Rectangle,Rec,Player,Me,Model,Bullet,recCollisionTest,recUpdate)
+module Model exposing (Rectangle,Rec,Circle,Player,Me,Model,Bullet,recCollisionTest,recUpdate)
 
 
 -- type alias MouseMoveData =
@@ -23,11 +23,18 @@ type alias Rectangle =
     , edge : Rec
     }
 
+type alias Circle =
+    { cx : Float
+    , cy : Float
+    , r : Float
+    }
+
 type alias Player = 
     { x : Float
     , y : Float
     , r : Float
     , rotate : Float
+    , hitBox : Circle
     }
 
 type alias Bullet =
@@ -37,22 +44,24 @@ type alias Bullet =
     , speedX : Float
     , speedY : Float
     , collision : Bool
+    , hitBox : Circle
     }
 
 type alias Me =
     { x : Float
-      , y : Float
-      , r : Float
-      , xSpeed : Float
-      , ySpeed : Float
-      , rotate : Float
-      , moveUp : Bool
-      , moveRight : Bool
-      , moveLeft : Bool
-      , moveDown : Bool
-      , edge : Rec
-      , mouseData : (Float,Float)
-      , fire : Bool -- 到时候用sum type
+    , y : Float
+    , r : Float
+    , xSpeed : Float
+    , ySpeed : Float
+    , rotate : Float
+    , moveUp : Bool
+    , moveRight : Bool
+    , moveLeft : Bool
+    , moveDown : Bool
+    , edge : Rec
+    , mouseData : (Float,Float)
+    , fire : Bool -- 到时候用sum type
+    , hitBox : Circle
     }
 
 type alias Model =
