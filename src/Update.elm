@@ -43,6 +43,29 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+        MouseMove newMouseData ->
+            let 
+                pTemp = model.myself 
+                -- d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
+                -- d = Debug.log "mouse" newMouseData 
+                me = {pTemp | mouseData = newMouseData}
+            in 
+                ({model|myself = me},Cmd.none)
+        
+        MouseDown ->
+            let
+                pTemp =  model.myself
+                me= {pTemp | fire = True}
+            in
+                ({model|myself = me},Cmd.none)
+        
+        MouseUp ->
+            let
+                pTemp =  model.myself
+                me= {pTemp | fire = False}
+            in
+                ({model|myself = me},Cmd.none) 
+            
 
         Tick time ->
            animate model
@@ -96,7 +119,7 @@ speedCase me =
         getSpeed = 
             case (horizontal,vertical) of
                 (True,True) ->
-                    (newXspeed/2,newYspeed/2)
+                    (newXspeed/1.414,newYspeed/1.414)
                 _ ->
                     (newXspeed,newYspeed)
         (xSpeedFinal,ySpeedFinal) = getSpeed
@@ -141,7 +164,9 @@ updateViewbox me model =
 
     --     -- viewRec = List.map viewUpdate viewedRecTemp
     -- in
-    let
-        d=Debug.log "recs" model.viewbox
-    in
+    -- let
+    --     meTemp = model.myself
+    --     d = Debug.log "mouse2" meTemp.mouseData 
+    --     -- d=Debug.log "recs" model.viewbox
+    -- in
         List.map (viewUpdate me) model.viewbox
