@@ -1,4 +1,4 @@
-module Model exposing (Rectangle,Rec,Player,Me,Model,recCollisionTest,recUpdate)
+module Model exposing (Rectangle,Rec,Player,Me,Model,Bullet,recCollisionTest,recUpdate)
 
 
 -- type alias MouseMoveData =
@@ -30,6 +30,15 @@ type alias Player =
     , rotate : Float
     }
 
+type alias Bullet =
+    { x : Float 
+    , y : Float
+    , r : Float
+    , speedX : Float
+    , speedY : Float
+    , collision : Bool
+    }
+
 type alias Me =
     { x : Float
       , y : Float
@@ -51,7 +60,8 @@ type alias Model =
     , other : List Player
     , myself :  Me
     , viewbox : List Rectangle
-   
+    , bullet : List Bullet 
+    , bulletViewbox : List Bullet
     }
 
 

@@ -5158,9 +5158,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Model$Model = F4(
-	function (walls, other, myself, viewbox) {
-		return {myself: myself, other: other, viewbox: viewbox, walls: walls};
+var $author$project$Model$Model = F6(
+	function (walls, other, myself, viewbox, bullet, bulletViewbox) {
+		return {bullet: bullet, bulletViewbox: bulletViewbox, myself: myself, other: other, viewbox: viewbox, walls: walls};
 	});
 var $author$project$Config$viewBoxMax = 1000;
 var $author$project$Config$initMapUpdate = F2(
@@ -5238,12 +5238,14 @@ var $author$project$Model$Me = function (x) {
 var $author$project$Config$playerSpeed = 10;
 var $author$project$Config$myselfConfig = $author$project$Model$Me(0)(0)(10)($author$project$Config$playerSpeed)(0)(0)(false)(false)(false)(false)($author$project$Map$recInit)(
 	_Utils_Tuple2(500, 500))(false);
-var $author$project$Config$init = A4(
+var $author$project$Config$init = A6(
 	$author$project$Model$Model,
 	$author$project$Map$mapWalls,
 	_List_Nil,
 	$author$project$Config$myselfConfig,
-	A2($author$project$Config$initMapUpdate, $author$project$Config$myselfConfig, $author$project$Map$mapWalls));
+	A2($author$project$Config$initMapUpdate, $author$project$Config$myselfConfig, $author$project$Map$mapWalls),
+	_List_Nil,
+	_List_Nil);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Messages$Tick = function (a) {
@@ -5860,6 +5862,16 @@ var $author$project$Update$speedCase = function (me) {
 		me,
 		{edge: recTemp, x: newX, xSpeed: xSpeedFinal, y: newY, ySpeed: ySpeedFinal});
 };
+var $author$project$Update$updateBullet = function (bullets) {
+	var updateXY = function (model) {
+		var newY = model.y + model.speedY;
+		var newX = model.x + model.speedX;
+		return _Utils_update(
+			model,
+			{x: newX, y: newY});
+	};
+	return A2($elm$core$List$map, updateXY, bullets);
+};
 var $author$project$Update$viewUpdate = F2(
 	function (me, oneWall) {
 		var yTemp = oneWall.y - me.ySpeed;
@@ -5875,15 +5887,62 @@ var $author$project$Update$updateViewbox = F2(
 			model.viewbox);
 	});
 var $author$project$Update$animate = function (model) {
+	var newBulletViewbox = $author$project$Update$updateBullet(model.bulletViewbox);
+	var newBullet = $author$project$Update$updateBullet(model.bullet);
 	var me = model.myself;
 	var newMe = $author$project$Update$speedCase(me);
 	var newViewbox = A2($author$project$Update$updateViewbox, newMe, model);
 	return _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{myself: newMe, viewbox: newViewbox}),
+			{bullet: newBullet, bulletViewbox: newBulletViewbox, myself: newMe, viewbox: newViewbox}),
 		$elm$core$Platform$Cmd$none);
 };
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $author$project$Model$Bullet = F6(
+	function (x, y, r, speedX, speedY, collision) {
+		return {collision: collision, r: r, speedX: speedX, speedY: speedY, x: x, y: y};
+	});
+var $author$project$Config$bulletConfig = A6($author$project$Model$Bullet, 500, 500, 5, 0, 0, false);
+var $author$project$Config$bulletSpeed = 20;
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$Update$fireBullet = F3(
+	function (me, bullets, viewBox) {
+		var posY = me.mouseData.b;
+		var posX = me.mouseData.a;
+		var unitV = $elm$core$Basics$sqrt(((posX - 500) * (posX - 500)) + ((posY - 500) * (posY - 500)));
+		var yTemp = ($author$project$Config$bulletSpeed / unitV) * (posY - 500);
+		var xTemp = ($author$project$Config$bulletSpeed / unitV) * (posX - 500);
+		var newBullet = _Utils_update(
+			$author$project$Config$bulletConfig,
+			{speedX: xTemp, speedY: yTemp, x: me.x, y: me.y});
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$List$append,
+				bullets,
+				_List_fromArray(
+					[newBullet])),
+			A2(
+				$elm$core$List$append,
+				viewBox,
+				_List_fromArray(
+					[
+						_Utils_update(
+						newBullet,
+						{x: 500, y: 500})
+					])));
+	});
 var $author$project$Update$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5947,10 +6006,13 @@ var $author$project$Update$update = F2(
 				var me = _Utils_update(
 					pTemp,
 					{fire: true});
+				var _v1 = A3($author$project$Update$fireBullet, me, model.bullet, model.bulletViewbox);
+				var newBullet = _v1.a;
+				var newBulletViewbox = _v1.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{myself: me}),
+						{bullet: newBullet, bulletViewbox: newBulletViewbox, myself: me}),
 					$elm$core$Platform$Cmd$none);
 			case 'MouseUp':
 				var pTemp = model.myself;
@@ -5983,14 +6045,6 @@ var $author$project$Messages$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
 var $author$project$Messages$MouseUp = {$: 'MouseUp'};
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -6001,10 +6055,6 @@ var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$View$gun = function (myself) {
@@ -6154,6 +6204,24 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $author$project$View$showBullets = function (bullets) {
+	var createBulletFormat = function (model) {
+		return A2(
+			$elm$svg$Svg$circle,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fill('gray'),
+					$elm$svg$Svg$Attributes$cx(
+					$elm$core$String$fromFloat(model.x)),
+					$elm$svg$Svg$Attributes$cy(
+					$elm$core$String$fromFloat(model.y)),
+					$elm$svg$Svg$Attributes$r(
+					$elm$core$String$fromFloat(model.r))
+				]),
+			_List_Nil);
+	};
+	return A2($elm$core$List$map, createBulletFormat, bullets);
+};
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
@@ -6219,12 +6287,15 @@ var $author$project$View$playerDemonstrate = function (model) {
 					]),
 				A2(
 					$elm$core$List$append,
-					$author$project$View$walls(model.viewbox),
-					_List_fromArray(
-						[
-							$author$project$View$gun(model.myself),
-							$author$project$View$me(model.myself)
-						])))
+					$author$project$View$showBullets(model.bulletViewbox),
+					A2(
+						$elm$core$List$append,
+						$author$project$View$walls(model.viewbox),
+						_List_fromArray(
+							[
+								$author$project$View$gun(model.myself),
+								$author$project$View$me(model.myself)
+							]))))
 			]));
 };
 var $author$project$View$view = function (model) {

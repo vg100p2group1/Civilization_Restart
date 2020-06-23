@@ -1,5 +1,5 @@
 module View exposing (view)
-import Model exposing (Model,Rectangle,Me)
+import Model exposing (Model,Rectangle,Me,Bullet)
 -- import Update exposing (..)
 import Messages exposing (Msg(..))
 -- import Json.Encode
@@ -17,6 +17,7 @@ import Svg
 import Svg.Attributes 
 
 
+
 view : Model -> Html.Html Msg
 view model =
     playerDemonstrate model
@@ -31,7 +32,7 @@ playerDemonstrate model =
         -- Html.div[Html.Attributes.style "margin" "auto 0"][
         Html.div [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Html.Attributes.style "width" "1000",Html.Attributes.style "height" "1000"]
             [ Svg.svg [Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              (List.append  (walls model.viewbox) [gun model.myself,me model.myself])
+              (List.append (showBullets model.bulletViewbox) (List.append  (walls model.viewbox) [gun model.myself,me model.myself]))
             ]
         -- ]
 
@@ -92,3 +93,13 @@ gun myself =
         -- transformAnimation = Svg.Styled.animateTransform[ Svg.Styled.Attributes.attributeName "transform", Svg.Styled.Attributes.begin "0s", Svg.Styled.Attributes.dur "3s", type_ "scale", from "1", to "1.2", repeatCount "indefinite"][]
     in
         Svg.path [ route ,  Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
+
+
+showBullets : List Bullet -> List ( Svg.Svg Msg) 
+showBullets bullets =
+    let 
+        createBulletFormat model =
+        --"#002c5a"
+          Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat (model.x), Svg.Attributes.cy <| String.fromFloat (model.y), Svg.Attributes.r <| String.fromFloat model.r][]
+    in
+        List.map createBulletFormat bullets
