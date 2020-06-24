@@ -186,7 +186,7 @@ fireBullet me bullets viewBox=
     let
         posX = Tuple.first me.mouseData
         posY = Tuple.second me.mouseData
-        unitV = sqrt ((posX-500)*(posX-500) + (posY-500)*(posY-500)) 
+        unitV = sqrt ((posX - 500)*(posX - 500) + (posY - 500)*(posY - 500))
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
         newBullet = {bulletConfig | x=me.x,y=me.y,speedX=xTemp,speedY=yTemp}

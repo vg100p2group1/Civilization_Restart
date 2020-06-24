@@ -88,3 +88,17 @@ recUpdate model =
         newRec = Rec newx newy halfx halfy
     in 
         { model| edge = newRec}
+
+circleRecTest : Circle -> Rec -> Bool
+circleRecTest circle rec =
+    let
+        relativeX = circle.cx - rec.cx
+        relativeY = circle.cy - rec.cy
+        dx = clamp -rec.halfWidth rec.halfWidth relativeX
+        dy = clamp -rec.halfHeight rec.halfHeight relativeY
+    in
+        (dx - relativeX) ^ 2 + (dy - relativeY) ^ 2 < circle.r ^ 2
+
+circleCollisonTest : Circle -> Circle -> Bool
+circleCollisonTest c1 c2 =
+    sqrt((c1.cx - c2.cx) ^ 2 + (c1.cy - c2.cy) ^ 2) <= c1.r + c2.r

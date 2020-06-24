@@ -1,8 +1,11 @@
-module Map exposing (mapWalls,mapMax,recInit)
-import Model exposing (Rectangle,Rec,recUpdate)
+module Map exposing (mapWalls,mapMax,recInit,circleInit)
+import Model exposing (Rectangle,Rec,recUpdate,Circle)
 
 recInit : Rec
 recInit = Rec 0 0 0 0
+
+circleInit : Circle
+circleInit = Circle 0 0 0
 
 wall1 : Rectangle
 wall1 = Rectangle 500 500 1000 400 recInit

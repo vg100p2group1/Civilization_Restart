@@ -1,6 +1,6 @@
 module Config exposing (init,viewBoxMax,playerConfig,playerSpeed,myselfConfig,initMapUpdate,bulletConfig,bulletSpeed)
 import Model exposing (Model,Player,Me,Rectangle,Bullet)
-import Map exposing (mapWalls,recInit)
+import Map exposing (mapWalls,recInit,circleInit)
 -- import Json.Decode exposing (Decoder,map4,at,int,float)
 playerSpeed : Float
 playerSpeed = 10
@@ -13,15 +13,15 @@ viewBoxMax = 1000
 
 
 playerConfig : Player
-playerConfig = Player 0 0 playerSpeed 0
+playerConfig = Player 0 0 playerSpeed 0 circleInit
 
 -- mouseConfig : MouseMoveData
 -- mouseConfig = MouseMoveData 0 0 0 0
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 5 0 0 False
+bulletConfig = Bullet 500 500 5 0 0 False circleInit
 
 myselfConfig : Me
-myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,500) False
+myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,500) False circleInit
 
 
 init : Model
