@@ -45,6 +45,10 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+        
+        Map ->
+         ({model | map = not model.map},Cmd.none)
+        
         MouseMove newMouseData ->
             let 
                 pTemp = model.myself 
@@ -71,7 +75,7 @@ update msg model =
                 me= {pTemp | fire = False}
             in
                 ({model|myself = me},Cmd.none) 
-            
+
 
         Tick time ->
            animate model

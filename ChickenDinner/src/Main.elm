@@ -47,5 +47,7 @@ key on keycode =
             MoveRight on       
         83 ->
             MoveDown on
+        77 ->
+            Map
         _ ->
             Noop

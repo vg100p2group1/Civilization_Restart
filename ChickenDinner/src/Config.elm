@@ -25,7 +25,7 @@ myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,50
 
 
 init : Model
-init = Model  mapWalls [] myselfConfig  (initMapUpdate myselfConfig mapWalls) [] []
+init = Model  mapWalls [] myselfConfig  (initMapUpdate myselfConfig mapWalls) [] [] False
 
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
 initMapUpdate me model =

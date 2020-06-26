@@ -62,6 +62,7 @@ type alias Model =
     , viewbox : List Rectangle
     , bullet : List Bullet 
     , bulletViewbox : List Bullet
+    , map : Bool
     }
 
 

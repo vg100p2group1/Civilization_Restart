@@ -1,4 +1,4 @@
-module View exposing (view)
+module View exposing (view, walls)
 import Model exposing (Model,Rectangle,Me,Bullet)
 -- import Update exposing (..)
 import Messages exposing (Msg(..))
@@ -27,14 +27,41 @@ playerDemonstrate model =
     let
         gWidth = "1000"
         gHeight = "1000"
+
+        getMap =
+            if model.map then
+                showmap model
+            else
+                Html.div[][]
         -- meTemp = model.myself
     in
         -- Html.div[Html.Attributes.style "margin" "auto 0"][
-        Html.div [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Html.Attributes.style "width" "1000",Html.Attributes.style "height" "1000"]
+        Html.div[][Html.div [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Html.Attributes.style "width" "1000",Html.Attributes.style "height" "1000",Html.Attributes.style "float" "left"]
             [ Svg.svg [Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
               (List.append (showBullets model.bulletViewbox) (List.append  (walls model.viewbox) [gun model.myself,me model.myself]))
-            ]
+            ],getMap]
         -- ]
+
+showmap : Model -> Html.Html Msg
+showmap model =
+    let
+        -- scaleMap wallTemp =
+        --     {wallTemp|x=wallTemp.x/10,y=wallTemp.y/10,width=wallTemp.width/10,height=wallTemp.height/10}
+        -- bulletViewbox = List.map model.bulletViewbox
+        viewbox =  model.walls
+    in
+    Html.div[Html.Attributes.style "float" "right"][Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500",Svg.Attributes.viewBox <| "-500 -500 4000 4000"]
+              (List.append  (walls viewbox) [mapMe model.myself])]
+
+mapMe : Me -> Svg.Svg Msg
+mapMe  myself=
+   let 
+        createBallFormat model =
+          Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat myself.x, Svg.Attributes.cy <| String.fromFloat myself.y, Svg.Attributes.r "20"][]
+    in
+        createBallFormat myself
+
+
 
 
 walls : List Rectangle -> List (Svg.Svg Msg)
