@@ -28,6 +28,9 @@ type alias Player =
     , y : Float
     , r : Float
     , rotate : Float
+    , name : String
+    , score : Float
+    , die : Bool
     }
 
 type alias Bullet =
@@ -53,6 +56,8 @@ type alias Me =
       , edge : Rec
       , mouseData : (Float,Float)
       , fire : Bool -- 到时候用sum type
+      , name : String
+      , score : Float 
     }
 
 type alias Model =

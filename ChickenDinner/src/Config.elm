@@ -13,7 +13,11 @@ viewBoxMax = 1000
 
 
 playerConfig : Player
-playerConfig = Player 0 0 playerSpeed 0
+playerConfig = Player 0 0 10 0 "Player" 0 False
+
+pTest : List Player
+pTest = [playerConfig,{playerConfig|x=900,y=300,die=True,score=100,name="T1"},{playerConfig|x=1900,y=1000,score=50,name="T2"}]
+
 
 -- mouseConfig : MouseMoveData
 -- mouseConfig = MouseMoveData 0 0 0 0
@@ -21,11 +25,10 @@ bulletConfig : Bullet
 bulletConfig = Bullet 500 500 5 0 0 False
 
 myselfConfig : Me
-myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,500) False
-
+myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,500) False "Me" 0
 
 init : Model
-init = Model  mapWalls [] myselfConfig  (initMapUpdate myselfConfig mapWalls) [] [] False
+init = Model  mapWalls pTest myselfConfig  (initMapUpdate myselfConfig mapWalls) [] [] False
 
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
 initMapUpdate me model =

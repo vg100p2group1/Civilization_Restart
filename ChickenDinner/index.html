@@ -5274,7 +5274,11 @@ var $author$project$Model$Me = function (x) {
 										return function (edge) {
 											return function (mouseData) {
 												return function (fire) {
-													return {edge: edge, fire: fire, mouseData: mouseData, moveDown: moveDown, moveLeft: moveLeft, moveRight: moveRight, moveUp: moveUp, r: r, rotate: rotate, x: x, xSpeed: xSpeed, y: y, ySpeed: ySpeed};
+													return function (name) {
+														return function (score) {
+															return {edge: edge, fire: fire, mouseData: mouseData, moveDown: moveDown, moveLeft: moveLeft, moveRight: moveRight, moveUp: moveUp, name: name, r: r, rotate: rotate, score: score, x: x, xSpeed: xSpeed, y: y, ySpeed: ySpeed};
+														};
+													};
 												};
 											};
 										};
@@ -5290,11 +5294,26 @@ var $author$project$Model$Me = function (x) {
 };
 var $author$project$Config$playerSpeed = 10;
 var $author$project$Config$myselfConfig = $author$project$Model$Me(0)(0)(10)($author$project$Config$playerSpeed)(0)(0)(false)(false)(false)(false)($author$project$Map$recInit)(
-	_Utils_Tuple2(500, 500))(false);
+	_Utils_Tuple2(500, 500))(false)('Me')(0);
+var $author$project$Model$Player = F7(
+	function (x, y, r, rotate, name, score, die) {
+		return {die: die, name: name, r: r, rotate: rotate, score: score, x: x, y: y};
+	});
+var $author$project$Config$playerConfig = A7($author$project$Model$Player, 0, 0, 10, 0, 'Player', 0, false);
+var $author$project$Config$pTest = _List_fromArray(
+	[
+		$author$project$Config$playerConfig,
+		_Utils_update(
+		$author$project$Config$playerConfig,
+		{die: true, name: 'T1', score: 100, x: 900, y: 300}),
+		_Utils_update(
+		$author$project$Config$playerConfig,
+		{name: 'T2', score: 50, x: 1900, y: 1000})
+	]);
 var $author$project$Config$init = A7(
 	$author$project$Model$Model,
 	$author$project$Map$mapWalls,
-	_List_Nil,
+	$author$project$Config$pTest,
 	$author$project$Config$myselfConfig,
 	A2($author$project$Config$initMapUpdate, $author$project$Config$myselfConfig, $author$project$Map$mapWalls),
 	_List_Nil,
@@ -6268,6 +6287,87 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$View$players = F2(
+	function (myself, others) {
+		var createOpponentsFormat = function (model) {
+			return (!model.die) ? A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$fill('red'),
+						$elm$svg$Svg$Attributes$cx(
+						$elm$core$String$fromFloat((model.x - myself.x) + 500)),
+						$elm$svg$Svg$Attributes$cy(
+						$elm$core$String$fromFloat((model.y - myself.y) + 500)),
+						$elm$svg$Svg$Attributes$r(
+						$elm$core$String$fromFloat(model.r))
+					]),
+				_List_Nil) : A2(
+				$elm$svg$Svg$rect,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(((model.x - myself.x) + 500) - model.r)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromFloat(((model.y - myself.y) + 500) - model.r)),
+						$elm$svg$Svg$Attributes$width(
+						$elm$core$String$fromFloat(model.r * 2)),
+						$elm$svg$Svg$Attributes$height(
+						$elm$core$String$fromFloat(model.r * 2)),
+						$elm$svg$Svg$Attributes$fill('grey')
+					]),
+				_List_Nil);
+		};
+		return A2($elm$core$List$map, createOpponentsFormat, others);
+	});
+var $elm$core$List$sortWith = _List_sortWith;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$View$scoreboard = F2(
+	function (myself, allPlayers) {
+		var ltemp = _Utils_ap(
+			A2(
+				$elm$core$List$map,
+				function (value) {
+					return {name: value.name, score: value.score};
+				},
+				allPlayers),
+			_List_fromArray(
+				[
+					{name: myself.name, score: myself.score}
+				]));
+		var flippedComparison = F2(
+			function (a, b) {
+				var _v0 = A2($elm$core$Basics$compare, a.score, b.score);
+				switch (_v0.$) {
+					case 'LT':
+						return $elm$core$Basics$GT;
+					case 'EQ':
+						return $elm$core$Basics$EQ;
+					default:
+						return $elm$core$Basics$LT;
+				}
+			});
+		var scoretemp = A2($elm$core$List$sortWith, flippedComparison, ltemp);
+		var scoreRank = A2(
+			$elm$core$List$map,
+			function (value) {
+				return A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							value.name + ('  ' + $elm$core$String$fromFloat(value.score)))
+						]));
+			},
+			scoretemp);
+		return A2($elm$html$Html$div, _List_Nil, scoreRank);
+	});
 var $author$project$View$showBullets = function (bullets) {
 	var createBulletFormat = function (model) {
 		return A2(
@@ -6303,14 +6403,8 @@ var $author$project$View$mapMe = function (myself) {
 	};
 	return createBallFormat(myself);
 };
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$View$walls = function (obstacle) {
 	var createBricksFormat = function (model) {
 		return A2(
@@ -6335,10 +6429,7 @@ var $author$project$View$showmap = function (model) {
 	var viewbox = model.walls;
 	return A2(
 		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'float', 'right')
-			]),
+		_List_Nil,
 		_List_fromArray(
 			[
 				A2(
@@ -6358,13 +6449,19 @@ var $author$project$View$showmap = function (model) {
 						])))
 			]));
 };
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $author$project$View$playerDemonstrate = function (model) {
 	var getMap = model.map ? $author$project$View$showmap(model) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
 	var gWidth = '1000';
 	var gHeight = '1000';
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'width', '100%'),
+				A2($elm$html$Html$Attributes$style, 'height', '100%')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -6400,19 +6497,29 @@ var $author$project$View$playerDemonstrate = function (model) {
 								$elm$svg$Svg$Attributes$height('1000'),
 								$elm$svg$Svg$Attributes$viewBox('0 0 ' + (gWidth + (' ' + gHeight)))
 							]),
-						A2(
-							$elm$core$List$append,
+						_Utils_ap(
 							$author$project$View$showBullets(model.bulletViewbox),
-							A2(
-								$elm$core$List$append,
+							_Utils_ap(
 								$author$project$View$walls(model.viewbox),
-								_List_fromArray(
-									[
-										$author$project$View$gun(model.myself),
-										$author$project$View$me(model.myself)
-									]))))
+								_Utils_ap(
+									A2($author$project$View$players, model.myself, model.other),
+									_List_fromArray(
+										[
+											$author$project$View$gun(model.myself),
+											$author$project$View$me(model.myself)
+										])))))
 					])),
-				getMap
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'float', 'right')
+					]),
+				_List_fromArray(
+					[
+						A2($author$project$View$scoreboard, model.myself, model.other),
+						getMap
+					]))
 			]));
 };
 var $author$project$View$view = function (model) {

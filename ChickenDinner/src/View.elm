@@ -1,5 +1,5 @@
 module View exposing (view, walls)
-import Model exposing (Model,Rectangle,Me,Bullet)
+import Model exposing (Model,Rectangle,Me,Bullet,Player)
 -- import Update exposing (..)
 import Messages exposing (Msg(..))
 -- import Json.Encode
@@ -36,10 +36,10 @@ playerDemonstrate model =
         -- meTemp = model.myself
     in
         -- Html.div[Html.Attributes.style "margin" "auto 0"][
-        Html.div[][Html.div [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Html.Attributes.style "width" "1000",Html.Attributes.style "height" "1000",Html.Attributes.style "float" "left"]
+        Html.div[Html.Attributes.style "width" "100%", Html.Attributes.style "height" "100%"][Html.div [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Html.Attributes.style "width" "1000",Html.Attributes.style "height" "1000",Html.Attributes.style "float" "left"]
             [ Svg.svg [Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              (List.append (showBullets model.bulletViewbox) (List.append  (walls model.viewbox) [gun model.myself,me model.myself]))
-            ],getMap]
+              ( showBullets model.bulletViewbox ++  walls model.viewbox ++ players model.myself model.other++ [gun model.myself,me model.myself])
+            ],Html.div[Html.Attributes.style "float" "right"][scoreboard model.myself model.other,getMap]]
         -- ]
 
 showmap : Model -> Html.Html Msg
@@ -50,7 +50,7 @@ showmap model =
         -- bulletViewbox = List.map model.bulletViewbox
         viewbox =  model.walls
     in
-    Html.div[Html.Attributes.style "float" "right"][Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500",Svg.Attributes.viewBox <| "-500 -500 4000 4000"]
+    Html.div[][Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500",Svg.Attributes.viewBox <| "-500 -500 4000 4000"]
               (List.append  (walls viewbox) [mapMe model.myself])]
 
 mapMe : Me -> Svg.Svg Msg
@@ -61,6 +61,21 @@ mapMe  myself=
     in
         createBallFormat myself
 
+
+scoreboard : Me -> List Player -> Html.Html Msg
+scoreboard myself allPlayers =
+    let
+        ltemp =  List.map (\value -> {name=value.name,score=value.score}) allPlayers ++ [{name=myself.name,score=myself.score}]
+        scoretemp = List.sortWith flippedComparison ltemp
+        flippedComparison a b =
+            case compare a.score b.score of
+            LT -> GT
+            EQ -> EQ
+            GT -> LT
+
+        scoreRank = List.map (\value -> Html.div[][Html.text (value.name ++ "  " ++String.fromFloat value.score)]) scoretemp
+    in
+        Html.div[]scoreRank
 
 
 
@@ -83,14 +98,24 @@ walls obstacle =
 
 
 
--- players : List Player -> List ( Svg.Svg Msg) 
--- players others =
---     let 
---         createOpponentsFormat model =
---         --"#002c5a"
---           Svg.circle [Svg.Attributes.fill "red", cx <| String.fromFloat model.x, cy <| String.fromFloat model.y, r <| String.fromFloat model.r][]
---     in
---         List.map createOpponentsFormat others
+players : Me -> List Player -> List ( Svg.Svg Msg) 
+players myself others =
+    let 
+    
+        createOpponentsFormat model =
+          if not model.die then         
+            Svg.circle [Svg.Attributes.fill "red", Svg.Attributes.cx <| String.fromFloat (model.x-myself.x+500), Svg.Attributes.cy <| String.fromFloat (model.y-myself.y+500), Svg.Attributes.r <| String.fromFloat model.r][]
+          else  
+            Svg.rect 
+                [ Svg.Attributes.x <| String.fromFloat (model.x-myself.x+500-model.r)
+                , Svg.Attributes.y <| String.fromFloat (model.y-myself.y+500-model.r)
+                , Svg.Attributes.width <| String.fromFloat (model.r*2)
+                , Svg.Attributes.height <| String.fromFloat (model.r*2)
+                , Svg.Attributes.fill "grey"
+                ][]
+                -- [Svg.Attributes.fill "red", Svg.Attributes.cx <| String.fromFloat (model.x-myself.x+500), Svg.Attributes.cy <| String.fromFloat (model.y-myself.y+500), Svg.Attributes.r <| String.fromFloat model.r][]  
+    in
+        List.map createOpponentsFormat others
 
 me : Me -> Svg.Svg Msg
 me  myself=
@@ -127,6 +152,6 @@ showBullets bullets =
     let 
         createBulletFormat model =
         --"#002c5a"
-          Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat (model.x), Svg.Attributes.cy <| String.fromFloat (model.y), Svg.Attributes.r <| String.fromFloat model.r][]
+          Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat  model.x, Svg.Attributes.cy <| String.fromFloat  model.y, Svg.Attributes.r <| String.fromFloat model.r][]
     in
         List.map createBulletFormat bullets
