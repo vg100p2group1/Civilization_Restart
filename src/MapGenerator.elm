@@ -1,7 +1,7 @@
 module MapGenerator exposing (roomGenerator,roomConfig)
 import Random
 import Model exposing (Room,Treasure)
-
+import ObstacleGenerator exposing (obstacleGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
 -- import Browser
@@ -76,11 +76,12 @@ firstRoomGenerator : Int -> Random.Seed ->  (Room,Int,Random.Seed)
 firstRoomGenerator number seed0=
     let
         (room0Direction,seed1) = Random.step (Random.int 0 1) seed0
+        (obstacleTemp,seed2) = obstacleGenerator seed1
     in
         if room0Direction == 0 then
-            ({roomConfig|position=(1,0),rank=number},number-1,seed1)
+            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp},number-1,seed2)
         else 
-            ({roomConfig|position=(0,1),rank=number},number-1,seed1)
+            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp},number-1,seed2)
 
 otherRoomGenerator : List Room -> List Room -> Int -> Random.Seed -> (List Room, Random.Seed)
 otherRoomGenerator roomList rooms number seed0 = 
@@ -113,12 +114,38 @@ otherRoomGenerator roomList rooms number seed0 =
 
         -- pick r rooms from available Room 
         (roomAdded,seed2) = roomPicking availableRoom (t-r) seed1
-        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number}
+
+        (obstacleTemp,seed3) = obstacleGenerator seed2
+
+        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp}
     in 
         if number == 0 then 
-            ((rooms++roomList),seed2)
+            ((rooms ++ (obstacleUpdate [] roomList (List.length roomList) seed3)),seed3)
         else
-            otherRoomGenerator (newRoomList ++ roomAdded) (rooms ++ [roomNowUpdated]) (number - r) seed2
+            otherRoomGenerator (newRoomList ++ roomAdded) (rooms ++ [roomNowUpdated]) (number - r) seed3
+
+obstacleUpdate : List Room -> List Room -> Int -> Random.Seed -> List Room 
+obstacleUpdate  roomUpdated roomList num seed0=
+    let
+        (obstacleTemp, seed1) = obstacleGenerator seed0
+        roomTemp = List.head roomList
+        roomListNew = List.drop 1 roomList
+        getRoom = 
+            case roomTemp of 
+                Just a ->
+                    a
+                Nothing ->
+                    roomConfig
+        roomNewTemp = getRoom
+        roomNew = {roomNewTemp| obstacles = obstacleTemp} 
+    in 
+        if num==0 then
+            roomUpdated
+        else 
+            obstacleUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed1
+        
+
+
 
 
 checkroom : Room -> List Room -> (List Room, Int)

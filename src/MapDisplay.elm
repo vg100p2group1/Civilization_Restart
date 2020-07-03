@@ -38,7 +38,19 @@ drawMonsters room =
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =
-    []
+    let
+        (x,y) = room.position
+        newX = toFloat (2500*x)
+        newY = toFloat (2500*y)
+        obstacleList = room.obstacles
+        movingRectangle model =
+            let
+                newModel = {model|x=model.x+newX,y=model.y+newY}
+            in
+                recUpdate newModel
+    in
+        List.map movingRectangle <| List.map (\value -> value.position) obstacleList
+
 
 drawDoors : Room -> List Rectangle
 drawDoors room =

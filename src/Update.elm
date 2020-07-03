@@ -194,10 +194,10 @@ updateViewbox me model =
         mapTemp = model.viewbox
         newWalls = List.map (viewUpdate me) mapTemp.walls
         newRoads = List.map (viewUpdate me) mapTemp.roads
-        
         newDoors = List.map (viewUpdate me) mapTemp.doors
+        newObstacles = List.map (viewUpdate me) mapTemp.obstacles
     in
-        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors}
+        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles}
 fireBullet : Me -> List Bullet -> List Bullet-> (List Bullet, List Bullet)
 fireBullet me bullets viewBox=
     let

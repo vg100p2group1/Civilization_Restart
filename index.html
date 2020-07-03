@@ -5288,6 +5288,156 @@ var $elm$random$Random$int = F2(
 				}
 			});
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Model$Obstacle = function (position) {
+	return {position: position};
+};
+var $author$project$Model$Rectangle = F5(
+	function (x, y, width, height, edge) {
+		return {edge: edge, height: height, width: width, x: x, y: y};
+	});
+var $author$project$Model$Rec = F4(
+	function (cx, cy, halfWidth, halfHeight) {
+		return {cx: cx, cy: cy, halfHeight: halfHeight, halfWidth: halfWidth};
+	});
+var $author$project$Map$recInit = A4($author$project$Model$Rec, 0, 0, 0, 0);
+var $author$project$ObstacleGenerator$obstacleConfig = $author$project$Model$Obstacle(
+	A5($author$project$Model$Rectangle, 0, 0, 0, 0, $author$project$Map$recInit));
+var $author$project$Model$recUpdate = function (model) {
+	var halfy = model.height / 2;
+	var newy = model.y + halfy;
+	var halfx = model.width / 2;
+	var newx = model.x + halfx;
+	var newRec = A4($author$project$Model$Rec, newx, newy, halfx, halfy);
+	return _Utils_update(
+		model,
+		{edge: newRec});
+};
+var $author$project$ObstacleGenerator$roomA = function () {
+	var roomTemp = _List_Nil;
+	return A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_update(
+				value,
+				{
+					position: $author$project$Model$recUpdate(value.position)
+				});
+		},
+		roomTemp);
+}();
+var $author$project$ObstacleGenerator$roomB = function () {
+	var a1 = A5($author$project$Model$Rectangle, 600, 600, 800, 800, $author$project$Map$recInit);
+	var roomTemp = _List_fromArray(
+		[
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a1})
+		]);
+	return A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_update(
+				value,
+				{
+					position: $author$project$Model$recUpdate(value.position)
+				});
+		},
+		roomTemp);
+}();
+var $author$project$ObstacleGenerator$roomC = function () {
+	var a3 = A5($author$project$Model$Rectangle, 950, 400, 100, 1200, $author$project$Map$recInit);
+	var a2 = A5($author$project$Model$Rectangle, 1400, 400, 100, 1200, $author$project$Map$recInit);
+	var a1 = A5($author$project$Model$Rectangle, 500, 400, 100, 1200, $author$project$Map$recInit);
+	var roomTemp = _List_fromArray(
+		[
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a1}),
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a2}),
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a3})
+		]);
+	return A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_update(
+				value,
+				{
+					position: $author$project$Model$recUpdate(value.position)
+				});
+		},
+		roomTemp);
+}();
+var $author$project$ObstacleGenerator$roomD = function () {
+	var a4 = A5($author$project$Model$Rectangle, 1200, 1400, 400, 200, $author$project$Map$recInit);
+	var a3 = A5($author$project$Model$Rectangle, 400, 1400, 400, 200, $author$project$Map$recInit);
+	var a2 = A5($author$project$Model$Rectangle, 1200, 400, 400, 200, $author$project$Map$recInit);
+	var a1 = A5($author$project$Model$Rectangle, 400, 400, 400, 200, $author$project$Map$recInit);
+	var roomTemp = _List_fromArray(
+		[
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a1}),
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a2}),
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a3}),
+			_Utils_update(
+			$author$project$ObstacleGenerator$obstacleConfig,
+			{position: a4})
+		]);
+	return A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_update(
+				value,
+				{
+					position: $author$project$Model$recUpdate(value.position)
+				});
+		},
+		roomTemp);
+}();
+var $author$project$ObstacleGenerator$roomList = _List_fromArray(
+	[$author$project$ObstacleGenerator$roomA, $author$project$ObstacleGenerator$roomB, $author$project$ObstacleGenerator$roomC, $author$project$ObstacleGenerator$roomD]);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $author$project$ObstacleGenerator$obstacleGenerator = function (seed0) {
+	var _v0 = A2(
+		$elm$random$Random$step,
+		A2($elm$random$Random$int, 0, 3),
+		seed0);
+	var roomnum = _v0.a;
+	var seed1 = _v0.b;
+	var roomTemp = $elm$core$List$head(
+		A2($elm$core$List$drop, roomnum, $author$project$ObstacleGenerator$roomList));
+	var getRoom = function () {
+		if (roomTemp.$ === 'Just') {
+			var a = roomTemp.a;
+			return a;
+		} else {
+			return _List_fromArray(
+				[$author$project$ObstacleGenerator$obstacleConfig]);
+		}
+	}();
+	return _Utils_Tuple2(getRoom, seed1);
+};
 var $author$project$Model$Room = F8(
 	function (position, gate, boss, obstacles, monsters, treasure, road, rank) {
 		return {boss: boss, gate: gate, monsters: monsters, obstacles: obstacles, position: position, rank: rank, road: road, treasure: treasure};
@@ -5307,11 +5457,6 @@ var $author$project$MapGenerator$roomConfig = A8(
 	$author$project$MapGenerator$treasureConfig,
 	_List_Nil,
 	0);
-var $elm$random$Random$step = F2(
-	function (_v0, seed) {
-		var generator = _v0.a;
-		return generator(seed);
-	});
 var $author$project$MapGenerator$firstRoomGenerator = F2(
 	function (number, seed0) {
 		var _v0 = A2(
@@ -5320,33 +5465,29 @@ var $author$project$MapGenerator$firstRoomGenerator = F2(
 			seed0);
 		var room0Direction = _v0.a;
 		var seed1 = _v0.b;
+		var _v1 = $author$project$ObstacleGenerator$obstacleGenerator(seed1);
+		var obstacleTemp = _v1.a;
+		var seed2 = _v1.b;
 		return (!room0Direction) ? _Utils_Tuple3(
 			_Utils_update(
 				$author$project$MapGenerator$roomConfig,
 				{
+					obstacles: obstacleTemp,
 					position: _Utils_Tuple2(1, 0),
 					rank: number
 				}),
 			number - 1,
-			seed1) : _Utils_Tuple3(
+			seed2) : _Utils_Tuple3(
 			_Utils_update(
 				$author$project$MapGenerator$roomConfig,
 				{
+					obstacles: obstacleTemp,
 					position: _Utils_Tuple2(0, 1),
 					rank: number
 				}),
 			number - 1,
-			seed1);
+			seed2);
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -5450,6 +5591,45 @@ var $elm$core$List$isEmpty = function (xs) {
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$MapGenerator$obstacleUpdate = F4(
+	function (roomUpdated, roomList, num, seed0) {
+		obstacleUpdate:
+		while (true) {
+			var roomTemp = $elm$core$List$head(roomList);
+			var roomListNew = A2($elm$core$List$drop, 1, roomList);
+			var getRoom = function () {
+				if (roomTemp.$ === 'Just') {
+					var a = roomTemp.a;
+					return a;
+				} else {
+					return $author$project$MapGenerator$roomConfig;
+				}
+			}();
+			var roomNewTemp = getRoom;
+			var _v0 = $author$project$ObstacleGenerator$obstacleGenerator(seed0);
+			var obstacleTemp = _v0.a;
+			var seed1 = _v0.b;
+			var roomNew = _Utils_update(
+				roomNewTemp,
+				{obstacles: obstacleTemp});
+			if (!num) {
+				return roomUpdated;
+			} else {
+				var $temp$roomUpdated = _Utils_ap(
+					roomUpdated,
+					_List_fromArray(
+						[roomNew])),
+					$temp$roomList = roomListNew,
+					$temp$num = num - 1,
+					$temp$seed0 = seed1;
+				roomUpdated = $temp$roomUpdated;
+				roomList = $temp$roomList;
+				num = $temp$num;
+				seed0 = $temp$seed0;
+				continue obstacleUpdate;
+			}
+		}
 	});
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
@@ -5629,9 +5809,13 @@ var $author$project$MapGenerator$otherRoomGenerator = F4(
 			var _v2 = A3($author$project$MapGenerator$roomPicking, availableRoom, t - r, seed1);
 			var roomAdded = _v2.a;
 			var seed2 = _v2.b;
+			var _v3 = $author$project$ObstacleGenerator$obstacleGenerator(seed2);
+			var obstacleTemp = _v3.a;
+			var seed3 = _v3.b;
 			var roomNowUpdated = _Utils_update(
 				roomNow,
 				{
+					obstacles: obstacleTemp,
 					rank: number,
 					road: A2(
 						$elm$core$List$map,
@@ -5642,8 +5826,15 @@ var $author$project$MapGenerator$otherRoomGenerator = F4(
 				});
 			if (!number) {
 				return _Utils_Tuple2(
-					_Utils_ap(rooms, roomList),
-					seed2);
+					_Utils_ap(
+						rooms,
+						A4(
+							$author$project$MapGenerator$obstacleUpdate,
+							_List_Nil,
+							roomList,
+							$elm$core$List$length(roomList),
+							seed3)),
+					seed3);
 			} else {
 				var $temp$roomList = _Utils_ap(newRoomList, roomAdded),
 					$temp$rooms = _Utils_ap(
@@ -5651,7 +5842,7 @@ var $author$project$MapGenerator$otherRoomGenerator = F4(
 					_List_fromArray(
 						[roomNowUpdated])),
 					$temp$number = number - r,
-					$temp$seed0 = seed2;
+					$temp$seed0 = seed3;
 				roomList = $temp$roomList;
 				rooms = $temp$rooms;
 				number = $temp$number;
@@ -5758,25 +5949,6 @@ var $author$project$Config$roomInit = A2(
 	$author$project$MapGenerator$roomGenerator,
 	1,
 	$elm$random$Random$initialSeed(0));
-var $author$project$Model$Rectangle = F5(
-	function (x, y, width, height, edge) {
-		return {edge: edge, height: height, width: width, x: x, y: y};
-	});
-var $author$project$Model$Rec = F4(
-	function (cx, cy, halfWidth, halfHeight) {
-		return {cx: cx, cy: cy, halfHeight: halfHeight, halfWidth: halfWidth};
-	});
-var $author$project$Map$recInit = A4($author$project$Model$Rec, 0, 0, 0, 0);
-var $author$project$Model$recUpdate = function (model) {
-	var halfy = model.height / 2;
-	var newy = model.y + halfy;
-	var halfx = model.width / 2;
-	var newx = model.x + halfx;
-	var newRec = A4($author$project$Model$Rec, newx, newy, halfx, halfy);
-	return _Utils_update(
-		model,
-		{edge: newRec});
-};
 var $author$project$MapDisplay$drawDoors = function (room) {
 	var roadList1 = room.road;
 	var _v0 = room.position;
@@ -5830,7 +6002,27 @@ var $author$project$MapDisplay$drawMonsters = function (room) {
 	return _List_Nil;
 };
 var $author$project$MapDisplay$drawObstacle = function (room) {
-	return _List_Nil;
+	var obstacleList = room.obstacles;
+	var _v0 = room.position;
+	var x = _v0.a;
+	var y = _v0.b;
+	var newX = 2500 * x;
+	var newY = 2500 * y;
+	var movingRectangle = function (model) {
+		var newModel = _Utils_update(
+			model,
+			{x: model.x + newX, y: model.y + newY});
+		return $author$project$Model$recUpdate(newModel);
+	};
+	return A2(
+		$elm$core$List$map,
+		movingRectangle,
+		A2(
+			$elm$core$List$map,
+			function (value) {
+				return value.position;
+			},
+			obstacleList));
 };
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -6701,6 +6893,10 @@ var $author$project$Update$updateViewbox = F2(
 			$elm$core$List$map,
 			$author$project$Update$viewUpdate(me),
 			mapTemp.doors);
+		var newObstacles = A2(
+			$elm$core$List$map,
+			$author$project$Update$viewUpdate(me),
+			mapTemp.obstacles);
 		var newRoads = A2(
 			$elm$core$List$map,
 			$author$project$Update$viewUpdate(me),
@@ -6711,7 +6907,7 @@ var $author$project$Update$updateViewbox = F2(
 			mapTemp.walls);
 		return _Utils_update(
 			mapTemp,
-			{doors: newDoors, roads: newRoads, walls: newWalls});
+			{doors: newDoors, obstacles: newObstacles, roads: newRoads, walls: newWalls});
 	});
 var $author$project$Update$animate = function (model) {
 	var newBulletViewbox = $author$project$Update$updateBullet(model.bulletViewbox);
@@ -7067,7 +7263,7 @@ var $author$project$View$displayDoors = function (obstacle) {
 					$elm$core$String$fromFloat(model.width)),
 					$elm$svg$Svg$Attributes$height(
 					$elm$core$String$fromFloat(model.height)),
-					$elm$svg$Svg$Attributes$fill('red')
+					$elm$svg$Svg$Attributes$fill('grey')
 				]),
 			_List_Nil);
 	};
@@ -7096,10 +7292,13 @@ var $author$project$View$displayRec = function (obstacle) {
 var $author$project$View$showMap = function (model) {
 	var walls = $author$project$View$displayRec(model.walls);
 	var roads = $author$project$View$displayRec(model.roads);
+	var obstacles = $author$project$View$displayRec(model.obstacles);
 	var doors = $author$project$View$displayDoors(model.doors);
 	return _Utils_ap(
 		walls,
-		_Utils_ap(roads, doors));
+		_Utils_ap(
+			roads,
+			_Utils_ap(doors, obstacles)));
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;

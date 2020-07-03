@@ -59,8 +59,9 @@ showMap model =
        roads = displayRec model.roads
 
        doors = displayDoors model.doors
+       obstacles = displayRec model.obstacles
     in
-       walls ++ roads ++ doors
+       walls ++ roads ++ doors ++ obstacles
 
 -- mapMe : Me -> Svg.Svg Msg
 -- mapMe  myself=
@@ -117,7 +118,7 @@ displayDoors obstacle =
                 , Svg.Attributes.y <| String.fromFloat model.y
                 , Svg.Attributes.width <| String.fromFloat model.width
                 , Svg.Attributes.height <| String.fromFloat model.height
-                , Svg.Attributes.fill "red"
+                , Svg.Attributes.fill "grey"
                 ]
            []
     in

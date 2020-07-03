@@ -1,4 +1,4 @@
-module Model exposing (Rectangle,Rec,Player,Me,Model,Bullet,recCollisionTest,recUpdate,Room,Treasure,Map)
+module Model exposing (Rectangle,Rec,Player,Me,Model,Bullet,recCollisionTest,recUpdate,Room,Treasure,Map,Obstacle)
 import Random
 
 -- type alias MouseMoveData =
@@ -42,15 +42,18 @@ type alias Bullet =
     , collision : Bool
     }
 
-type alias Obstacle = 
-    {} 
-
 type alias Monster =
     {}
 
 type alias Treasure =
     { position : (Int,Int)
     }
+
+type alias Obstacle =
+    { position : Rectangle
+    -- , type : Int
+    }
+
 
 type alias Room =
     { position : (Int,Int)
