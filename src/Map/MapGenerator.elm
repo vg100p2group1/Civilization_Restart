@@ -15,7 +15,11 @@ roomGenerator storey seed0 =
     let
         (room1,seed1) = roomPositionGenerator storey seed0
         --  room2 = roomUpdate room1
+<<<<<<< HEAD
         -- d = Debug.log "d" (roomUpdate room1)
+=======
+        -- d = Debug.log "room" (List.map (\value->value.position) room1)
+>>>>>>> Zihao_Wei
     in
         (roomUpdate room1,seed1)
 
@@ -126,6 +130,10 @@ otherRoomGenerator roomList rooms number seed0 =
 leavesUpdate : List Room -> List Room -> Int -> Random.Seed -> List Room 
 leavesUpdate  roomUpdated roomList num seed0=
     let
+<<<<<<< HEAD
+=======
+        -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
+>>>>>>> Zihao_Wei
         (obstacleTemp, seed1) = obstacleGenerator seed0
         (monsterTemp, seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
         roomTemp = List.head roomList
@@ -141,9 +149,24 @@ leavesUpdate  roomUpdated roomList num seed0=
     in 
         if num==0 then
             roomUpdated
+<<<<<<< HEAD
         else 
             leavesUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed2
         
+=======
+        else
+            if checkOverlap roomNew roomListNew then 
+                leavesUpdate (roomUpdated) roomListNew (num-1) seed2
+            else 
+                leavesUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed2
+        
+checkOverlap : Room -> List Room -> Bool
+checkOverlap room roomList =
+    let
+        roomPosList = List.map (\value -> value.position) roomList
+    in
+        List.member room.position roomPosList
+>>>>>>> Zihao_Wei
 
 
 
