@@ -1,14 +1,10 @@
 module View exposing (view)
-import Model exposing (Model,Rectangle,Me,Bullet)
--- import Update exposing (..)
+import Model exposing (Model,Me)
+import Map.Map exposing (Map,Monster)
+import Weapon exposing (Bullet)
+import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
--- import Json.Encode
-
--- import Config exposing (decoder)
-
--- import Css exposing (..)
 import Html
--- import Html.Styled 
 import Html.Attributes 
 
 import Html.Events.Extra.Mouse as Mouse
@@ -25,20 +21,30 @@ view model =
 playerDemonstrate : Model -> Html.Html Msg
 playerDemonstrate model =
     let
-        gWidth = "1000"
-        gHeight = "1000"
-        -- meTemp = model.myself
+        gWidth = "5000"
+        gHeight = "5000"
     in
-        -- Html.div[Html.Attributes.style "margin" "auto 0"][
-        Html.div [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Html.Attributes.style "width" "1000",Html.Attributes.style "height" "1000"]
-            [ Svg.svg [Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              (List.append (showBullets model.bulletViewbox) (List.append  (walls model.viewbox) [gun model.myself,me model.myself]))
-            ]
-        -- ]
+        Html.div[][Html.div [Html.Attributes.style "width" "50%",Html.Attributes.style "height" "50%",Html.Attributes.style "float" "left"]
+            [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
+              ( showBullets model.bulletViewbox ++  showMap model.viewbox++ [gun model.myself,me model.myself])]]
 
 
-walls : List Rectangle -> List (Svg.Svg Msg)
-walls obstacle =
+showMap : Map -> List (Svg.Svg Msg)
+
+showMap model =
+    let
+       walls = displayRec model.walls
+       roads = displayRec model.roads
+
+       doors = displayDoors model.doors
+       obstacles = displayRec model.obstacles
+       monsters = displayMonster model.monsters
+    in
+       walls ++ roads ++ doors ++ obstacles ++ monsters
+
+
+displayRec : List Rectangle -> List (Svg.Svg Msg)
+displayRec obstacle =
     let
         
         -- d=Debug.log "wall" obstacle
@@ -55,15 +61,43 @@ walls obstacle =
         List.map createBricksFormat obstacle
 
 
+displayDoors : List Rectangle -> List (Svg.Svg Msg)
+displayDoors obstacle =
+    let
+        
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat model =
+           Svg.rect 
+                [ Svg.Attributes.x <| String.fromFloat model.x
+                , Svg.Attributes.y <| String.fromFloat model.y
+                , Svg.Attributes.width <| String.fromFloat model.width
+                , Svg.Attributes.height <| String.fromFloat model.height
+                , Svg.Attributes.fill "grey"
+                ]
+           []
+    in
+        List.map createBricksFormat obstacle
 
--- players : List Player -> List ( Svg.Svg Msg) 
--- players others =
---     let 
---         createOpponentsFormat model =
---         --"#002c5a"
---           Svg.circle [Svg.Attributes.fill "red", cx <| String.fromFloat model.x, cy <| String.fromFloat model.y, r <| String.fromFloat model.r][]
---     in
---         List.map createOpponentsFormat others
+displayMonster : List Monster -> List (Svg.Svg Msg)
+displayMonster monsters =
+    let
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat monsterTemp =
+            let
+                model = monsterTemp.position
+                monsterType = monsterTemp.monsterType
+            in
+                Svg.rect 
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill monsterType.color
+                    ]
+                []
+    in
+        List.map createBricksFormat monsters
+
 
 me : Me -> Svg.Svg Msg
 me  myself=
@@ -79,8 +113,6 @@ gun myself =
         pos = myself.mouseData
         px = Tuple.first pos
         py = Tuple.second pos
-        -- d1 =Debug.log "px" px
-        -- d2 = Debug.log "p2" py
         route=Svg.Attributes.d(
                                       " M 500 500" ++
                                       " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
@@ -90,7 +122,6 @@ gun myself =
                 "red"
             else
                 "blue"                              
-        -- transformAnimation = Svg.Styled.animateTransform[ Svg.Styled.Attributes.attributeName "transform", Svg.Styled.Attributes.begin "0s", Svg.Styled.Attributes.dur "3s", type_ "scale", from "1", to "1.2", repeatCount "indefinite"][]
     in
         Svg.path [ route ,  Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
 
@@ -100,6 +131,6 @@ showBullets bullets =
     let 
         createBulletFormat model =
         --"#002c5a"
-          Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat (model.x), Svg.Attributes.cy <| String.fromFloat (model.y), Svg.Attributes.r <| String.fromFloat model.r][]
+          Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat  model.x, Svg.Attributes.cy <| String.fromFloat  model.y, Svg.Attributes.r <| String.fromFloat model.r][]
     in
         List.map createBulletFormat bullets
