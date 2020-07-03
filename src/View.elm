@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me)
-import Map.Map exposing (Map,Monster,MonsterType)
+import Map.Map exposing (Map,Monster)
 import Weapon exposing (Bullet)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))

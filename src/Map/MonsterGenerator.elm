@@ -14,9 +14,9 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 100 100 "Yellow"
-        m2=MonsterType 100 100 "Red"
-        m3=MonsterType 100 100 "Blue"
+        m1=MonsterType 150 150 "Yellow"
+        m2=MonsterType 150 150 "Red"
+        m3=MonsterType 150 150 "Blue"
     in 
         [m1,m2,m3]
 
@@ -48,8 +48,8 @@ checkMonsterCollison monster obstacles monsterList=
 monsterBuilding : List Monster -> Int -> List Obstacle -> Random.Seed -> (List Monster,Random.Seed)
 monsterBuilding monsterList number obstacles seed0 =
     let
-        (xTemp,seed1) = Random.step (Random.int 250 1750) seed0
-        (yTemp,seed2) = Random.step (Random.int 250 1750) seed1
+        (xTemp,seed1) = Random.step (Random.int 300 1700) seed0
+        (yTemp,seed2) = Random.step (Random.int 300 1700) seed1
         (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
         getMonsterType = 
             let
@@ -62,7 +62,7 @@ monsterBuilding monsterList number obstacles seed0 =
                         MonsterType 0 0 ""
         monsterTypeTemp = getMonsterType
 
-        monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 25 25 recInit
+        monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 50 50 recInit
         monsterNew = Monster (recUpdate monsterPos) monsterTypeTemp
 
     in 

@@ -10,7 +10,7 @@ import Map.MapDisplay exposing (showMap)
 -- import Json.Decode exposing (Decoder,map4,at,int,float)
 
 playerSpeed : Float
-playerSpeed = 500
+playerSpeed = 30
 
 bulletSpeed : Float
 bulletSpeed = 20
