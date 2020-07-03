@@ -9,5 +9,6 @@ type Msg
     | MouseMove (Float,Float)
     | MouseDown
     | MouseUp
-    | Map
+    -- | Map
+    | NextFloor
     | Noop

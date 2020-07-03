@@ -4369,6 +4369,43 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
@@ -5158,36 +5195,578 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Model$Model = F7(
-	function (walls, other, myself, viewbox, bullet, bulletViewbox, map) {
-		return {bullet: bullet, bulletViewbox: bulletViewbox, map: map, myself: myself, other: other, viewbox: viewbox, walls: walls};
+var $author$project$Model$Model = F6(
+	function (myself, bullet, bulletViewbox, map, rooms, viewbox) {
+		return {bullet: bullet, bulletViewbox: bulletViewbox, map: map, myself: myself, rooms: rooms, viewbox: viewbox};
 	});
-var $author$project$Config$viewBoxMax = 1000;
-var $author$project$Config$initMapUpdate = F2(
-	function (me, model) {
+var $author$project$Model$Map = F5(
+	function (walls, roads, obstacles, monsters, doors) {
+		return {doors: doors, monsters: monsters, obstacles: obstacles, roads: roads, walls: walls};
+	});
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $author$project$Model$Room = F8(
+	function (position, gate, boss, obstacles, monsters, treasure, road, rank) {
+		return {boss: boss, gate: gate, monsters: monsters, obstacles: obstacles, position: position, rank: rank, road: road, treasure: treasure};
+	});
+var $author$project$Model$Treasure = function (position) {
+	return {position: position};
+};
+var $author$project$MapGenerator$treasureConfig = $author$project$Model$Treasure(
+	_Utils_Tuple2(0, 0));
+var $author$project$MapGenerator$roomConfig = A8(
+	$author$project$Model$Room,
+	_Utils_Tuple2(0, 0),
+	false,
+	false,
+	_List_Nil,
+	_List_Nil,
+	$author$project$MapGenerator$treasureConfig,
+	_List_Nil,
+	0);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $author$project$MapGenerator$firstRoomGenerator = F2(
+	function (number, seed0) {
+		var _v0 = A2(
+			$elm$random$Random$step,
+			A2($elm$random$Random$int, 0, 1),
+			seed0);
+		var room0Direction = _v0.a;
+		var seed1 = _v0.b;
+		return (!room0Direction) ? _Utils_Tuple3(
+			_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					position: _Utils_Tuple2(1, 0),
+					rank: number
+				}),
+			number - 1,
+			seed1) : _Utils_Tuple3(
+			_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					position: _Utils_Tuple2(0, 1),
+					rank: number
+				}),
+			number - 1,
+			seed1);
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
 		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$MapGenerator$checkroom = F2(
+	function (position, rooms) {
+		var _v0 = _Utils_Tuple2(position.position.a, position.position.b);
+		var x = _v0.a;
+		var y = _v0.b;
+		var initRoomList = _List_fromArray(
+			[
+				_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					position: _Utils_Tuple2(x + 1, y)
+				}),
+				_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					position: _Utils_Tuple2(x, y + 1)
+				}),
+				_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					position: _Utils_Tuple2(x - 1, y)
+				}),
+				_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					position: _Utils_Tuple2(x, y - 1)
+				})
+			]);
+		var availableRoom = A2(
+			$elm$core$List$filter,
+			function (value) {
+				return !A2(
+					$elm$core$List$member,
+					value.position,
+					A2(
+						$elm$core$List$map,
+						function (roomTemp) {
+							return roomTemp.position;
+						},
+						rooms));
+			},
+			initRoomList);
+		return _Utils_Tuple2(
+			availableRoom,
+			$elm$core$List$length(availableRoom));
+	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $author$project$MapGenerator$roomPicking = F3(
+	function (availableRoom, r, seed0) {
+		roomPicking:
+		while (true) {
+			var randomFunction = A2(
+				$elm$random$Random$int,
+				0,
+				$elm$core$List$length(availableRoom) - 1);
+			var _v0 = A2($elm$random$Random$step, randomFunction, seed0);
+			var num = _v0.a;
+			var seed1 = _v0.b;
+			var newList1 = A2($elm$core$List$take, num, availableRoom);
+			var newList2 = A2($elm$core$List$drop, num + 1, availableRoom);
+			if (!r) {
+				return _Utils_Tuple2(availableRoom, seed1);
+			} else {
+				var $temp$availableRoom = _Utils_ap(newList1, newList2),
+					$temp$r = r - 1,
+					$temp$seed0 = seed1;
+				availableRoom = $temp$availableRoom;
+				r = $temp$r;
+				seed0 = $temp$seed0;
+				continue roomPicking;
+			}
+		}
+	});
+var $author$project$MapGenerator$otherRoomGenerator = F4(
+	function (roomList, rooms, number, seed0) {
+		otherRoomGenerator:
+		while (true) {
+			var roomNowTemp = $elm$core$List$head(roomList);
+			var newRoomList = A2($elm$core$List$drop, 1, roomList);
+			var getRoom = function () {
+				if (roomNowTemp.$ === 'Just') {
+					var a = roomNowTemp.a;
+					return a;
+				} else {
+					return $author$project$MapGenerator$roomConfig;
+				}
+			}();
+			var roomNow = getRoom;
+			var _v0 = A2($author$project$MapGenerator$checkroom, roomNow, rooms);
+			var availableRoom = _v0.a;
+			var t = _v0.b;
+			var getRandomFunction = $elm$core$List$isEmpty(newRoomList) ? A2($elm$random$Random$int, 1, t) : A2($elm$random$Random$int, 0, t);
+			var _v1 = A2($elm$random$Random$step, getRandomFunction, seed0);
+			var rTemp = _v1.a;
+			var seed1 = _v1.b;
+			var r = A2($elm$core$Basics$min, rTemp, number);
+			var _v2 = A3($author$project$MapGenerator$roomPicking, availableRoom, t - r, seed1);
+			var roomAdded = _v2.a;
+			var seed2 = _v2.b;
+			var roomNowUpdated = _Utils_update(
+				roomNow,
+				{
+					rank: number,
+					road: A2(
+						$elm$core$List$map,
+						function (value) {
+							return value.position;
+						},
+						roomAdded)
+				});
+			if (!number) {
+				return _Utils_Tuple2(
+					_Utils_ap(rooms, roomList),
+					seed2);
+			} else {
+				var $temp$roomList = _Utils_ap(newRoomList, roomAdded),
+					$temp$rooms = _Utils_ap(
+					rooms,
+					_List_fromArray(
+						[roomNowUpdated])),
+					$temp$number = number - r,
+					$temp$seed0 = seed2;
+				roomList = $temp$roomList;
+				rooms = $temp$rooms;
+				number = $temp$number;
+				seed0 = $temp$seed0;
+				continue otherRoomGenerator;
+			}
+		}
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $author$project$MapGenerator$roomPositionGenerator = F2(
+	function (storey, seed0) {
+		var _v0 = A2(
+			$elm$random$Random$step,
+			A2($elm$random$Random$int, 5, 10),
+			seed0);
+		var roomNumber = _v0.a;
+		var seed1 = _v0.b;
+		var _v1 = A2($author$project$MapGenerator$firstRoomGenerator, roomNumber, seed1);
+		var room1 = _v1.a;
+		var newNumber = _v1.b;
+		var seed2 = _v1.c;
+		var room = _List_fromArray(
+			[
+				_Utils_update(
+				$author$project$MapGenerator$roomConfig,
+				{
+					rank: roomNumber + 1,
+					road: _List_fromArray(
+						[room1.position])
+				})
+			]);
+		var _v2 = A4(
+			$author$project$MapGenerator$otherRoomGenerator,
+			_List_fromArray(
+				[room1]),
+			room,
+			newNumber,
+			seed2);
+		var room2 = _v2.a;
+		var seed3 = _v2.b;
+		var room3 = A2(
+			$elm$core$List$sortBy,
+			function ($) {
+				return $.rank;
+			},
+			room2);
+		var gateRoom = $elm$core$List$head(room3);
+		var getGateRoom = function () {
+			if (gateRoom.$ === 'Just') {
+				var a = gateRoom.a;
+				return a;
+			} else {
+				return $author$project$MapGenerator$roomConfig;
+			}
+		}();
+		var gateRoomTemp = getGateRoom;
+		var whetherBoss = (!A2($elm$core$Basics$modBy, 5, storey)) ? _List_fromArray(
+			[
+				_Utils_update(
+				gateRoomTemp,
+				{boss: true, gate: true})
+			]) : _List_fromArray(
+			[
+				_Utils_update(
+				gateRoomTemp,
+				{gate: true})
+			]);
+		var room4 = _Utils_ap(
+			whetherBoss,
+			A2($elm$core$List$drop, 1, room3));
+		return _Utils_Tuple2(room4, seed3);
+	});
+var $author$project$MapGenerator$roomUpdate = function (room) {
+	var findRoom = function (model) {
+		var appendList = A2(
 			$elm$core$List$map,
 			function (value) {
-				return _Utils_update(
-					value,
-					{x: (me.x + ($author$project$Config$viewBoxMax / 2)) + value.x, y: (me.y + ($author$project$Config$viewBoxMax / 2)) + value.y});
+				return value.position;
 			},
-			model);
+			A2(
+				$elm$core$List$filter,
+				function (value) {
+					return A2($elm$core$List$member, model.position, value.road);
+				},
+				room));
+		return _Utils_update(
+			model,
+			{
+				road: _Utils_ap(model.road, appendList)
+			});
+	};
+	return A2($elm$core$List$map, findRoom, room);
+};
+var $author$project$MapGenerator$roomGenerator = F2(
+	function (storey, seed0) {
+		var _v0 = A2($author$project$MapGenerator$roomPositionGenerator, storey, seed0);
+		var room1 = _v0.a;
+		var seed1 = _v0.b;
+		return _Utils_Tuple2(
+			$author$project$MapGenerator$roomUpdate(room1),
+			seed1);
 	});
+var $author$project$Config$roomInit = A2(
+	$author$project$MapGenerator$roomGenerator,
+	1,
+	$elm$random$Random$initialSeed(0));
 var $author$project$Model$Rectangle = F5(
 	function (x, y, width, height, edge) {
 		return {edge: edge, height: height, width: width, x: x, y: y};
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $author$project$Model$Rec = F4(
 	function (cx, cy, halfWidth, halfHeight) {
 		return {cx: cx, cy: cy, halfHeight: halfHeight, halfWidth: halfWidth};
 	});
 var $author$project$Map$recInit = A4($author$project$Model$Rec, 0, 0, 0, 0);
-var $author$project$Map$bottom = A5($author$project$Model$Rectangle, -500, 3000, 4000, 500, $author$project$Map$recInit);
-var $author$project$Map$left = A5($author$project$Model$Rectangle, -500, -500, 500, 4000, $author$project$Map$recInit);
 var $author$project$Model$recUpdate = function (model) {
 	var halfy = model.height / 2;
 	var newy = model.y + halfy;
@@ -5198,69 +5777,251 @@ var $author$project$Model$recUpdate = function (model) {
 		model,
 		{edge: newRec});
 };
-var $author$project$Map$right = A5($author$project$Model$Rectangle, 3000, -500, 500, 4000, $author$project$Map$recInit);
-var $author$project$Map$top = A5($author$project$Model$Rectangle, -500, -500, 4000, 500, $author$project$Map$recInit);
-var $author$project$Map$wall1 = A5($author$project$Model$Rectangle, 200, 200, 300, 50, $author$project$Map$recInit);
-var $author$project$Map$wall10 = A5($author$project$Model$Rectangle, 1000, 200, 900, 50, $author$project$Map$recInit);
-var $author$project$Map$wall11 = A5($author$project$Model$Rectangle, 1600, 200, 50, 250, $author$project$Map$recInit);
-var $author$project$Map$wall12 = A5($author$project$Model$Rectangle, 1500, 450, 150, 50, $author$project$Map$recInit);
-var $author$project$Map$wall13 = A5($author$project$Model$Rectangle, 1000, 450, 50, 300, $author$project$Map$recInit);
-var $author$project$Map$wall14 = A5($author$project$Model$Rectangle, 450, 450, 50, 400, $author$project$Map$recInit);
-var $author$project$Map$wall15 = A5($author$project$Model$Rectangle, 700, 700, 50, 700, $author$project$Map$recInit);
-var $author$project$Map$wall16 = A5($author$project$Model$Rectangle, 700, 700, 300, 50, $author$project$Map$recInit);
-var $author$project$Map$wall17 = A5($author$project$Model$Rectangle, 2350, 200, 300, 50, $author$project$Map$recInit);
-var $author$project$Map$wall18 = A5($author$project$Model$Rectangle, 2600, 200, 50, 550, $author$project$Map$recInit);
-var $author$project$Map$wall19 = A5($author$project$Model$Rectangle, 2050, 450, 600, 50, $author$project$Map$recInit);
-var $author$project$Map$wall2 = A5($author$project$Model$Rectangle, 200, 200, 50, 650, $author$project$Map$recInit);
-var $author$project$Map$wall20 = A5($author$project$Model$Rectangle, 1800, 450, 50, 650, $author$project$Map$recInit);
-var $author$project$Map$wall21 = A5($author$project$Model$Rectangle, 1800, 700, 650, 50, $author$project$Map$recInit);
-var $author$project$Map$wall22 = A5($author$project$Model$Rectangle, 2600, 700, 300, 50, $author$project$Map$recInit);
-var $author$project$Map$wall23 = A5($author$project$Model$Rectangle, 1250, 700, 400, 50, $author$project$Map$recInit);
-var $author$project$Map$wall24 = A5($author$project$Model$Rectangle, 1600, 700, 50, 400, $author$project$Map$recInit);
-var $author$project$Map$wall25 = A5($author$project$Model$Rectangle, 2850, 700, 50, 500, $author$project$Map$recInit);
-var $author$project$Map$wall26 = A5($author$project$Model$Rectangle, 2600, 1050, 50, 300, $author$project$Map$recInit);
-var $author$project$Map$wall27 = A5($author$project$Model$Rectangle, 2050, 1050, 600, 50, $author$project$Map$recInit);
-var $author$project$Map$wall28 = A5($author$project$Model$Rectangle, 2050, 1050, 50, 300, $author$project$Map$recInit);
-var $author$project$Map$wall29 = A5($author$project$Model$Rectangle, 1500, 1300, 550, 50, $author$project$Map$recInit);
-var $author$project$Map$wall3 = A5($author$project$Model$Rectangle, 200, 1050, 300, 50, $author$project$Map$recInit);
-var $author$project$Map$wall30 = A5($author$project$Model$Rectangle, 1500, 1300, 50, 550, $author$project$Map$recInit);
-var $author$project$Map$wall31 = A5($author$project$Model$Rectangle, 1250, 700, 50, 1150, $author$project$Map$recInit);
-var $author$project$Map$wall32 = A5($author$project$Model$Rectangle, 700, 1350, 350, 50, $author$project$Map$recInit);
-var $author$project$Map$wall33 = A5($author$project$Model$Rectangle, 450, 1600, 800, 50, $author$project$Map$recInit);
-var $author$project$Map$wall34 = A5($author$project$Model$Rectangle, 200, 2150, 900, 50, $author$project$Map$recInit);
-var $author$project$Map$wall35 = A5($author$project$Model$Rectangle, 1300, 2150, 700, 50, $author$project$Map$recInit);
-var $author$project$Map$wall36 = A5($author$project$Model$Rectangle, 1800, 1600, 1000, 50, $author$project$Map$recInit);
-var $author$project$Map$wall37 = A5($author$project$Model$Rectangle, 2400, 1300, 50, 1100, $author$project$Map$recInit);
-var $author$project$Map$wall38 = A5($author$project$Model$Rectangle, 500, 2650, 700, 50, $author$project$Map$recInit);
-var $author$project$Map$wall39 = A5($author$project$Model$Rectangle, 1750, 2650, 1150, 50, $author$project$Map$recInit);
-var $author$project$Map$wall4 = A5($author$project$Model$Rectangle, 200, 1350, 50, 1350, $author$project$Map$recInit);
-var $author$project$Map$wall40 = A5($author$project$Model$Rectangle, 2700, 2050, 50, 600, $author$project$Map$recInit);
-var $author$project$Map$wall41 = A5($author$project$Model$Rectangle, 500, 2450, 50, 350, $author$project$Map$recInit);
-var $author$project$Map$wall42 = A5($author$project$Model$Rectangle, 2000, 1850, 50, 650, $author$project$Map$recInit);
-var $author$project$Map$wall43 = A5($author$project$Model$Rectangle, 1500, 2150, 50, 600, $author$project$Map$recInit);
-var $author$project$Map$wall44 = A5($author$project$Model$Rectangle, 1000, 2450, 500, 50, $author$project$Map$recInit);
-var $author$project$Map$wall45 = A5($author$project$Model$Rectangle, 800, 2350, 50, 350, $author$project$Map$recInit);
-var $author$project$Map$wall5 = A5($author$project$Model$Rectangle, 200, 1350, 300, 50, $author$project$Map$recInit);
-var $author$project$Map$wall6 = A5($author$project$Model$Rectangle, 200, 1800, 550, 50, $author$project$Map$recInit);
-var $author$project$Map$wall7 = A5($author$project$Model$Rectangle, 700, 200, 50, 250, $author$project$Map$recInit);
-var $author$project$Map$wall8 = A5($author$project$Model$Rectangle, 450, 450, 900, 50, $author$project$Map$recInit);
-var $author$project$Map$wall9 = A5($author$project$Model$Rectangle, 450, 450, 50, 300, $author$project$Map$recInit);
-var $author$project$Map$mapWalls = function () {
-	var wallList3 = _List_fromArray(
-		[$author$project$Map$wall31, $author$project$Map$wall32, $author$project$Map$wall33, $author$project$Map$wall34, $author$project$Map$wall35, $author$project$Map$wall36, $author$project$Map$wall37, $author$project$Map$wall38, $author$project$Map$wall39, $author$project$Map$wall40, $author$project$Map$wall41, $author$project$Map$wall42, $author$project$Map$wall43, $author$project$Map$wall44, $author$project$Map$wall45]);
-	var wallList2 = _List_fromArray(
-		[$author$project$Map$wall16, $author$project$Map$wall17, $author$project$Map$wall18, $author$project$Map$wall19, $author$project$Map$wall20, $author$project$Map$wall21, $author$project$Map$wall22, $author$project$Map$wall23, $author$project$Map$wall24, $author$project$Map$wall25, $author$project$Map$wall26, $author$project$Map$wall27, $author$project$Map$wall28, $author$project$Map$wall29, $author$project$Map$wall30]);
-	var wallList1 = _List_fromArray(
-		[$author$project$Map$wall1, $author$project$Map$wall2, $author$project$Map$wall3, $author$project$Map$wall4, $author$project$Map$wall5, $author$project$Map$wall6, $author$project$Map$wall7, $author$project$Map$wall8, $author$project$Map$wall9, $author$project$Map$wall10, $author$project$Map$wall11, $author$project$Map$wall12, $author$project$Map$wall13, $author$project$Map$wall14, $author$project$Map$wall15]);
-	var fourWalls = _List_fromArray(
-		[$author$project$Map$left, $author$project$Map$right, $author$project$Map$top, $author$project$Map$bottom]);
-	var entireWalls = _Utils_ap(
-		fourWalls,
-		_Utils_ap(
-			wallList1,
-			_Utils_ap(wallList2, wallList3)));
-	return A2($elm$core$List$map, $author$project$Model$recUpdate, entireWalls);
-}();
+var $author$project$MapDisplay$drawDoors = function (room) {
+	var roadList1 = room.road;
+	var _v0 = room.position;
+	var x = _v0.a;
+	var y = _v0.b;
+	var newX = 2500 * x;
+	var newY = 2500 * y;
+	var recPosition = function (model) {
+		_v1$4:
+		while (true) {
+			switch (model.a) {
+				case 2:
+					if (model.b === 1) {
+						return A5($author$project$Model$Rectangle, newX + 1800, newY + 900, 100, 200, $author$project$Map$recInit);
+					} else {
+						break _v1$4;
+					}
+				case 0:
+					if (model.b === 1) {
+						return A5($author$project$Model$Rectangle, newX + 100, newY + 900, 100, 200, $author$project$Map$recInit);
+					} else {
+						break _v1$4;
+					}
+				case 1:
+					switch (model.b) {
+						case 2:
+							return A5($author$project$Model$Rectangle, newX + 900, newY + 1800, 200, 100, $author$project$Map$recInit);
+						case 0:
+							return A5($author$project$Model$Rectangle, newX + 900, newY + 100, 200, 100, $author$project$Map$recInit);
+						default:
+							break _v1$4;
+					}
+				default:
+					break _v1$4;
+			}
+		}
+		return A5($author$project$Model$Rectangle, 0, 0, 0, 0, $author$project$Map$recInit);
+	};
+	var roadList2 = A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_Tuple2((value.a - x) + 1, (value.b - y) + 1);
+		},
+		roadList1);
+	return A2(
+		$elm$core$List$map,
+		$author$project$Model$recUpdate,
+		A2($elm$core$List$map, recPosition, roadList2));
+};
+var $author$project$MapDisplay$drawMonsters = function (room) {
+	return _List_Nil;
+};
+var $author$project$MapDisplay$drawObstacle = function (room) {
+	return _List_Nil;
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $author$project$MapDisplay$drawRoads = function (room) {
+	var roadList1 = room.road;
+	var _v0 = room.position;
+	var x = _v0.a;
+	var y = _v0.b;
+	var newX = 2500 * x;
+	var newY = 2500 * y;
+	var recPosition = function (model) {
+		_v1$4:
+		while (true) {
+			switch (model.a) {
+				case 2:
+					if (model.b === 1) {
+						return _List_fromArray(
+							[
+								A5($author$project$Model$Rectangle, newX + 2000, newY + 800, 500, 100, $author$project$Map$recInit),
+								A5($author$project$Model$Rectangle, newX + 2000, newY + 1100, 500, 100, $author$project$Map$recInit)
+							]);
+					} else {
+						break _v1$4;
+					}
+				case 0:
+					if (model.b === 1) {
+						return _List_fromArray(
+							[
+								A5($author$project$Model$Rectangle, newX - 500, newY + 800, 500, 100, $author$project$Map$recInit),
+								A5($author$project$Model$Rectangle, newX - 500, newY + 1100, 500, 100, $author$project$Map$recInit)
+							]);
+					} else {
+						break _v1$4;
+					}
+				case 1:
+					switch (model.b) {
+						case 2:
+							return _List_fromArray(
+								[
+									A5($author$project$Model$Rectangle, newX + 800, newY + 2000, 100, 500, $author$project$Map$recInit),
+									A5($author$project$Model$Rectangle, newX + 1100, newY + 2000, 100, 500, $author$project$Map$recInit)
+								]);
+						case 0:
+							return _List_fromArray(
+								[
+									A5($author$project$Model$Rectangle, newX + 800, newY - 500, 100, 500, $author$project$Map$recInit),
+									A5($author$project$Model$Rectangle, newX + 1100, newY - 500, 100, 500, $author$project$Map$recInit)
+								]);
+						default:
+							break _v1$4;
+					}
+				default:
+					break _v1$4;
+			}
+		}
+		return _List_fromArray(
+			[
+				A5($author$project$Model$Rectangle, 0, 0, 0, 0, $author$project$Map$recInit)
+			]);
+	};
+	var roadList2 = A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_Tuple2((value.a - x) + 1, (value.b - y) + 1);
+		},
+		roadList1);
+	return A2(
+		$elm$core$List$map,
+		$author$project$Model$recUpdate,
+		$elm$core$List$concat(
+			A2($elm$core$List$map, recPosition, roadList2)));
+};
+var $author$project$MapDisplay$drawWalls = function (room) {
+	var roadList1 = room.road;
+	var _v0 = room.position;
+	var x = _v0.a;
+	var y = _v0.b;
+	var newX = (2000 * x) + (500 * x);
+	var newY = (2000 * y) + (500 * y);
+	var roadList2 = A2(
+		$elm$core$List$map,
+		function (value) {
+			return _Utils_Tuple2((value.a - x) + 1, (value.b - y) + 1);
+		},
+		roadList1);
+	var newRec1 = A2(
+		$elm$core$List$member,
+		_Utils_Tuple2(0, 1),
+		roadList2) ? _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX, newY, 200, 900, $author$project$Map$recInit),
+			A5($author$project$Model$Rectangle, newX, newY + 1100, 200, 900, $author$project$Map$recInit)
+		]) : _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX, newY, 200, 2000, $author$project$Map$recInit)
+		]);
+	var newRec2 = A2(
+		$elm$core$List$member,
+		_Utils_Tuple2(1, 0),
+		roadList2) ? _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX, newY, 900, 200, $author$project$Map$recInit),
+			A5($author$project$Model$Rectangle, newX + 1100, newY, 900, 200, $author$project$Map$recInit)
+		]) : _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX, newY, 2000, 200, $author$project$Map$recInit)
+		]);
+	var newRec3 = A2(
+		$elm$core$List$member,
+		_Utils_Tuple2(2, 1),
+		roadList2) ? _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX + 1800, newY, 200, 900, $author$project$Map$recInit),
+			A5($author$project$Model$Rectangle, newX + 1800, newY + 1100, 200, 900, $author$project$Map$recInit)
+		]) : _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX + 1800, newY, 200, 2000, $author$project$Map$recInit)
+		]);
+	var newRec4 = A2(
+		$elm$core$List$member,
+		_Utils_Tuple2(1, 2),
+		roadList2) ? _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX, newY + 1800, 900, 200, $author$project$Map$recInit),
+			A5($author$project$Model$Rectangle, newX + 1100, newY + 1800, 900, 200, $author$project$Map$recInit)
+		]) : _List_fromArray(
+		[
+			A5($author$project$Model$Rectangle, newX, newY + 1800, 2000, 200, $author$project$Map$recInit)
+		]);
+	return A2(
+		$elm$core$List$map,
+		$author$project$Model$recUpdate,
+		$elm$core$List$concat(
+			_List_fromArray(
+				[newRec1, newRec2, newRec3, newRec4])));
+};
+var $author$project$MapDisplay$showMap = F3(
+	function (rooms, number, drawnrooms) {
+		showMap:
+		while (true) {
+			var roomNowTemp = $elm$core$List$head(rooms);
+			var newRooms = A2($elm$core$List$drop, 1, rooms);
+			var getRoomNow = function () {
+				if (roomNowTemp.$ === 'Just') {
+					var a = roomNowTemp.a;
+					return a;
+				} else {
+					return $author$project$MapGenerator$roomConfig;
+				}
+			}();
+			var roomNow = getRoomNow;
+			var monstersNew = $author$project$MapDisplay$drawMonsters(roomNow);
+			var obstaclesNew = $author$project$MapDisplay$drawObstacle(roomNow);
+			var roadsNew = $author$project$MapDisplay$drawRoads(roomNow);
+			var wallsNew = $author$project$MapDisplay$drawWalls(roomNow);
+			var doorsNew = $author$project$MapDisplay$drawDoors(roomNow);
+			if (!number) {
+				return drawnrooms;
+			} else {
+				var $temp$rooms = newRooms,
+					$temp$number = number - 1,
+					$temp$drawnrooms = _Utils_update(
+					drawnrooms,
+					{
+						doors: _Utils_ap(drawnrooms.doors, doorsNew),
+						monsters: _Utils_ap(drawnrooms.monsters, monstersNew),
+						obstacles: _Utils_ap(drawnrooms.obstacles, obstaclesNew),
+						roads: _Utils_ap(drawnrooms.roads, roadsNew),
+						walls: _Utils_ap(drawnrooms.walls, wallsNew)
+					});
+				rooms = $temp$rooms;
+				number = $temp$number;
+				drawnrooms = $temp$drawnrooms;
+				continue showMap;
+			}
+		}
+	});
+var $author$project$Config$mapInit = A3(
+	$author$project$MapDisplay$showMap,
+	$author$project$Config$roomInit.a,
+	$elm$core$List$length($author$project$Config$roomInit.a),
+	A5($author$project$Model$Map, _List_Nil, _List_Nil, _List_Nil, _List_Nil, _List_Nil));
 var $author$project$Model$Me = function (x) {
 	return function (y) {
 		return function (r) {
@@ -5292,40 +6053,16 @@ var $author$project$Model$Me = function (x) {
 		};
 	};
 };
-var $author$project$Config$playerSpeed = 10;
-var $author$project$Config$myselfConfig = $author$project$Model$Me(0)(0)(10)($author$project$Config$playerSpeed)(0)(0)(false)(false)(false)(false)($author$project$Map$recInit)(
+var $author$project$Config$playerSpeed = 500;
+var $author$project$Config$myselfConfig = $author$project$Model$Me(0)(0)(50)($author$project$Config$playerSpeed)(0)(0)(false)(false)(false)(false)($author$project$Map$recInit)(
 	_Utils_Tuple2(500, 500))(false)('Me')(0);
-var $author$project$Model$Player = F7(
-	function (x, y, r, rotate, name, score, die) {
-		return {die: die, name: name, r: r, rotate: rotate, score: score, x: x, y: y};
-	});
-var $author$project$Config$playerConfig = A7($author$project$Model$Player, 0, 0, 10, 0, 'Player', 0, false);
-var $author$project$Config$pTest = _List_fromArray(
-	[
-		$author$project$Config$playerConfig,
-		_Utils_update(
-		$author$project$Config$playerConfig,
-		{die: true, name: 'T1', score: 100, x: 900, y: 300}),
-		_Utils_update(
-		$author$project$Config$playerConfig,
-		{name: 'T2', score: 50, x: 1900, y: 1000})
-	]);
-var $author$project$Config$init = A7(
-	$author$project$Model$Model,
-	$author$project$Map$mapWalls,
-	$author$project$Config$pTest,
-	$author$project$Config$myselfConfig,
-	A2($author$project$Config$initMapUpdate, $author$project$Config$myselfConfig, $author$project$Map$mapWalls),
-	_List_Nil,
-	_List_Nil,
-	false);
+var $author$project$Config$init = A6($author$project$Model$Model, $author$project$Config$myselfConfig, _List_Nil, _List_Nil, $author$project$Config$mapInit, $author$project$Config$roomInit, $author$project$Config$mapInit);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Messages$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $author$project$Messages$Map = {$: 'Map'};
 var $author$project$Messages$MoveDown = function (a) {
 	return {$: 'MoveDown', a: a};
 };
@@ -5338,6 +6075,7 @@ var $author$project$Messages$MoveRight = function (a) {
 var $author$project$Messages$MoveUp = function (a) {
 	return {$: 'MoveUp', a: a};
 };
+var $author$project$Messages$NextFloor = {$: 'NextFloor'};
 var $author$project$Messages$Noop = {$: 'Noop'};
 var $author$project$Main$key = F2(
 	function (on, keycode) {
@@ -5351,7 +6089,7 @@ var $author$project$Main$key = F2(
 			case 83:
 				return $author$project$Messages$MoveDown(on);
 			case 77:
-				return $author$project$Messages$Map;
+				return $author$project$Messages$NextFloor;
 			default:
 				return $author$project$Messages$Noop;
 		}
@@ -5910,6 +6648,7 @@ var $author$project$Main$subscriptions = function (model) {
 					$elm$html$Html$Events$keyCode))
 			]));
 };
+var $author$project$Config$viewBoxMax = 1000;
 var $author$project$Update$speedCase = function (me) {
 	var getNewYSpeed = me.moveUp ? _Utils_Tuple2(true, -$author$project$Config$playerSpeed) : (me.moveDown ? _Utils_Tuple2(true, $author$project$Config$playerSpeed) : _Utils_Tuple2(false, 0));
 	var getNewXSpeed = me.moveLeft ? _Utils_Tuple2(true, -$author$project$Config$playerSpeed) : (me.moveRight ? _Utils_Tuple2(true, $author$project$Config$playerSpeed) : _Utils_Tuple2(false, 0));
@@ -5957,10 +6696,22 @@ var $author$project$Update$viewUpdate = F2(
 	});
 var $author$project$Update$updateViewbox = F2(
 	function (me, model) {
-		return A2(
+		var mapTemp = model.viewbox;
+		var newDoors = A2(
 			$elm$core$List$map,
 			$author$project$Update$viewUpdate(me),
-			model.viewbox);
+			mapTemp.doors);
+		var newRoads = A2(
+			$elm$core$List$map,
+			$author$project$Update$viewUpdate(me),
+			mapTemp.roads);
+		var newWalls = A2(
+			$elm$core$List$map,
+			$author$project$Update$viewUpdate(me),
+			mapTemp.walls);
+		return _Utils_update(
+			mapTemp,
+			{doors: newDoors, roads: newRoads, walls: newWalls});
 	});
 var $author$project$Update$animate = function (model) {
 	var newBulletViewbox = $author$project$Update$updateBullet(model.bulletViewbox);
@@ -5974,24 +6725,12 @@ var $author$project$Update$animate = function (model) {
 			{bullet: newBullet, bulletViewbox: newBulletViewbox, myself: newMe, viewbox: newViewbox}),
 		$elm$core$Platform$Cmd$none);
 };
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $author$project$Model$Bullet = F6(
 	function (x, y, r, speedX, speedY, collision) {
 		return {collision: collision, r: r, speedX: speedX, speedY: speedY, x: x, y: y};
 	});
 var $author$project$Config$bulletConfig = A6($author$project$Model$Bullet, 500, 500, 5, 0, 0, false);
 var $author$project$Config$bulletSpeed = 20;
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $elm$core$Basics$sqrt = _Basics_sqrt;
 var $author$project$Update$fireBullet = F3(
 	function (me, bullets, viewBox) {
@@ -6019,7 +6758,6 @@ var $author$project$Update$fireBullet = F3(
 						{x: 500, y: 500})
 					])));
 	});
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Update$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6067,12 +6805,6 @@ var $author$project$Update$update = F2(
 						model,
 						{myself: me}),
 					$elm$core$Platform$Cmd$none);
-			case 'Map':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{map: !model.map}),
-					$elm$core$Platform$Cmd$none);
 			case 'MouseMove':
 				var newMouseData = msg.a;
 				var pTemp = model.myself;
@@ -6106,6 +6838,18 @@ var $author$project$Update$update = F2(
 					_Utils_update(
 						model,
 						{myself: me}),
+					$elm$core$Platform$Cmd$none);
+			case 'NextFloor':
+				var roomNew = A2($author$project$MapGenerator$roomGenerator, 1, model.rooms.b);
+				var mapNew = A3(
+					$author$project$MapDisplay$showMap,
+					roomNew.a,
+					$elm$core$List$length(roomNew.a),
+					A5($author$project$Model$Map, _List_Nil, _List_Nil, _List_Nil, _List_Nil, _List_Nil));
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{map: mapNew, rooms: roomNew, viewbox: mapNew}),
 					$elm$core$Platform$Cmd$none);
 			case 'Tick':
 				var time = msg.a;
@@ -6287,87 +7031,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$View$players = F2(
-	function (myself, others) {
-		var createOpponentsFormat = function (model) {
-			return (!model.die) ? A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$fill('red'),
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat((model.x - myself.x) + 500)),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat((model.y - myself.y) + 500)),
-						$elm$svg$Svg$Attributes$r(
-						$elm$core$String$fromFloat(model.r))
-					]),
-				_List_Nil) : A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromFloat(((model.x - myself.x) + 500) - model.r)),
-						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromFloat(((model.y - myself.y) + 500) - model.r)),
-						$elm$svg$Svg$Attributes$width(
-						$elm$core$String$fromFloat(model.r * 2)),
-						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(model.r * 2)),
-						$elm$svg$Svg$Attributes$fill('grey')
-					]),
-				_List_Nil);
-		};
-		return A2($elm$core$List$map, createOpponentsFormat, others);
-	});
-var $elm$core$List$sortWith = _List_sortWith;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$View$scoreboard = F2(
-	function (myself, allPlayers) {
-		var ltemp = _Utils_ap(
-			A2(
-				$elm$core$List$map,
-				function (value) {
-					return {name: value.name, score: value.score};
-				},
-				allPlayers),
-			_List_fromArray(
-				[
-					{name: myself.name, score: myself.score}
-				]));
-		var flippedComparison = F2(
-			function (a, b) {
-				var _v0 = A2($elm$core$Basics$compare, a.score, b.score);
-				switch (_v0.$) {
-					case 'LT':
-						return $elm$core$Basics$GT;
-					case 'EQ':
-						return $elm$core$Basics$EQ;
-					default:
-						return $elm$core$Basics$LT;
-				}
-			});
-		var scoretemp = A2($elm$core$List$sortWith, flippedComparison, ltemp);
-		var scoreRank = A2(
-			$elm$core$List$map,
-			function (value) {
-				return A2(
-					$elm$html$Html$div,
-					_List_Nil,
-					_List_fromArray(
-						[
-							$elm$html$Html$text(
-							value.name + ('  ' + $elm$core$String$fromFloat(value.score)))
-						]));
-			},
-			scoretemp);
-		return A2($elm$html$Html$div, _List_Nil, scoreRank);
-	});
 var $author$project$View$showBullets = function (bullets) {
 	var createBulletFormat = function (model) {
 		return A2(
@@ -6386,26 +7049,31 @@ var $author$project$View$showBullets = function (bullets) {
 	};
 	return A2($elm$core$List$map, createBulletFormat, bullets);
 };
-var $author$project$View$mapMe = function (myself) {
-	var createBallFormat = function (model) {
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$View$displayDoors = function (obstacle) {
+	var createBricksFormat = function (model) {
 		return A2(
-			$elm$svg$Svg$circle,
+			$elm$svg$Svg$rect,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$fill('green'),
-					$elm$svg$Svg$Attributes$cx(
-					$elm$core$String$fromFloat(myself.x)),
-					$elm$svg$Svg$Attributes$cy(
-					$elm$core$String$fromFloat(myself.y)),
-					$elm$svg$Svg$Attributes$r('20')
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(model.x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(model.y)),
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromFloat(model.width)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromFloat(model.height)),
+					$elm$svg$Svg$Attributes$fill('red')
 				]),
 			_List_Nil);
 	};
-	return createBallFormat(myself);
+	return A2($elm$core$List$map, createBricksFormat, obstacle);
 };
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$View$walls = function (obstacle) {
+var $author$project$View$displayRec = function (obstacle) {
 	var createBricksFormat = function (model) {
 		return A2(
 			$elm$svg$Svg$rect,
@@ -6425,66 +7093,33 @@ var $author$project$View$walls = function (obstacle) {
 	};
 	return A2($elm$core$List$map, createBricksFormat, obstacle);
 };
-var $author$project$View$showmap = function (model) {
-	var viewbox = model.walls;
+var $author$project$View$showMap = function (model) {
+	var walls = $author$project$View$displayRec(model.walls);
+	var roads = $author$project$View$displayRec(model.roads);
+	var doors = $author$project$View$displayDoors(model.doors);
+	return _Utils_ap(
+		walls,
+		_Utils_ap(roads, doors));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $author$project$View$playerDemonstrate = function (model) {
+	var rooms = model.rooms.a;
+	var gWidth = '5000';
+	var gHeight = '5000';
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
 				A2(
-				$elm$svg$Svg$svg,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$width('500'),
-						$elm$svg$Svg$Attributes$height('500'),
-						$elm$svg$Svg$Attributes$viewBox('-500 -500 4000 4000')
-					]),
-				A2(
-					$elm$core$List$append,
-					$author$project$View$walls(viewbox),
-					_List_fromArray(
-						[
-							$author$project$View$mapMe(model.myself)
-						])))
-			]));
-};
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$View$playerDemonstrate = function (model) {
-	var getMap = model.map ? $author$project$View$showmap(model) : A2($elm$html$Html$div, _List_Nil, _List_Nil);
-	var gWidth = '1000';
-	var gHeight = '1000';
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'width', '100%'),
-				A2($elm$html$Html$Attributes$style, 'height', '100%')
-			]),
-		_List_fromArray(
-			[
-				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
-						A2(
-							$elm$core$Basics$composeR,
-							function ($) {
-								return $.clientPos;
-							},
-							$author$project$Messages$MouseMove)),
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
-						function (event) {
-							return $author$project$Messages$MouseDown;
-						}),
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp(
-						function (event) {
-							return $author$project$Messages$MouseUp;
-						}),
-						A2($elm$html$Html$Attributes$style, 'width', '1000'),
-						A2($elm$html$Html$Attributes$style, 'height', '1000'),
+						A2($elm$html$Html$Attributes$style, 'width', '50%'),
+						A2($elm$html$Html$Attributes$style, 'height', '50%'),
 						A2($elm$html$Html$Attributes$style, 'float', 'left')
 					]),
 				_List_fromArray(
@@ -6493,6 +7128,21 @@ var $author$project$View$playerDemonstrate = function (model) {
 						$elm$svg$Svg$svg,
 						_List_fromArray(
 							[
+								$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
+								A2(
+									$elm$core$Basics$composeR,
+									function ($) {
+										return $.clientPos;
+									},
+									$author$project$Messages$MouseMove)),
+								$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
+								function (event) {
+									return $author$project$Messages$MouseDown;
+								}),
+								$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp(
+								function (event) {
+									return $author$project$Messages$MouseUp;
+								}),
 								$elm$svg$Svg$Attributes$width('1000'),
 								$elm$svg$Svg$Attributes$height('1000'),
 								$elm$svg$Svg$Attributes$viewBox('0 0 ' + (gWidth + (' ' + gHeight)))
@@ -6500,25 +7150,12 @@ var $author$project$View$playerDemonstrate = function (model) {
 						_Utils_ap(
 							$author$project$View$showBullets(model.bulletViewbox),
 							_Utils_ap(
-								$author$project$View$walls(model.viewbox),
-								_Utils_ap(
-									A2($author$project$View$players, model.myself, model.other),
-									_List_fromArray(
-										[
-											$author$project$View$gun(model.myself),
-											$author$project$View$me(model.myself)
-										])))))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'float', 'right')
-					]),
-				_List_fromArray(
-					[
-						A2($author$project$View$scoreboard, model.myself, model.other),
-						getMap
+								$author$project$View$showMap(model.viewbox),
+								_List_fromArray(
+									[
+										$author$project$View$gun(model.myself),
+										$author$project$View$me(model.myself)
+									]))))
 					]))
 			]));
 };

@@ -48,6 +48,6 @@ key on keycode =
         83 ->
             MoveDown on
         77 ->
-            Map
+            NextFloor
         _ ->
             Noop

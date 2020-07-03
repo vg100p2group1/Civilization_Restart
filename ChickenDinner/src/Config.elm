@@ -1,9 +1,14 @@
 module Config exposing (init,viewBoxMax,playerConfig,playerSpeed,myselfConfig,initMapUpdate,bulletConfig,bulletSpeed)
-import Model exposing (Model,Player,Me,Rectangle,Bullet)
-import Map exposing (mapWalls,recInit)
+import Model exposing (Model,Player,Me,Rectangle,Bullet,Map,Room)
+import Map exposing (recInit)
+import Random
+import MapGenerator exposing (roomGenerator)
+import MapDisplay exposing (showMap)
+
 -- import Json.Decode exposing (Decoder,map4,at,int,float)
+
 playerSpeed : Float
-playerSpeed = 10
+playerSpeed = 500
 
 bulletSpeed : Float
 bulletSpeed = 20
@@ -15,20 +20,21 @@ viewBoxMax = 1000
 playerConfig : Player
 playerConfig = Player 0 0 10 0 "Player" 0 False
 
-pTest : List Player
-pTest = [playerConfig,{playerConfig|x=900,y=300,die=True,score=100,name="T1"},{playerConfig|x=1900,y=1000,score=50,name="T2"}]
-
-
--- mouseConfig : MouseMoveData
--- mouseConfig = MouseMoveData 0 0 0 0
 bulletConfig : Bullet
 bulletConfig = Bullet 500 500 5 0 0 False
 
 myselfConfig : Me
-myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,500) False "Me" 0
+myselfConfig = Me 0 0 50 playerSpeed 0 0 False False False False recInit (500,500) False "Me" 0
+
+roomInit : (List Room, Random.Seed)
+roomInit = 
+    roomGenerator 1 (Random.initialSeed 0)
+
+mapInit : Map
+mapInit = showMap (Tuple.first roomInit) (List.length (Tuple.first roomInit)) (Map [] [] [] [] [])
 
 init : Model
-init = Model  mapWalls pTest myselfConfig  (initMapUpdate myselfConfig mapWalls) [] [] False
+init = Model myselfConfig [] [] mapInit roomInit mapInit
 
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
 initMapUpdate me model =

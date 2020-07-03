@@ -1,5 +1,5 @@
-module Model exposing (Rectangle,Rec,Player,Me,Model,Bullet,recCollisionTest,recUpdate)
-
+module Model exposing (Rectangle,Rec,Player,Me,Model,Bullet,recCollisionTest,recUpdate,Room,Treasure,Map)
+import Random
 
 -- type alias MouseMoveData =
 --     { offsetX : Int
@@ -42,6 +42,36 @@ type alias Bullet =
     , collision : Bool
     }
 
+type alias Obstacle = 
+    {} 
+
+type alias Monster =
+    {}
+
+type alias Treasure =
+    { position : (Int,Int)
+    }
+
+type alias Room =
+    { position : (Int,Int)
+    , gate : Bool
+    , boss : Bool
+    , obstacles : List Obstacle
+    , monsters : List Monster
+    , treasure : Treasure
+    , road : List (Int,Int) -- 邻接表
+    , rank : Int -- rank 越低，怪难度越高？
+    }
+
+type alias Map =
+    { walls : List Rectangle
+    , roads : List Rectangle
+    , obstacles : List Rectangle
+    , monsters : List Rectangle
+    , doors : List Rectangle
+    }
+
+
 type alias Me =
     { x : Float
       , y : Float
@@ -61,13 +91,13 @@ type alias Me =
     }
 
 type alias Model =
-    { walls : List Rectangle
-    , other : List Player
-    , myself :  Me
-    , viewbox : List Rectangle
+    { 
+      myself :  Me    
     , bullet : List Bullet 
     , bulletViewbox : List Bullet
-    , map : Bool
+    , map : Map
+    , rooms : (List Room,Random.Seed)
+    , viewbox : Map
     }
 
 

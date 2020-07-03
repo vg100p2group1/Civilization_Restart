@@ -1,11 +1,14 @@
 module Update exposing (..)
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,Rec,Rectangle,recCollisionTest,recUpdate)
+import Model exposing (Model,Me,Rec,Rectangle,Map,recCollisionTest,recUpdate)
 import Config exposing (playerSpeed,viewBoxMax,bulletConfig,bulletSpeed)
 import Map exposing (recInit)
 import Debug
 import Model exposing (Bullet)
-import Svg.Attributes exposing (viewBox)
+-- import Svg.Attributes exposing (viewBox)
+-- import Html.Attributes exposing (value)
+import MapGenerator exposing (roomGenerator)
+import MapDisplay exposing (showMap)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -46,8 +49,8 @@ update msg model =
                 , Cmd.none
                 )
         
-        Map ->
-         ({model | map = not model.map},Cmd.none)
+        -- Map ->
+        --  ({model | map = not model.map},Cmd.none)
         
         MouseMove newMouseData ->
             let 
@@ -75,7 +78,14 @@ update msg model =
                 me= {pTemp | fire = False}
             in
                 ({model|myself = me},Cmd.none) 
+        NextFloor ->
+            let
+                roomNew = 
+                    roomGenerator 1 (Tuple.second model.rooms)
 
+                mapNew = showMap (Tuple.first roomNew) (List.length (Tuple.first roomNew)) (Map [] [] [] [] [])
+            in
+                ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
         Tick time ->
            animate model
@@ -159,7 +169,7 @@ viewUpdate me oneWall =
         recUpdate recTemp
 
 
-updateViewbox : Me -> Model -> List Rectangle
+updateViewbox : Me -> Model -> Map
 updateViewbox me model =
     -- let
     --     -- recs = model.walls
@@ -180,8 +190,14 @@ updateViewbox me model =
     --     d = Debug.log "mouse2" meTemp.mouseData 
     --     -- d=Debug.log "recs" model.viewbox
     -- in
-        List.map (viewUpdate me) model.viewbox
-
+    let
+        mapTemp = model.viewbox
+        newWalls = List.map (viewUpdate me) mapTemp.walls
+        newRoads = List.map (viewUpdate me) mapTemp.roads
+        
+        newDoors = List.map (viewUpdate me) mapTemp.doors
+    in
+        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors}
 fireBullet : Me -> List Bullet -> List Bullet-> (List Bullet, List Bullet)
 fireBullet me bullets viewBox=
     let
