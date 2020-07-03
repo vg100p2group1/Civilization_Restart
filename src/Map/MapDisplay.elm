@@ -1,11 +1,7 @@
-module MapDisplay exposing (..)
-import MapGenerator exposing (..)
-import Model exposing (..)
-import Map exposing (recInit)
-
-
-
-
+module Map.MapDisplay exposing (showMap)
+-- import MapGenerator exposing (..)
+import Map.Map exposing (Room,Map,roomConfig)
+import Shape exposing (recInit,Rectangle,recUpdate)
 
 showMap : List Room -> Int -> Map -> Map
 showMap rooms number drawnrooms=

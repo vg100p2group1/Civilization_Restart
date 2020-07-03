@@ -1,14 +1,15 @@
 module Update exposing (..)
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,Rec,Rectangle,Map,recCollisionTest,recUpdate)
-import Config exposing (playerSpeed,viewBoxMax,bulletConfig,bulletSpeed)
-import Map exposing (recInit)
+import Model exposing (Model,Me)
+import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
+import Map.Map exposing (Map)
+import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
+import Weapon exposing (bulletConfig,Bullet)
 import Debug
-import Model exposing (Bullet)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
-import MapGenerator exposing (roomGenerator)
-import MapDisplay exposing (showMap)
+import Map.MapGenerator exposing (roomGenerator)
+import Map.MapDisplay exposing (showMap)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -150,7 +151,7 @@ speedCase me =
         
         
     in
-        {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,edge=recTemp}
+        {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)}
 
 
 

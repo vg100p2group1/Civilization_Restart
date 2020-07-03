@@ -1,17 +1,13 @@
-module MapGenerator exposing (roomGenerator,roomConfig)
+module Map.MapGenerator exposing (roomGenerator)
 import Random
-import Model exposing (Room,Treasure)
-import ObstacleGenerator exposing (obstacleGenerator)
+import Map.Map exposing (Room,Treasure,roomConfig)
+import Map.ObstacleGenerator exposing (obstacleGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
 -- import Browser
 
 
-treasureConfig : Treasure
-treasureConfig = Treasure (0,0) 
 
-roomConfig : Room
-roomConfig = Room (0,0) False False [] [] treasureConfig [] 0
 
 roomGenerator : Int -> Random.Seed -> (List Room,Random.Seed)
 roomGenerator storey seed0 = 

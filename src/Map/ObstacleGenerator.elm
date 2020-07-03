@@ -1,9 +1,9 @@
-module ObstacleGenerator exposing (obstacleGenerator)
+module Map.ObstacleGenerator exposing (obstacleGenerator)
 import Random
-import Css exposing (visited)
-import Model exposing (Rectangle,Obstacle)
-import Map exposing (recInit)
-import Model exposing (recUpdate)
+-- import Css exposing (visited)
+import Map.Map exposing (Obstacle)
+import Shape exposing (recInit,recUpdate,Rectangle)
+-- import Model exposing (recUpdate)
 
 
 obstacleConfig : Obstacle
