@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me)
-import Map.Map exposing (Map)
+import Map.Map exposing (Map,Monster,MonsterType)
 import Weapon exposing (Bullet)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
@@ -38,8 +38,9 @@ showMap model =
 
        doors = displayDoors model.doors
        obstacles = displayRec model.obstacles
+       monsters = displayMonster model.monsters
     in
-       walls ++ roads ++ doors ++ obstacles
+       walls ++ roads ++ doors ++ obstacles ++ monsters
 
 
 displayRec : List Rectangle -> List (Svg.Svg Msg)
@@ -76,6 +77,27 @@ displayDoors obstacle =
            []
     in
         List.map createBricksFormat obstacle
+
+displayMonster : List Monster -> List (Svg.Svg Msg)
+displayMonster monsters =
+    let
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat monsterTemp =
+            let
+                model = monsterTemp.position
+                monsterType = monsterTemp.monsterType
+            in
+                Svg.rect 
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill monsterType.color
+                    ]
+                []
+    in
+        List.map createBricksFormat monsters
+
 
 me : Me -> Svg.Svg Msg
 me  myself=

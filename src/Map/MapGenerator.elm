@@ -2,6 +2,7 @@ module Map.MapGenerator exposing (roomGenerator)
 import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator)
+import Map.MonsterGenerator exposing (monsterGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
 -- import Browser
@@ -73,11 +74,12 @@ firstRoomGenerator number seed0=
     let
         (room0Direction,seed1) = Random.step (Random.int 0 1) seed0
         (obstacleTemp,seed2) = obstacleGenerator seed1
+        (monsterTemp,seed3) = monsterGenerator seed2 obstacleTemp
     in
         if room0Direction == 0 then
-            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp},number-1,seed2)
+            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number-1,seed3)
         else 
-            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp},number-1,seed2)
+            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number-1,seed3)
 
 otherRoomGenerator : List Room -> List Room -> Int -> Random.Seed -> (List Room, Random.Seed)
 otherRoomGenerator roomList rooms number seed0 = 
@@ -112,18 +114,20 @@ otherRoomGenerator roomList rooms number seed0 =
         (roomAdded,seed2) = roomPicking availableRoom (t-r) seed1
 
         (obstacleTemp,seed3) = obstacleGenerator seed2
+        (monsterTemp,seed4) = monsterGenerator seed3 obstacleTemp
 
-        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp}
+        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp,monsters=monsterTemp}
     in 
         if number == 0 then 
-            ((rooms ++ (obstacleUpdate [] roomList (List.length roomList) seed3)),seed3)
+            ((rooms ++ (leavesUpdate [] roomList (List.length roomList) seed3)),seed4)
         else
-            otherRoomGenerator (newRoomList ++ roomAdded) (rooms ++ [roomNowUpdated]) (number - r) seed3
+            otherRoomGenerator (newRoomList ++ roomAdded) (rooms ++ [roomNowUpdated]) (number - r) seed4
 
-obstacleUpdate : List Room -> List Room -> Int -> Random.Seed -> List Room 
-obstacleUpdate  roomUpdated roomList num seed0=
+leavesUpdate : List Room -> List Room -> Int -> Random.Seed -> List Room 
+leavesUpdate  roomUpdated roomList num seed0=
     let
         (obstacleTemp, seed1) = obstacleGenerator seed0
+        (monsterTemp, seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
         roomTemp = List.head roomList
         roomListNew = List.drop 1 roomList
         getRoom = 
@@ -133,12 +137,12 @@ obstacleUpdate  roomUpdated roomList num seed0=
                 Nothing ->
                     roomConfig
         roomNewTemp = getRoom
-        roomNew = {roomNewTemp| obstacles = obstacleTemp} 
+        roomNew = {roomNewTemp| obstacles = obstacleTemp,monsters=monsterTemp} 
     in 
         if num==0 then
             roomUpdated
         else 
-            obstacleUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed1
+            leavesUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed2
         
 
 

@@ -2,6 +2,7 @@ module Map.MapDisplay exposing (showMap)
 -- import MapGenerator exposing (..)
 import Map.Map exposing (Room,Map,roomConfig)
 import Shape exposing (recInit,Rectangle,recUpdate)
+import Map.Map exposing (Monster)
 
 showMap : List Room -> Int -> Map -> Map
 showMap rooms number drawnrooms=
@@ -28,9 +29,20 @@ showMap rooms number drawnrooms=
             showMap newRooms (number-1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew}
 
 
-drawMonsters : Room -> List Rectangle
+drawMonsters : Room -> List Monster
 drawMonsters room =
-    []
+    let
+        (x,y) = room.position
+        newX = toFloat (2500*x)
+        newY = toFloat (2500*y)
+        monsterList = room.monsters
+        movingRectangle model =
+            let
+                newModel = {model|x=model.x+newX,y=model.y+newY}
+            in
+                recUpdate newModel
+    in
+        List.map (\value->{value| position = movingRectangle value.position}) monsterList
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =

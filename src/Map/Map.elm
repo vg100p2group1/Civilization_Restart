@@ -1,8 +1,6 @@
-module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,treasureConfig,roomConfig)
+module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig)
 import Shape exposing (Rectangle)
 
-type alias Monster =
-    {}
 
 type alias Treasure =
     { position : (Int,Int)
@@ -11,6 +9,17 @@ type alias Treasure =
 type alias Obstacle =
     { position : Rectangle
     -- , type : Int
+    }
+
+type alias MonsterType =
+    {   hP : Float
+    ,   attack : Float
+    ,   color : String     
+    }
+type alias Monster =
+    {
+        position : Rectangle
+    ,   monsterType : MonsterType 
     }
 
 
@@ -29,7 +38,7 @@ type alias Map =
     { walls : List Rectangle
     , roads : List Rectangle
     , obstacles : List Rectangle
-    , monsters : List Rectangle
+    , monsters : List Monster
     , doors : List Rectangle
     }
 
