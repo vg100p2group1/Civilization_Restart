@@ -1,9 +1,16 @@
-module Config exposing (init,viewBoxMax,playerConfig,playerSpeed,myselfConfig,initMapUpdate,bulletConfig,bulletSpeed)
-import Model exposing (Model,Player,Me,Rectangle,Bullet)
-import Map exposing (mapWalls,recInit)
+module Config exposing (init,viewBoxMax,playerSpeed,myselfConfig,initMapUpdate,bulletSpeed)
+import Model exposing (Model,Me)
+import Shape exposing (Rectangle, Circle)
+import Map.Map exposing (Map,Room)
+-- import Map exposing (recInit)
+import Random
+import Map.MapGenerator exposing (roomGenerator)
+import Map.MapDisplay exposing (showMap)
+
 -- import Json.Decode exposing (Decoder,map4,at,int,float)
+
 playerSpeed : Float
-playerSpeed = 10
+playerSpeed = 30
 
 bulletSpeed : Float
 bulletSpeed = 20
@@ -11,30 +18,19 @@ bulletSpeed = 20
 viewBoxMax : Float 
 viewBoxMax = 1000
 
-
-playerConfig : Player
-playerConfig = Player 0 0 playerSpeed 0
-
--- mouseConfig : MouseMoveData
--- mouseConfig = MouseMoveData 0 0 0 0
-bulletConfig : Bullet
-bulletConfig = Bullet 500 500 5 0 0 False
-
 myselfConfig : Me
-myselfConfig = Me 0 0 10 playerSpeed 0 0 False False False False recInit (500,500) False
+myselfConfig = Me 0 0 50 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 50) []
 
+roomInit : (List Room, Random.Seed)
+roomInit = 
+    roomGenerator 1 (Random.initialSeed 0)
+
+mapInit : Map
+mapInit = showMap (Tuple.first roomInit) (List.length (Tuple.first roomInit)) (Map [] [] [] [] [])
 
 init : Model
-init = Model  mapWalls [] myselfConfig  (initMapUpdate myselfConfig mapWalls) [] []
+init = Model myselfConfig [] [] mapInit roomInit mapInit
 
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
 initMapUpdate me model =
     List.map (\value-> {value|x=me.x + viewBoxMax/2 + value.x, y= me.y + viewBoxMax/2 + value.y}) model
-
--- decoder : Decoder MouseMoveData
--- decoder =
---     map4 MouseMoveData
---         (at [ "offsetX" ] int)
---         (at [ "offsetY" ] int)
---         (at [ "target", "offsetHeight" ] float)
---         (at [ "target", "offsetWidth" ] float)

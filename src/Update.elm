@@ -1,14 +1,16 @@
 module Update exposing (update)
 
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,Rec,Rectangle,recCollisionTest,recUpdate)
-import Config exposing (playerSpeed,viewBoxMax,bulletConfig,bulletSpeed)
-import Map exposing (recInit)
+import Model exposing (Model,Me)
+import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
+import Map.Map exposing (Map)
+import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
+import Weapon exposing (bulletConfig,Bullet)
 import Debug
-import Model exposing (Bullet)
-import Svg.Attributes exposing (viewBox)
-
--- TODO: rewrite this function and classify the messages
+-- import Svg.Attributes exposing (viewBox)
+-- import Html.Attributes exposing (value)
+import Map.MapGenerator exposing (roomGenerator)
+import Map.MapDisplay exposing (showMap)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -48,6 +50,10 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+        
+        -- Map ->
+        --  ({model | map = not model.map},Cmd.none)
+        
         MouseMove newMouseData ->
             let 
                 pTemp = model.myself 
@@ -74,7 +80,14 @@ update msg model =
                 me= {pTemp | fire = False}
             in
                 ({model|myself = me},Cmd.none) 
-            
+        NextFloor ->
+            let
+                roomNew = 
+                    roomGenerator 1 (Tuple.second model.rooms)
+
+                mapNew = showMap (Tuple.first roomNew) (List.length (Tuple.first roomNew)) (Map [] [] [] [] [])
+            in
+                ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
         Tick time ->
            animate model
@@ -139,7 +152,7 @@ speedCase me =
         
         
     in
-        {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,edge=recTemp}
+        {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)}
 
 
 
@@ -158,7 +171,7 @@ viewUpdate me oneWall =
         recUpdate recTemp
 
 
-updateViewbox : Me -> Model -> List Rectangle
+updateViewbox : Me -> Model -> Map
 updateViewbox me model =
     -- let
     --     -- recs = model.walls
@@ -179,8 +192,18 @@ updateViewbox me model =
     --     d = Debug.log "mouse2" meTemp.mouseData 
     --     -- d=Debug.log "recs" model.viewbox
     -- in
-        List.map (viewUpdate me) model.viewbox
+    let
+        mapTemp = model.viewbox
+        newWalls = List.map (viewUpdate me) mapTemp.walls
+        newRoads = List.map (viewUpdate me) mapTemp.roads
+        newDoors = List.map (viewUpdate me) mapTemp.doors
+        newObstacles = List.map (viewUpdate me) mapTemp.obstacles
 
+        newMonsters = List.map (\value -> {value| position = viewUpdate me value.position}) mapTemp.monsters 
+
+    in
+        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters}
+        
 fireBullet : Me -> List Bullet -> List Bullet-> (List Bullet, List Bullet)
 fireBullet me bullets viewBox=
     let
