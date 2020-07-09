@@ -24,13 +24,27 @@ playerDemonstrate model =
         gWidth = "5000"
         gHeight = "5000"
     in
-        Html.div[][Html.div [Html.Attributes.style "width" "50%",Html.Attributes.style "height" "50%",Html.Attributes.style "float" "left"]
-            [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              ( showBullets model.bulletViewbox ++  showMap model.viewbox++ [gun model.myself,me model.myself])]]
+        Html.div
+        []
+        [ Html.div 
+            [ Html.Attributes.style "width" "50%"
+            , Html.Attributes.style "height" "50%"
+            , Html.Attributes.style "float" "left"
+            ]
+            [ Svg.svg 
+                [ Mouse.onMove(.clientPos>>MouseMove)
+                , Mouse.onDown(\_->MouseDown)
+                , Mouse.onUp(\_->MouseUp)
+                , Svg.Attributes.width "1000"
+                , Svg.Attributes.height "1000"
+                , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
+                ]
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself])
+            ]
+        ]
 
 
 showMap : Map -> List (Svg.Svg Msg)
-
 showMap model =
     let
        walls = displayRec model.walls
@@ -103,7 +117,13 @@ me : Me -> Svg.Svg Msg
 me  myself=
    let 
         createBallFormat model =
-          Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx "500", Svg.Attributes.cy "500", Svg.Attributes.r <| String.fromFloat model.r][]
+          Svg.circle 
+            [ Svg.Attributes.fill "green"
+            , Svg.Attributes.cx "500"
+            , Svg.Attributes.cy "500"
+            , Svg.Attributes.r <| String.fromFloat model.r
+            ] 
+            []
     in
         createBallFormat myself
 

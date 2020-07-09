@@ -12,7 +12,7 @@ type alias Obstacle =
     }
 
 type alias MonsterType =
-    {   hP : Float
+    {   hp : Float
     ,   attack : Float
     ,   color : String     
     }

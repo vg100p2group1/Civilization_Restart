@@ -8,8 +8,7 @@ import Messages exposing (Msg(..))
 -- import Task
 import View exposing (view)
 import Update
-import Config exposing (init)
-import Model exposing (Model)
+import Model exposing (Model, defaultMe)
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -19,7 +18,7 @@ main : Program Value Model Msg
 main =
     Browser.element
         { view =  View.view 
-        , init = \value -> (init, Cmd.none)
+        , init = \_ -> (init, Cmd.none)
         , update = Update.update
         
         , subscriptions = subscriptions
@@ -51,3 +50,6 @@ key on keycode =
             NextFloor
         _ ->
             Noop
+
+init : Model
+init = Model defaultMe [] [] mapInit roomInit mapInit
