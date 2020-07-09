@@ -5,7 +5,7 @@ import Model exposing (Model,Me)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
 import Map.Map exposing (Map)
 import Config exposing (playerSpeed,viewBoxMax)
-import Weapon exposing (Bullet)
+import Weapon exposing (Bullet, fireBullet, updateBullet)
 import Debug
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap)
@@ -67,7 +67,10 @@ update msg model =
                 pTemp =  model.myself
                 me= {pTemp | fire = True}
                 -- bulletnow = model.bullet
-                (newBullet,newBulletViewbox) = fireBullet me model.bullet model.bulletViewbox
+                newShoot = fireBullet me.mouseData me.hitbox.x me.hitbox.y
+                newBullet = model.bullet :: newShoot
+                newCircle = Circle 500 500 newShoot.hitbox.r
+                newBulletViewbox = model.bulletViewbox :: {newShoot|hitbox = newCircle}
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
                 ({model|myself = me, bullet = newBullet,bulletViewbox=newBulletViewbox},Cmd.none)

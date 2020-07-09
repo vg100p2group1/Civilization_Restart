@@ -29,16 +29,17 @@ defaultBulletGenerator : WeaponInfo -> Bullet
 defaultBulletGenerator _ =
     bulletConfig
 
-fireBullet : (Float, Float) -> Bullet
-fireBullet (mouseX,mouseY)=
+fireBullet : (Float, Float) -> (Float, Float) -> Bullet
+fireBullet (mouseX,mouseY) (meX, meY) =
     let
         posX = mouseX
         posY = mouseY
         unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500)) 
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
+        newCircle = Circle meX meY 5
     in
-        {bulletConfig | x=me.x,y=me.y,speedX=xTemp,speedY=yTemp}
+        {bulletConfig | hitbox = newCircle,speedX=xTemp,speedY=yTemp}
 
 updateBullet : List Bullet -> List Bullet
 updateBullet bullets =
@@ -47,8 +48,9 @@ updateBullet bullets =
             let
                 newX = model.x + model.speedX
                 newY = model.y + model.speedY
+                newHitbox = Circle newX newY model.hitbox.r
             in
-                {model|x=newX,y=newY}
+                {model|hitbox = newHitbox}
             -- Remove all bullets that hit the wall/ the door.
     in
         List.map updateXY bullets
