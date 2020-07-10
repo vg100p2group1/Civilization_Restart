@@ -1,5 +1,7 @@
+
 module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
+
 
 
 type alias Treasure =
@@ -54,3 +56,4 @@ roomConfig = Room (0,0) False False [] [] treasureConfig [] 0
 
 mapConfig : Map
 mapConfig = Map [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+

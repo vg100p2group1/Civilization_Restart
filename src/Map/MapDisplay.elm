@@ -1,3 +1,4 @@
+
 module Map.MapDisplay exposing (mapWithGate)
 -- import MapGenerator exposing (..)
 import Map.Map exposing (Room,Map,Monster,roomConfig)
@@ -13,7 +14,6 @@ mapWithGate rooms number drawnrooms seed0 =
         (gateTemp, _) = gateGenerator rooms seed0
     in
         {mapTemp| gate=gateTemp}
-
 
 showMap : List Room -> Int -> Map -> Map
 showMap rooms number drawnrooms=
