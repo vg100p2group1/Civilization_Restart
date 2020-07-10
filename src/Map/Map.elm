@@ -1,5 +1,7 @@
-module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig)
-import Shape exposing (Rectangle)
+
+module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig,mapConfig)
+import Shape exposing (Rectangle,recInit)
+
 
 
 type alias Treasure =
@@ -40,6 +42,7 @@ type alias Map =
     , obstacles : List Rectangle
     , monsters : List Monster
     , doors : List Rectangle
+    , gate : Rectangle
     }
 
 
@@ -48,3 +51,7 @@ treasureConfig = Treasure (0,0)
 
 roomConfig : Room
 roomConfig = Room (0,0) False False [] [] treasureConfig [] 0
+
+mapConfig : Map
+mapConfig = Map [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+

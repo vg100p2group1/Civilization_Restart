@@ -2,14 +2,15 @@ module Update exposing (..)
 import Messages exposing (Msg(..))
 import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
-import Map.Map exposing (Map)
+import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (bulletConfig,Bullet)
 import Debug
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
-import Map.MapDisplay exposing (showMap)
+import Map.MapDisplay exposing (mapWithGate)
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -84,7 +85,7 @@ update msg model =
                 roomNew = 
                     roomGenerator 1 (Tuple.second model.rooms)
 
-                mapNew = showMap (Tuple.first roomNew) (List.length (Tuple.first roomNew)) (Map [] [] [] [] [])
+                mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
             in
                 ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
@@ -210,8 +211,11 @@ updateViewbox me model =
 
         newMonsters = List.map (\value -> {value| position = viewUpdate me value.position}) mapTemp.monsters 
 
+        newGate = viewUpdate me mapTemp.gate
+
     in
-        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters}
+        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters,gate=newGate}
+
         
 fireBullet : Me -> List Bullet -> List Bullet-> (List Bullet, List Bullet)
 fireBullet me bullets viewBox=

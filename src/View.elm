@@ -7,6 +7,8 @@ import Messages exposing (Msg(..))
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Config exposing (sentenceInit)
+
+
 import Html.Events.Extra.Mouse as Mouse
 
 import Svg 
@@ -21,12 +23,12 @@ view model =
 playerDemonstrate : Model -> Html.Html Msg
 playerDemonstrate model =
     let
-        gWidth = "5000"
-        gHeight = "5000"
+        gWidth = "10000"
+        gHeight = "10000"
     in
         Html.div[][Html.div [Html.Attributes.style "width" "50%",Html.Attributes.style "height" "50%",Html.Attributes.style "float" "left"]
             [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              ( showBullets model.bulletViewbox ++  showMap model.viewbox ++ [gun model.myself,me model.myself])], showDialogue model 0]
+              ( showBullets model.bulletViewbox ++  showMap model.viewbox++ [gun model.myself,me model.myself])], showDialogue model 0]
 
 
 showMap : Map -> List (Svg.Svg Msg)
@@ -39,8 +41,12 @@ showMap model =
        doors = displayDoors model.doors
        obstacles = displayRec model.obstacles
        monsters = displayMonster model.monsters
+       gate = displayDoors [model.gate]
+    --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate
+    --    walls++gate
+
 
 
 displayRec : List Rectangle -> List (Svg.Svg Msg)

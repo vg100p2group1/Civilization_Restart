@@ -1,3 +1,4 @@
+
 module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState)
 import Random
 import Map.Map exposing(Room,Map)
@@ -24,7 +25,8 @@ type alias Me =
     }
 
 type alias Model =
-    { myself :  Me
+    { 
+      myself :  Me
     , bullet : List Bullet 
     , bulletViewbox : List Bullet
     , map : Map

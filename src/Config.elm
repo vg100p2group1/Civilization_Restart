@@ -1,11 +1,13 @@
-module Config exposing (init,viewBoxMax,playerSpeed,myselfConfig,initMapUpdate,bulletSpeed, sentenceInit)
+
+module Config exposing (init,viewBoxMax,playerSpeed,myselfConfig,initMapUpdate,bulletSpeed,sentenceInit)
 import Model exposing (Model,Me,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState)
 import Shape exposing (Rectangle, Circle)
-import Map.Map exposing (Map,Room)
+import Map.Map exposing (Map,Room,mapConfig)
 -- import Map exposing (recInit)
 import Random
 import Map.MapGenerator exposing (roomGenerator)
-import Map.MapDisplay exposing (showMap)
+import Map.MapDisplay exposing (mapWithGate)
+
 
 -- import Json.Decode exposing (Decoder,map4,at,int,float)
 
@@ -26,7 +28,8 @@ roomInit =
     roomGenerator 1 (Random.initialSeed 0)
 
 mapInit : Map
-mapInit = showMap (Tuple.first roomInit) (List.length (Tuple.first roomInit)) (Map [] [] [] [] [])
+
+mapInit = mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)) mapConfig (Random.initialSeed 0)
 
 sentenceInit : Sentence
 sentenceInit = Sentence "Enjoy the game now!" Bottom Monster False 0 "url(background1.jpg)"

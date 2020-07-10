@@ -1,8 +1,19 @@
-module Map.MapDisplay exposing (showMap)
+
+module Map.MapDisplay exposing (mapWithGate)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,roomConfig)
+import Map.Map exposing (Room,Map,Monster,roomConfig)
 import Shape exposing (recInit,Rectangle,recUpdate)
-import Map.Map exposing (Monster)
+
+import Map.Gate exposing (gateGenerator)
+import Random 
+
+mapWithGate : List Room -> Int -> Map -> Random.Seed -> Map
+mapWithGate rooms number drawnrooms seed0 = 
+    let
+        mapTemp = showMap rooms number drawnrooms
+        (gateTemp, _) = gateGenerator rooms seed0
+    in
+        {mapTemp| gate=gateTemp}
 
 showMap : List Room -> Int -> Map -> Map
 showMap rooms number drawnrooms=
