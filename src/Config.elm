@@ -1,11 +1,20 @@
 module Config exposing (init,viewBoxMax,playerSpeed,myselfConfig,initMapUpdate,bulletSpeed)
 import Model exposing (Model,Me)
 import Shape exposing (Rectangle, Circle)
+<<<<<<< HEAD
 import Map.Map exposing (Map,Room)
 -- import Map exposing (recInit)
 import Random
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap)
+=======
+import Map.Map exposing (Map,Room,mapConfig)
+-- import Map exposing (recInit)
+import Random
+import Map.MapGenerator exposing (roomGenerator)
+import Map.MapDisplay exposing (mapWithGate)
+
+>>>>>>> Zihao_Wei
 
 -- import Json.Decode exposing (Decoder,map4,at,int,float)
 
@@ -26,7 +35,11 @@ roomInit =
     roomGenerator 1 (Random.initialSeed 0)
 
 mapInit : Map
+<<<<<<< HEAD
 mapInit = showMap (Tuple.first roomInit) (List.length (Tuple.first roomInit)) (Map [] [] [] [] [])
+=======
+mapInit = mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)) mapConfig (Random.initialSeed 0)
+>>>>>>> Zihao_Wei
 
 init : Model
 init = Model myselfConfig [] [] mapInit roomInit mapInit

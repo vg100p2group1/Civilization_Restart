@@ -21,8 +21,13 @@ view model =
 playerDemonstrate : Model -> Html.Html Msg
 playerDemonstrate model =
     let
+<<<<<<< HEAD
         gWidth = "5000"
         gHeight = "5000"
+=======
+        gWidth = "10000"
+        gHeight = "10000"
+>>>>>>> Zihao_Wei
     in
         Html.div[][Html.div [Html.Attributes.style "width" "50%",Html.Attributes.style "height" "50%",Html.Attributes.style "float" "left"]
             [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
@@ -39,8 +44,17 @@ showMap model =
        doors = displayDoors model.doors
        obstacles = displayRec model.obstacles
        monsters = displayMonster model.monsters
+<<<<<<< HEAD
     in
        walls ++ roads ++ doors ++ obstacles ++ monsters
+=======
+
+       gate = displayDoors [model.gate]
+    --    d = Debug.log "gateshow" model.gate
+    in
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate
+    --    walls++gate
+>>>>>>> Zihao_Wei
 
 
 displayRec : List Rectangle -> List (Svg.Svg Msg)

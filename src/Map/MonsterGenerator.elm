@@ -63,7 +63,11 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterTypeTemp = getMonsterType
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 100 100 recInit
+=======
+        monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 50 50 recInit
+>>>>>>> Zihao_Wei
 =======
         monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 50 50 recInit
 >>>>>>> Zihao_Wei

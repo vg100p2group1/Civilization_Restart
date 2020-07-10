@@ -16,7 +16,11 @@ roomGenerator storey seed0 =
         (room1,seed1) = roomPositionGenerator storey seed0
         --  room2 = roomUpdate room1
 <<<<<<< HEAD
+<<<<<<< HEAD
         -- d = Debug.log "d" (roomUpdate room1)
+=======
+        -- d = Debug.log "room" (List.map (\value->value.position) room1)
+>>>>>>> Zihao_Wei
 =======
         -- d = Debug.log "room" (List.map (\value->value.position) room1)
 >>>>>>> Zihao_Wei
@@ -131,6 +135,10 @@ leavesUpdate : List Room -> List Room -> Int -> Random.Seed -> List Room
 leavesUpdate  roomUpdated roomList num seed0=
     let
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
+>>>>>>> Zihao_Wei
 =======
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
 >>>>>>> Zihao_Wei
@@ -150,10 +158,13 @@ leavesUpdate  roomUpdated roomList num seed0=
         if num==0 then
             roomUpdated
 <<<<<<< HEAD
+<<<<<<< HEAD
         else 
             leavesUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed2
         
 =======
+=======
+>>>>>>> Zihao_Wei
         else
             if checkOverlap roomNew roomListNew then 
                 leavesUpdate (roomUpdated) roomListNew (num-1) seed2
@@ -166,6 +177,9 @@ checkOverlap room roomList =
         roomPosList = List.map (\value -> value.position) roomList
     in
         List.member room.position roomPosList
+<<<<<<< HEAD
+>>>>>>> Zihao_Wei
+=======
 >>>>>>> Zihao_Wei
 
 
