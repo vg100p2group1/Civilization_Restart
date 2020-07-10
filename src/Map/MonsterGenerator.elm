@@ -2,6 +2,7 @@ module Map.MonsterGenerator exposing (monsterGenerator)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
+import Shape exposing (circleInit)
 
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
@@ -36,10 +37,10 @@ monsterGenerator seed0 obstacle =
 checkMonsterCollison : Monster -> List Obstacle -> List Monster -> Bool
 checkMonsterCollison monster obstacles monsterList=
     let
-        monsterPos=monster.position
+        monsterRegion=monster.region
         obstaclePosList = List.map (\value -> value.position) obstacles
-        monsterPosList = List.map (\value->value.position) monsterList
-        obstacleCol=List.filter (recCollisionTest monsterPos.edge) <| List.map (\value->value.edge) (obstaclePosList++monsterPosList)
+        monsterRegList = List.map (\value->value.region) monsterList
+        obstacleCol=List.filter (recCollisionTest monsterRegion.edge) <| List.map (\value->value.edge) (obstaclePosList++monsterRegList)
     in
         List.isEmpty obstacleCol
 
@@ -62,8 +63,10 @@ monsterBuilding monsterList number obstacles seed0 =
                         MonsterType 0 0 ""
         monsterTypeTemp = getMonsterType
 
-        monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 50 50 recInit
-        monsterNew = Monster (recUpdate monsterPos) monsterTypeTemp
+        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit
+        monsterPos = Shape.Circle (toFloat xTemp) (toFloat yTemp) 50 
+
+        monsterNew = Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp
 
     in 
         if number==0 then

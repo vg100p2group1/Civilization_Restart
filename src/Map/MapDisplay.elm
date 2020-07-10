@@ -47,13 +47,13 @@ drawMonsters room =
         newX = toFloat (2500*x)
         newY = toFloat (2500*y)
         monsterList = room.monsters
-        movingRectangle model =
+        movingCircle model =
             let
-                newModel = {model|x=model.x+newX,y=model.y+newY}
+                newModel = {model|cx=model.cx+newX,cy=model.cy+newY}
             in
-                recUpdate newModel
+                newModel
     in
-        List.map (\value->{value| position = movingRectangle value.position}) monsterList
+        List.map (\value->{value| position = movingCircle value.position}) monsterList
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =

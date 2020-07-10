@@ -15,11 +15,13 @@ type alias MonsterType =
     {   hP : Float
     ,   attack : Float
     ,   color : String     
+       
     }
 type alias Monster =
     {
-        position : Rectangle
-    ,   monsterType : MonsterType 
+        position : Shape.Circle
+    ,   region : Rectangle
+   ,   monsterType : MonsterType 
     }
 
 

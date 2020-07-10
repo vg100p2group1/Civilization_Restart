@@ -168,6 +168,14 @@ viewUpdate me oneWall =
         recTemp = Rectangle xTemp yTemp oneWall.width oneWall.height recInit
     in
         recUpdate recTemp
+        
+viewUpdateCircle : Me -> Circle -> Shape.Circle
+viewUpdateCircle me circ =
+    let 
+        xTemp = circ.cx - me.xSpeed
+        yTemp = circ.cy - me.ySpeed
+    in
+        Circle xTemp yTemp circ.r
 
 
 updateViewbox : Me -> Model -> Map
@@ -198,7 +206,7 @@ updateViewbox me model =
         newDoors = List.map (viewUpdate me) mapTemp.doors
         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
 
-        newMonsters = List.map (\value -> {value| position = viewUpdate me value.position}) mapTemp.monsters 
+        newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position}) mapTemp.monsters 
 
         newGate = viewUpdate me mapTemp.gate
 

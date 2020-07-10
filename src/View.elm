@@ -86,21 +86,20 @@ displayMonster : List Monster -> List (Svg.Svg Msg)
 displayMonster monsters =
     let
         -- d=Debug.log "wall" obstacle
-        createBricksFormat monsterTemp =
+        createMonsterFormat monsterTemp =
             let
                 model = monsterTemp.position
                 monsterType = monsterTemp.monsterType
             in
-                Svg.rect 
-                    [ Svg.Attributes.x <| String.fromFloat model.x
-                    , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat model.width
-                    , Svg.Attributes.height <| String.fromFloat model.height
+                Svg.circle
+                    [ Svg.Attributes.cx <| String.fromFloat model.cx
+                    , Svg.Attributes.cy <| String.fromFloat model.cy
+                    , Svg.Attributes.r <| String.fromFloat model.r
                     , Svg.Attributes.fill monsterType.color
                     ]
                 []
     in
-        List.map createBricksFormat monsters
+        List.map createMonsterFormat monsters
 
 
 me : Me -> Svg.Svg Msg
