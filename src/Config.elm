@@ -1,5 +1,5 @@
-module Config exposing (init,viewBoxMax,playerSpeed,myselfConfig,initMapUpdate,bulletSpeed)
-import Model exposing (Model,Me)
+module Config exposing (init,viewBoxMax,playerSpeed,myselfConfig,initMapUpdate,bulletSpeed, sentenceInit)
+import Model exposing (Model,Me,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState)
 import Shape exposing (Rectangle, Circle)
 import Map.Map exposing (Map,Room)
 -- import Map exposing (recInit)
@@ -28,8 +28,24 @@ roomInit =
 mapInit : Map
 mapInit = showMap (Tuple.first roomInit) (List.length (Tuple.first roomInit)) (Map [] [] [] [] [])
 
+sentenceInit : Sentence
+sentenceInit = Sentence "Enjoy the game now!" Bottom Monster False 0 "url(background1.jpg)"
+
 init : Model
-init = Model myselfConfig [] [] mapInit roomInit mapInit
+init =
+    { myself = myselfConfig
+    , bullet = []
+    , bulletViewbox = []
+    , map = mapInit
+    , rooms = roomInit
+    , viewbox = mapInit
+    , state = Others
+    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+    }
+
+--init = Model myselfConfig [] [] mapInit roomInit mapInit Others [{sentenceInit | text = "hello"}, {sentenceInit | text = "bad"}, {sentenceInit | text = "badddddd"}, {sentenceInit | text = "good"] False False
+
+
 
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
 initMapUpdate me model =

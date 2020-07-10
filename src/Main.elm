@@ -48,6 +48,16 @@ key on keycode =
         83 ->
             MoveDown on
         77 ->
-            NextFloor
+            if on then
+                NextFloor
+            else
+                Noop
+        13 ->
+            if on then
+                NextSentence
+            else
+                Noop
+        71 ->
+            ShowDialogue
         _ ->
             Noop

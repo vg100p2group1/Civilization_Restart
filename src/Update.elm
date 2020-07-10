@@ -1,6 +1,6 @@
 module Update exposing (..)
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me)
+import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
 import Map.Map exposing (Map)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
@@ -33,7 +33,7 @@ update msg model =
                 )
 
         MoveUp on ->
-            let 
+            let
                 pTemp =  model.myself 
                 me= {pTemp | moveUp = on, moveDown =  False}
             in
@@ -89,7 +89,17 @@ update msg model =
                 ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
         Tick time ->
-           animate model
+            model
+                --|> updateSentence (min time 25)
+                |> animate
+
+
+        NextSentence ->
+            (updateSentence 0 model, Cmd.none)
+
+        -- the dialogue should be displayed when the player enters a new room actually
+        ShowDialogue ->
+            ({ model | state = Dialogue}, Cmd.none)
 
         Noop ->
             let 
@@ -208,7 +218,7 @@ fireBullet me bullets viewBox=
     let
         posX = Tuple.first me.mouseData
         posY = Tuple.second me.mouseData
-        unitV = sqrt ((posX-500)*(posX-500) + (posY-500)*(posY-500)) 
+        unitV = sqrt ((posX - 500)*(posX - 500) + (posY - 500)*(posY - 500))
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
         newBullet = {bulletConfig | x=me.x,y=me.y,speedX=xTemp,speedY=yTemp}
@@ -227,3 +237,44 @@ updateBullet bullets =
             --ToDo filter
     in
         List.map updateXY bullets
+
+activateUpdate : Float -> Float -> { a | active : Bool, elapsed : Float } -> { a | active : Bool, elapsed : Float }
+activateUpdate interval elapsed state =
+    let
+        elapsed_ = state.elapsed + elapsed
+    in
+        if elapsed_ > interval then
+            {state | active = True, elapsed = elapsed_ - interval}
+        else
+            {state | elapsed = elapsed_}
+
+{-
+startUpdateSen : Model -> Model
+startUpdateSen model =
+    if model.changeSentence then
+        { model | sentenceState = Just {active = True, elapsed = 0}}
+    else
+        { model | sentenceState = Nothing}
+-}
+updateSentence : Float -> Model -> Model
+updateSentence elapsed model =
+    case model.state of
+        Dialogue ->
+            let
+                head = List.head model.currentDialogues
+                end =
+                    case head of
+                        Just a ->
+                            False
+                        Nothing ->
+                            True
+                (state, newDialogues) =
+                    if end then
+                        (Others, model.currentDialogues)
+                    else
+                        (Dialogue, List.drop 1 model.currentDialogues)
+            in
+                {model | state = state, currentDialogues = newDialogues}
+        _ ->
+            model
+

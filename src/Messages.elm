@@ -12,3 +12,7 @@ type Msg
     -- | Map
     | NextFloor
     | Noop
+
+    -- for testing
+    | ShowDialogue
+    | NextSentence
