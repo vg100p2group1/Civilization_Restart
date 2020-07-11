@@ -9,8 +9,10 @@ import Messages exposing (Msg(..))
 import Task
 import View exposing (view)
 import Update
-import Config exposing (init)
-import Model exposing (Model)
+import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit)
+import Map.MapDisplay exposing (mapInit)
+import Map.MapGenerator exposing (roomInit)
+
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -61,3 +63,17 @@ key on keycode =
             ShowDialogue
         _ ->
             Noop
+
+init : Model
+init =
+    { myself = defaultMe
+    , bullet = []
+    , bulletViewbox = []
+    , map = mapInit
+    , rooms = roomInit
+    , viewbox = mapInit
+    , size = (0, 0)
+    , state = Others
+    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+    }
+

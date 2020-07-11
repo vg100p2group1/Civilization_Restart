@@ -1,12 +1,12 @@
 module View exposing (view)
-import Model exposing (Model,Me,Dialogues,State(..), Side(..))
+import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
 import Map.Map exposing (Map,Monster,Room)
 import Weapon exposing (Bullet)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-import Config exposing (sentenceInit)
+
 
 
 import Html.Events.Extra.Mouse as Mouse
@@ -67,11 +67,28 @@ playerDemonstrate model =
     let
         gWidth = "1000"
         gHeight = "1000"
-
     in
-        Html.div[][Html.div [Html.Attributes.style "width" "100%",Html.Attributes.style "height" "100%",Html.Attributes.style "float" "left",Html.Attributes.style "border" "inset"]
-            [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              ( showBullets model.bulletViewbox ++  showMap model.viewbox++ [gun model.myself,me model.myself])], showDialogue model 0]
+        Html.div
+        []
+        [ Html.div 
+            [ Html.Attributes.style "width" "50%"
+            , Html.Attributes.style "height" "50%"
+            , Html.Attributes.style "float" "left"
+            , Html.Attributes.style "border" "inset"
+            ]
+            [ Svg.svg 
+                [ Mouse.onMove(.clientPos>>MouseMove)
+                , Mouse.onDown(\event->MouseDown)
+                , Mouse.onUp(\event->MouseUp)
+                , Svg.Attributes.width "1000"
+                , Svg.Attributes.height "1000"
+                , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
+                ]
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself])
+            ]
+            , showDialogue model 0
+        ]
+
 
 
 showMap : Map -> List (Svg.Svg Msg)
@@ -152,7 +169,13 @@ me : Me -> Svg.Svg Msg
 me  myself=
    let 
         createBallFormat model =
-          Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx "500", Svg.Attributes.cy "500", Svg.Attributes.r <| String.fromFloat model.r][]
+          Svg.circle 
+            [ Svg.Attributes.fill "green"
+            , Svg.Attributes.cx "500"
+            , Svg.Attributes.cy "500"
+            , Svg.Attributes.r <| String.fromFloat model.r
+            ] 
+            []
     in
         createBallFormat myself
 

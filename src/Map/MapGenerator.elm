@@ -1,4 +1,4 @@
-module Map.MapGenerator exposing (roomGenerator)
+module Map.MapGenerator exposing (roomGenerator,roomInit)
 import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator)
@@ -7,8 +7,9 @@ import Map.MonsterGenerator exposing (monsterGenerator)
 -- import Html.Events exposing (onClick)
 -- import Browser
 
-
-
+roomInit : (List Room, Random.Seed)
+roomInit = 
+    roomGenerator 1 (Random.initialSeed 0)
 
 roomGenerator : Int -> Random.Seed -> (List Room,Random.Seed)
 roomGenerator storey seed0 = 
@@ -30,8 +31,6 @@ roomUpdate room =
                 {model|road=model.road++appendList}  
     in
         List.map findRoom room 
-
-
 
 roomPositionGenerator : Int -> Random.Seed -> (List Room, Random.Seed)
 roomPositionGenerator storey seed0= 
@@ -181,12 +180,6 @@ roomPicking  availableRoom r seed0 =
             (availableRoom,seed1)
         else 
             roomPicking (newList1 ++ newList2) (r - 1) seed1
-
-
-
-
-
-
 
 
 

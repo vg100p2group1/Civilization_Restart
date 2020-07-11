@@ -1,15 +1,15 @@
-module Update exposing (..)
+module Update exposing (update)
+
 import Messages exposing (Msg(..))
 import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
 import Map.Map exposing (Map,mapConfig)
-import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
-import Weapon exposing (bulletConfig,Bullet)
+import Config exposing (playerSpeed,viewBoxMax)
+import Weapon exposing (Bullet, fireBullet, updateBullet)
 import Debug
--- import Svg.Attributes exposing (viewBox)
--- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
-import Map.MapDisplay exposing (mapWithGate)
+import Map.MapDisplay exposing (showMap, mapWithGate)
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -17,7 +17,7 @@ update msg model =
 
         MoveLeft on ->
             let 
-                pTemp =  model.myself 
+                pTemp = model.myself 
                 me= {pTemp | moveLeft = on, moveRight =  False}
             in
                 ( {model| myself= me}
@@ -68,7 +68,10 @@ update msg model =
                 pTemp =  model.myself
                 me= {pTemp | fire = True}
                 -- bulletnow = model.bullet
-                (newBullet,newBulletViewbox) = fireBullet me model.bullet model.bulletViewbox
+                newShoot = fireBullet me.mouseData (me.x,me.y)
+                newBullet = newShoot :: model.bullet 
+                newCircle = Circle 500 500 newShoot.hitbox.r
+                newBulletViewbox = {newShoot|hitbox = newCircle, x = 500, y = 500, r = 5} :: model.bulletViewbox
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
                 ({model|myself = me, bullet = newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
@@ -160,10 +163,10 @@ animate  model =
         me = model.myself
         newMe = speedCase me
         newViewbox = updateViewbox newMe model
-        newBullet = updateBullet model.bullet
-        newBulletViewbox = updateBullet model.bulletViewbox
+        newBullet = updateBullet model.map model.bullet
+        newBulletViewbox = updateBullet model.viewbox model.bulletViewbox
     in
-        ({model| myself = newMe, viewbox=newViewbox,bullet= newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
+        ({model| myself = newMe, viewbox=newViewbox, bullet= newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
 
 
 speedCase : Me -> Me
@@ -225,24 +228,12 @@ viewUpdate me oneWall =
 
 updateViewbox : Me -> Model -> Map
 updateViewbox me model =
-    -- let
-    --     -- recs = model.walls
-    --     -- d1 =Debug.log "Edge" me.edge
-    --     -- viewedRecTemp = List.filter (\value -> (recCollisionTest me.edge value.edge)) model.walls
-    --     -- d2 =Debug.log "viewedRecTemp" viewedRecTemp
-    --     -- left = me.x - viewBoxMax/2
-    --     -- right = me.x + viewBoxMax/2
-    --     -- top = me.y - viewBoxMax/2
-    --     -- bottom = me.y + viewBoxMax/2
-        
-
-
-    --     -- viewRec = List.map viewUpdate viewedRecTemp
+    -- viewRec = List.map viewUpdate viewedRecTemp
     -- in
     -- let
     --     meTemp = model.myself
     --     d = Debug.log "mouse2" meTemp.mouseData 
-    --     -- d=Debug.log "recs" model.viewbox
+    --     d=Debug.log "recs" model.viewbox
     -- in
     let
         mapTemp = model.viewbox
@@ -250,7 +241,6 @@ updateViewbox me model =
         newRoads = List.map (viewUpdate me) mapTemp.roads
         newDoors = List.map (viewUpdate me) mapTemp.doors
         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
-
         newMonsters = List.map (\value -> {value| position = viewUpdate me value.position}) mapTemp.monsters 
 
         newGate = viewUpdate me mapTemp.gate
@@ -258,31 +248,7 @@ updateViewbox me model =
     in
         {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters,gate=newGate}
 
-        
-fireBullet : Me -> List Bullet -> List Bullet-> (List Bullet, List Bullet)
-fireBullet me bullets viewBox=
-    let
-        posX = Tuple.first me.mouseData
-        posY = Tuple.second me.mouseData
-        unitV = sqrt ((posX - 500)*(posX - 500) + (posY - 500)*(posY - 500))
-        xTemp = bulletSpeed / unitV * (posX - 500)
-        yTemp = bulletSpeed / unitV * (posY - 500)
-        newBullet = {bulletConfig | x=me.x,y=me.y,speedX=xTemp,speedY=yTemp}
-    in
-        (List.append bullets [newBullet],List.append viewBox [{newBullet|x=500,y=500}])
 
-updateBullet : List Bullet -> List Bullet
-updateBullet bullets =
-    let
-        updateXY model =
-            let
-                newX = model.x + model.speedX
-                newY = model.y + model.speedY
-            in
-                {model|x=newX,y=newY}
-            --ToDo filter
-    in
-        List.map updateXY bullets
 
 activateUpdate : Float -> Float -> { a | active : Bool, elapsed : Float } -> { a | active : Bool, elapsed : Float }
 activateUpdate interval elapsed state =
