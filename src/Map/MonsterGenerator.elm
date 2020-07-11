@@ -70,6 +70,6 @@ monsterBuilding monsterList number obstacles seed0 =
             (monsterList,seed3)
         else
             if checkMonsterCollison monsterNew obstacles monsterList then
-                monsterBuilding (monsterNew :: monsterList) (number-1) obstacles seed3
+                monsterBuilding (monsterNew :: monsterList) (number - 1) obstacles seed3
             else 
                 monsterBuilding  monsterList number obstacles seed3
