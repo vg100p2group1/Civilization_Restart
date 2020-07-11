@@ -57,10 +57,9 @@ update msg model =
         MouseMove newMouseData ->
             let 
                 pTemp = model.myself 
-                -- d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
-                -- d = Debug.log "mouse" newMouseData 
-                me = {pTemp | mouseData = newMouseData}
-                
+                d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
+                d = Debug.log "mouse" newMouseData 
+                me = {pTemp | mouseData = mouseDataUpdate model newMouseData}
             in 
                 ({model|myself = me},Cmd.none)
         
@@ -102,6 +101,23 @@ update msg model =
         ShowDialogue ->
             ({ model | state = Dialogue}, Cmd.none)
 
+
+        Resize width height ->
+            ( { model | size = ( toFloat width, toFloat height ) }
+            , Cmd.none
+            )
+
+        GetViewport { viewport } ->
+            ( { model
+                | size =
+                    ( viewport.width
+                    , viewport.height
+                    )
+              }
+            , Cmd.none
+            )
+
+
         Noop ->
             let 
                 pTemp =  model.myself
@@ -110,6 +126,32 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+
+mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
+mouseDataUpdate model mousedata = 
+    let
+        ( w, h ) =
+            model.size
+        
+        configheight =1000
+        configwidth = 1000
+        r =
+            if w / h > 1 then
+                Basics.min 1 (h / configwidth)
+
+            else
+                Basics.min 1 (w / configheight)
+        
+        xLeft = (w - configwidth*r) / 2 
+        yTop = (h - configheight*r) / 2
+
+        (mx,my) = 
+            mousedata 
+
+    in
+        (mx - xLeft, my - yTop)
+
+
 
 
 animate :  Model -> (Model, Cmd Msg)

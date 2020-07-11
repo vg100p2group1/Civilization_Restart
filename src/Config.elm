@@ -42,6 +42,7 @@ init =
     , map = mapInit
     , rooms = roomInit
     , viewbox = mapInit
+    , size = (0, 0)
     , state = Others
     , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
     }

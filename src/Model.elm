@@ -32,6 +32,7 @@ type alias Model =
     , map : Map
     , rooms : (List Room,Random.Seed)
     , viewbox : Map
+    , size : (Float, Float)
     , state : State
     , currentDialogues: Dialogues
     }
@@ -62,4 +63,5 @@ type alias AnimationState =
     Maybe
     { active: Bool
     , elapsed: Float
+    , size : (Float,Float)
     }
