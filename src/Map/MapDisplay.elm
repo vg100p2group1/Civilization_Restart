@@ -1,10 +1,15 @@
-module Map.MapDisplay exposing (mapWithGate)
+
+module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,Monster,roomConfig)
+import Map.Map exposing (Room,Map,Monster,roomConfig,mapConfig)
 import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
+import Map.MapGenerator exposing (roomInit)
 import Random 
+
+mapInit : Map
+mapInit = mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)) mapConfig (Random.initialSeed 0)
 
 mapWithGate : List Room -> Int -> Map -> Random.Seed -> Map
 mapWithGate rooms number drawnrooms seed0 = 
@@ -37,8 +42,7 @@ showMap rooms number drawnrooms=
         if number == 0 then 
             drawnrooms
         else 
-            showMap newRooms (number-1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew}
-
+            showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew}
 
 drawMonsters : Room -> List Monster
 drawMonsters room =
@@ -99,7 +103,7 @@ drawDoors room =
             
         
         roadList1 = room.road
-        roadList2 = List.map (\value -> ( Tuple.first value-x+1, Tuple.second value-y+1)) roadList1
+        roadList2 = List.map (\value -> ( Tuple.first value - x + 1, Tuple.second value - y + 1)) roadList1
     in
         List.map recUpdate <| List.map recPosition roadList2
 
@@ -114,19 +118,19 @@ drawRoads room =
         recPosition model =
             case model of 
                 (2,1) ->
-                    [Rectangle (newX+2000) (newY+800) 500 100 recInit,Rectangle (newX+2000) (newY+1100) 500 100 recInit]
+                    [Rectangle (newX + 2000) (newY + 800) 500 100 recInit,Rectangle (newX + 2000) (newY + 1100) 500 100 recInit]
                 (1,2) ->
-                    [Rectangle (newX+800) (newY+2000) 100 500 recInit,Rectangle (newX+1100) (newY+2000) 100 500 recInit]
+                    [Rectangle (newX + 800) (newY + 2000) 100 500 recInit,Rectangle (newX + 1100) (newY + 2000) 100 500 recInit]
                 (0,1) ->
-                    [Rectangle (newX-500) (newY+800) 500 100 recInit,Rectangle (newX-500) (newY+1100) 500 100 recInit]
+                    [Rectangle (newX - 500) (newY + 800) 500 100 recInit,Rectangle (newX - 500) (newY + 1100) 500 100 recInit]
                 (1,0) ->
-                    [Rectangle (newX+800) (newY-500) 100 500 recInit,Rectangle (newX+1100) (newY-500) 100 500 recInit]
+                    [Rectangle (newX + 800) (newY - 500) 100 500 recInit,Rectangle (newX + 1100) (newY - 500) 100 500 recInit]
                 _ ->
                     [Rectangle 0 0 0 0 recInit]
             
         
         roadList1 = room.road
-        roadList2 = List.map (\value -> ( Tuple.first value-x+1, Tuple.second value-y+1)) roadList1
+        roadList2 = List.map (\value -> ( Tuple.first value - x + 1, Tuple.second value - y + 1)) roadList1
     in
         List.map recUpdate <| List.concat <| List.map recPosition roadList2
     
@@ -144,7 +148,7 @@ drawWalls room=
         -- d2=Debug.log "edge" roadList1
 
 
-        roadList2 = List.map (\value -> ( Tuple.first value-x+1, Tuple.second value-y+1)) roadList1
+        roadList2 = List.map (\value -> ( Tuple.first value - x + 1, Tuple.second value- y + 1)) roadList1
 
         -- d3 = Debug.log "update" roadList2 
         newRec1 = 

@@ -1,27 +1,30 @@
 module Main exposing (main,subscriptions,key)
 import Browser
-import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp) 
+import Browser.Dom exposing (getViewport)
+import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp, onResize)
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode
 import Json.Encode exposing (Value)
 import Messages exposing (Msg(..))
--- import Task
+import Task
 import View exposing (view)
 import Update
-import Config exposing (init)
-import Model exposing (Model)
+import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit)
+import Map.MapDisplay exposing (mapInit)
+import Map.MapGenerator exposing (roomInit)
+
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
 -- import Debug
 -- import Model exposing (Model)
+
 main : Program Value Model Msg
 main =
     Browser.element
         { view =  View.view 
-        , init = \value -> (init, Cmd.none)
-        , update = Update.update
-        
+        , init = \value -> (init, Task.perform GetViewport getViewport)
+        , update = Update.update        
         , subscriptions = subscriptions
         }
 
@@ -32,9 +35,8 @@ subscriptions model =
         [ onAnimationFrameDelta Tick
         , onKeyUp (Decode.map (key False) keyCode)
         , onKeyDown (Decode.map (key True) keyCode)
-        -- , onResize Resize
+        , onResize Resize
         ]
-
 
 key : Bool -> Int -> Msg
 key on keycode =
@@ -61,3 +63,17 @@ key on keycode =
             ShowDialogue
         _ ->
             Noop
+
+init : Model
+init =
+    { myself = defaultMe
+    , bullet = []
+    , bulletViewbox = []
+    , map = mapInit
+    , rooms = roomInit
+    , viewbox = mapInit
+    , size = (0, 0)
+    , state = Others
+    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+    }
+

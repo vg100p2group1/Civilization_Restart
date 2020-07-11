@@ -1,36 +1,97 @@
 module View exposing (view)
-import Model exposing (Model,Me)
-import Map.Map exposing (Map,Monster)
+import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
+import Map.Map exposing (Map,Monster,Room)
 import Weapon exposing (Bullet)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
-import Html
-import Html.Attributes 
+import Html exposing (Html, div, text)
+import Html.Attributes exposing (style)
+
+
 
 import Html.Events.Extra.Mouse as Mouse
 
 import Svg 
 import Svg.Attributes 
 
+import MiniMap exposing (getMiniMap)
+
+
+-- view : Model -> Html.Html Msg
+-- view model =
+--     playerDemonstrate model
 
 
 view : Model -> Html.Html Msg
 view model =
-    playerDemonstrate model
+    let
+        ( w, h ) =
+            model.size
+        
+        configheight =1000
+        configwidth = 1000
+        r =
+            if w / h > 1 then
+                Basics.min 1 (h / configwidth)
+
+            else
+                Basics.min 1 (w / configheight)
+    in
+        Html.div
+            [ 
+                Html.Attributes.style "width" "100%"
+            , Html.Attributes.style "height" "100%"
+            , Html.Attributes.style "position" "absolute"
+            , Html.Attributes.style "left" "0"
+            , Html.Attributes.style "top" "0"
+            , Html.Attributes.style "background" "linear-gradient(135deg, rgba(206,188,155,1) 0%, rgba(85,63,50,1) 51%, rgba(42,31,25,1) 100%)"
+            , Html.Attributes.style "overflow" "scroll"
+            , Html.Attributes.style "overflow-x" "hidden"
+            ]
+            [   Html.div [Html.Attributes.style "top" "200px",Html.Attributes.style "left" "200px"][showMiniMap model]
+            ,   Html.div
+                [ 
+                    Html.Attributes.style "width" (String.fromFloat configwidth ++ "px")
+                    , Html.Attributes.style "height" (String.fromFloat configheight ++ "px")
+                    , Html.Attributes.style "position" "absolute"
+                    , Html.Attributes.style "left" (String.fromFloat ((w - configwidth*r) / 2) ++ "px")
+                    , Html.Attributes.style "top" (String.fromFloat ((h - configheight*r) / 2) ++ "px")
+                    , Html.Attributes.style "transform-origin" "0 0"
+                    , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
+                ][playerDemonstrate model]
+            ]
+
 
 playerDemonstrate : Model -> Html.Html Msg
 playerDemonstrate model =
     let
-        gWidth = "10000"
-        gHeight = "10000"
+        gWidth = "1000"
+        gHeight = "1000"
     in
-        Html.div[][Html.div [Html.Attributes.style "width" "50%",Html.Attributes.style "height" "50%",Html.Attributes.style "float" "left"]
-            [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
-              ( showBullets model.bulletViewbox ++  showMap model.viewbox++ [gun model.myself,me model.myself])]]
+        Html.div
+        []
+        [ Html.div 
+            [ Html.Attributes.style "width" "50%"
+            , Html.Attributes.style "height" "50%"
+            , Html.Attributes.style "float" "left"
+            , Html.Attributes.style "border" "inset"
+            ]
+            [ Svg.svg 
+                [ Mouse.onMove(.clientPos>>MouseMove)
+                , Mouse.onDown(\event->MouseDown)
+                , Mouse.onUp(\event->MouseUp)
+                , Svg.Attributes.width "1000"
+                , Svg.Attributes.height "1000"
+                , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
+                ]
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself])
+            ]
+            , showDialogue model 0
+        ]
+
 
 
 showMap : Map -> List (Svg.Svg Msg)
-
 showMap model =
     let
        walls = displayRec model.walls
@@ -82,6 +143,7 @@ displayDoors obstacle =
     in
         List.map createBricksFormat obstacle
 
+
 displayMonster : List Monster -> List (Svg.Svg Msg)
 displayMonster monsters =
     let
@@ -106,7 +168,13 @@ me : Me -> Svg.Svg Msg
 me  myself=
    let 
         createBallFormat model =
-          Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx "500", Svg.Attributes.cy "500", Svg.Attributes.r <| String.fromFloat model.r][]
+          Svg.circle 
+            [ Svg.Attributes.fill "green"
+            , Svg.Attributes.cx "500"
+            , Svg.Attributes.cy "500"
+            , Svg.Attributes.r <| String.fromFloat model.r
+            ] 
+            []
     in
         createBallFormat myself
 
@@ -116,10 +184,9 @@ gun myself =
         pos = myself.mouseData
         px = Tuple.first pos
         py = Tuple.second pos
-        route=Svg.Attributes.d(
-                                      " M 500 500" ++
-                                      " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
-                                      )
+        route=Svg.Attributes.d(" M 500 500" ++
+                               " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
+                              )
         getcolor = 
             if myself.fire then 
                 "red"
@@ -137,3 +204,63 @@ showBullets bullets =
           Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat  model.x, Svg.Attributes.cy <| String.fromFloat  model.y, Svg.Attributes.r <| String.fromFloat model.r][]
     in
         List.map createBulletFormat bullets
+
+
+
+showDialogue : Model -> Float -> Html Msg
+showDialogue model deltaTime =
+    case model.state of
+        Dialogue ->
+            let
+                txt = Maybe.withDefault sentenceInit (List.head model.currentDialogues)
+                location =
+                    case txt.side of
+                        Left -> "120px 0 0 -50px"
+                        Right -> "120px 0 0 390px"
+                        Bottom -> "300px 0 0 120px"
+            in
+                div
+                [ style "background" "rgba(236, 240, 241, 0.89)"
+                , style "color" "#34495f"
+                , style "height" "400px"
+                , style "left" "280px"
+                , style "padding" "0 140px"
+                , style "position" "absolute"
+                , style "top" "155px"
+                , style "width" "400px"
+                , style "background-image" txt.image
+                , style "background-size" "100% 100%"
+                ]
+                [ div [style "margin" "20px 0 0 120px", style "color" "red"] [text "Press ENTER to continue"]
+                , div
+                    [ style "margin" location
+                    , style "position" "absolute"
+                    , style "color" "orange"
+                    ]
+                    [text txt.text]
+                ]
+        _ ->
+            div [] []
+
+
+
+
+showMiniMap : Model -> Html.Html Msg
+showMiniMap model =
+    let
+       (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
+
+       walls = displayRec miniMap.walls
+       roads = displayRec miniMap.roads
+       gate = displayDoors [miniMap.gate]
+
+       myself = model.myself
+       xTemp = myself.x - toFloat(dx*2500) +500
+       yTemp = myself.y - toFloat(dy*2500) +500
+       rTemp = 200
+
+       meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
+    in
+     Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500",Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
+             (walls ++ roads  ++ gate ++ meTemp)
+
