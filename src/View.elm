@@ -12,6 +12,7 @@ import Html.Events.Extra.Mouse as Mouse
 import Svg 
 import Svg.Attributes 
 
+import MiniMap exposing (getMiniMap)
 
 
 -- view : Model -> Html.Html Msg
@@ -45,7 +46,7 @@ view model =
             , Html.Attributes.style "overflow" "scroll"
             , Html.Attributes.style "overflow-x" "hidden"
             ]
-            [   Html.div [][miniMap model.map]
+            [   Html.div [Html.Attributes.style "top" "200px",Html.Attributes.style "left" "200px"][showMiniMap model]
             ,   Html.div
                 [ 
                     Html.Attributes.style "width" (String.fromFloat configwidth ++ "px")
@@ -199,14 +200,22 @@ showBullets bullets =
         List.map createBulletFormat bullets
 
 
-miniMap : Map -> Html.Html Msg
-miniMap model = 
+showMiniMap : Model -> Html.Html Msg
+showMiniMap model =
     let
-       walls = displayRec model.walls
-       roads = displayRec model.roads
+       (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
 
-       doors = displayDoors model.doors
-       gate = displayDoors [model.gate] -- todo
+       walls = displayRec miniMap.walls
+       roads = displayRec miniMap.roads
+       gate = displayDoors [miniMap.gate]
+
+       myself = model.myself
+       xTemp = myself.x - toFloat(dx*2500) +500
+       yTemp = myself.y - toFloat(dy*2500) +500
+       rTemp = 200
+
+       meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
     in
-       Svg.svg [Svg.Attributes.width "300", Svg.Attributes.height "300",Svg.Attributes.viewBox "0 0 100% 100%"]
-               (walls ++ roads ++ doors ++ gate)
+     Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500",Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
+             (walls ++ roads  ++ gate ++ meTemp)
+        
