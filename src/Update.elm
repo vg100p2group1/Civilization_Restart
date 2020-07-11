@@ -3,12 +3,12 @@ module Update exposing (update)
 import Messages exposing (Msg(..))
 import Model exposing (Model,Me)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
-import Map.Map exposing (Map)
+import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax)
 import Weapon exposing (Bullet, fireBullet, updateBullet)
 import Debug
 import Map.MapGenerator exposing (roomGenerator)
-import Map.MapDisplay exposing (showMap)
+import Map.MapDisplay exposing (showMap, mapWithGate)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -56,10 +56,9 @@ update msg model =
         MouseMove newMouseData ->
             let 
                 pTemp = model.myself 
-                -- d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
-                -- d = Debug.log "mouse" newMouseData 
-                me = {pTemp | mouseData = newMouseData}
-                
+                d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
+                d = Debug.log "mouse" newMouseData 
+                me = {pTemp | mouseData = mouseDataUpdate model newMouseData}
             in 
                 ({model|myself = me},Cmd.none)
         
@@ -87,12 +86,29 @@ update msg model =
                 roomNew = 
                     roomGenerator 1 (Tuple.second model.rooms)
 
-                mapNew = showMap (Tuple.first roomNew) (List.length (Tuple.first roomNew)) (Map [] [] [] [] [])
+                mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
             in
                 ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
         Tick time ->
            animate model
+
+
+        Resize width height ->
+            ( { model | size = ( toFloat width, toFloat height ) }
+            , Cmd.none
+            )
+
+        GetViewport { viewport } ->
+            ( { model
+                | size =
+                    ( viewport.width
+                    , viewport.height
+                    )
+              }
+            , Cmd.none
+            )
+
 
         Noop ->
             let 
@@ -102,6 +118,32 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+
+mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
+mouseDataUpdate model mousedata = 
+    let
+        ( w, h ) =
+            model.size
+        
+        configheight =1000
+        configwidth = 1000
+        r =
+            if w / h > 1 then
+                Basics.min 1 (h / configwidth)
+
+            else
+                Basics.min 1 (w / configheight)
+        
+        xLeft = (w - configwidth*r) / 2 
+        yTop = (h - configheight*r) / 2
+
+        (mx,my) = 
+            mousedata 
+
+    in
+        (mx-xLeft,my-yTop)
+
+
 
 
 animate :  Model -> (Model, Cmd Msg)
@@ -189,6 +231,8 @@ updateViewbox me model =
         newDoors = List.map (viewUpdate me) mapTemp.doors
         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
         newMonsters = List.map (\value -> {value| position = viewUpdate me value.position}) mapTemp.monsters 
+
+        newGate = viewUpdate me mapTemp.gate
 
     in
         {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters}

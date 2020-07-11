@@ -1,7 +1,22 @@
-module Map.MapDisplay exposing (showMap)
+module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,roomConfig,Monster)
+import Map.Map exposing (Room,Map,Monster,roomConfig,mapConfig)
 import Shape exposing (recInit,Rectangle,recUpdate)
+
+import Map.Gate exposing (gateGenerator)
+import Map.MapGenerator exposing (roomInit)
+import Random 
+
+mapInit : Map
+mapInit = mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)) mapConfig (Random.initialSeed 0)
+
+mapWithGate : List Room -> Int -> Map -> Random.Seed -> Map
+mapWithGate rooms number drawnrooms seed0 = 
+    let
+        mapTemp = showMap rooms number drawnrooms
+        (gateTemp, _) = gateGenerator rooms seed0
+    in
+        {mapTemp| gate=gateTemp}
 
 showMap : List Room -> Int -> Map -> Map
 showMap rooms number drawnrooms=
@@ -26,7 +41,6 @@ showMap rooms number drawnrooms=
             drawnrooms
         else 
             showMap newRooms (number-1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew}
-
 
 drawMonsters : Room -> List Monster
 drawMonsters room =
