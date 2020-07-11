@@ -6,6 +6,7 @@ import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (bulletConfig,Bullet)
 import Debug
+import Monster.Monster exposing (allMonsterAct)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
@@ -217,7 +218,7 @@ updateViewbox me model =
         newDoors = List.map (viewUpdate me) mapTemp.doors
         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
 
-        newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position}) mapTemp.monsters 
+        newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position,region = viewUpdate me value.region}) mapTemp.monsters 
 
         newGate = viewUpdate me mapTemp.gate
 

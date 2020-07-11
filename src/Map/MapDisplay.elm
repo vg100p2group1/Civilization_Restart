@@ -1,4 +1,3 @@
-
 module Map.MapDisplay exposing (mapWithGate)
 -- import MapGenerator exposing (..)
 import Map.Map exposing (Room,Map,Monster,roomConfig)
@@ -14,6 +13,7 @@ mapWithGate rooms number drawnrooms seed0 =
         (gateTemp, _) = gateGenerator rooms seed0
     in
         {mapTemp| gate=gateTemp}
+
 
 showMap : List Room -> Int -> Map -> Map
 showMap rooms number drawnrooms=
@@ -47,13 +47,19 @@ drawMonsters room =
         newX = toFloat (2500*x)
         newY = toFloat (2500*y)
         monsterList = room.monsters
+        movingRectangle model =
+            let
+                newModel = {model|x=model.x+newX,y=model.y+newY}
+            in
+                recUpdate newModel
+
         movingCircle model =
             let
                 newModel = {model|cx=model.cx+newX,cy=model.cy+newY}
             in
                 newModel
     in
-        List.map (\value->{value| position = movingCircle value.position}) monsterList
+        List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position}) monsterList
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =
