@@ -9,6 +9,7 @@ import Weapon exposing (Bullet, fireBullet, updateBullet)
 import Debug
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap)
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -67,10 +68,10 @@ update msg model =
                 pTemp =  model.myself
                 me= {pTemp | fire = True}
                 -- bulletnow = model.bullet
-                newShoot = fireBullet me.mouseData me.hitbox.x me.hitbox.y
-                newBullet = model.bullet :: newShoot
+                newShoot = fireBullet me.mouseData (me.x,me.y)
+                newBullet = newShoot :: model.bullet 
                 newCircle = Circle 500 500 newShoot.hitbox.r
-                newBulletViewbox = model.bulletViewbox :: {newShoot|hitbox = newCircle}
+                newBulletViewbox = {newShoot|hitbox = newCircle, x = 500, y = 500, r = 5} :: model.bulletViewbox
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
                 ({model|myself = me, bullet = newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
@@ -109,10 +110,10 @@ animate  model =
         me = model.myself
         newMe = speedCase me
         newViewbox = updateViewbox newMe model
-        newBullet = updateBullet model.bullet
-        newBulletViewbox = updateBullet model.bulletViewbox
+        newBullet = updateBullet model.map model.bullet
+        newBulletViewbox = updateBullet model.viewbox model.bulletViewbox
     in
-        ({model| myself = newMe, viewbox=newViewbox,bullet= newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
+        ({model| myself = newMe, viewbox=newViewbox, bullet= newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
 
 
 speedCase : Me -> Me

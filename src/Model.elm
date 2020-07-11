@@ -3,9 +3,12 @@ import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon)
+import Config exposing (playerSpeed)
 
 type alias Me =
-    { hitbox : Circle
+    { x : Float
+    , y : Float
+    , r : Float
     , xSpeed : Float
     , ySpeed : Float
     , rotate : Float
@@ -25,8 +28,7 @@ defaultMe : Me
 defaultMe = Me 0 0 50 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 50) []
 
 type alias Model =
-    { 
-      myself : Me
+    { myself : Me
     , bullet : List Bullet 
     , bulletViewbox : List Bullet
     , map : Map

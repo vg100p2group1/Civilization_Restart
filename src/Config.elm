@@ -1,4 +1,4 @@
-module Config exposing (viewBoxMax,playerSpeed,initMapUpdate,bulletSpeed)
+module Config exposing (viewBoxMax,playerSpeed,initMapUpdate,bulletSpeed,roomInit,mapInit)
 
 import Shape exposing (Rectangle, Circle)
 import Map.Map exposing (Map,Room)

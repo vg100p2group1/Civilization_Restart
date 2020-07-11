@@ -9,6 +9,7 @@ import Messages exposing (Msg(..))
 import View exposing (view)
 import Update
 import Model exposing (Model, defaultMe)
+import Config exposing (roomInit,mapInit)
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -20,7 +21,6 @@ main =
         { view =  View.view 
         , init = \_ -> (init, Cmd.none)
         , update = Update.update
-        
         , subscriptions = subscriptions
         }
 
