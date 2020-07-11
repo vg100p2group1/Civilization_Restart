@@ -31,4 +31,5 @@ type alias Model =
     , map : Map
     , rooms : (List Room,Random.Seed)
     , viewbox : Map
+    , size : (Float,Float)
     }

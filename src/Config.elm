@@ -42,7 +42,7 @@ mapInit = mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)
 >>>>>>> Zihao_Wei
 
 init : Model
-init = Model myselfConfig [] [] mapInit roomInit mapInit
+init = Model myselfConfig [] [] mapInit roomInit mapInit (0,0)
 
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
 initMapUpdate me model =

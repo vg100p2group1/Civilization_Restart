@@ -1,4 +1,6 @@
 module Messages exposing (Msg(..))
+import Css exposing (Resize)
+import Browser.Dom exposing (Viewport)
 -- import Model exposing (MouseMoveData)
 type Msg
     = Tick Float
@@ -12,3 +14,5 @@ type Msg
     -- | Map
     | NextFloor
     | Noop
+    | Resize Int Int
+    | GetViewport Viewport
