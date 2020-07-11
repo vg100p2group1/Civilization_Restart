@@ -14,23 +14,64 @@ import Svg.Attributes
 
 
 
+-- view : Model -> Html.Html Msg
+-- view model =
+--     playerDemonstrate model
+
+
 view : Model -> Html.Html Msg
 view model =
-    playerDemonstrate model
+    let
+        ( w, h ) =
+            model.size
+        
+        configheight =1000
+        configwidth = 1000
+        r =
+            if w / h > 1 then
+                Basics.min 1 (h / configwidth)
+
+            else
+                Basics.min 1 (w / configheight)
+    in
+        Html.div
+            [ 
+                Html.Attributes.style "width" "100%"
+            , Html.Attributes.style "height" "100%"
+            , Html.Attributes.style "position" "absolute"
+            , Html.Attributes.style "left" "0"
+            , Html.Attributes.style "top" "0"
+            , Html.Attributes.style "background" "linear-gradient(135deg, rgba(206,188,155,1) 0%, rgba(85,63,50,1) 51%, rgba(42,31,25,1) 100%)"
+            , Html.Attributes.style "overflow" "scroll"
+            , Html.Attributes.style "overflow-x" "hidden"
+            ]
+            [   Html.div [][miniMap model.map]
+            ,   Html.div
+                [ 
+                    Html.Attributes.style "width" (String.fromFloat configwidth ++ "px")
+                    , Html.Attributes.style "height" (String.fromFloat configheight ++ "px")
+                    , Html.Attributes.style "position" "absolute"
+                    , Html.Attributes.style "left" (String.fromFloat ((w - configwidth*r) / 2) ++ "px")
+                    , Html.Attributes.style "top" (String.fromFloat ((h - configheight*r) / 2) ++ "px")
+                    , Html.Attributes.style "transform-origin" "0 0"
+                    , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
+                ][playerDemonstrate model]
+            ]
+
 
 playerDemonstrate : Model -> Html.Html Msg
 playerDemonstrate model =
     let
-        gWidth = "10000"
-        gHeight = "10000"
+        gWidth = "1000"
+        gHeight = "1000"
+
     in
-        Html.div[][Html.div [Html.Attributes.style "width" "50%",Html.Attributes.style "height" "50%",Html.Attributes.style "float" "left"]
+        Html.div[][Html.div [Html.Attributes.style "width" "100%",Html.Attributes.style "height" "100%",Html.Attributes.style "float" "left",Html.Attributes.style "border" "inset"]
             [ Svg.svg [Mouse.onMove(.clientPos>>MouseMove),Mouse.onDown(\event->MouseDown),Mouse.onUp(\event->MouseUp),Svg.Attributes.width "1000", Svg.Attributes.height "1000",Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight]
               ( showBullets model.bulletViewbox ++  showMap model.viewbox++ [gun model.myself,me model.myself])]]
 
 
 showMap : Map -> List (Svg.Svg Msg)
-
 showMap model =
     let
        walls = displayRec model.walls
@@ -82,6 +123,7 @@ displayDoors obstacle =
     in
         List.map createBricksFormat obstacle
 
+
 displayMonster : List Monster -> List (Svg.Svg Msg)
 displayMonster monsters =
     let
@@ -117,10 +159,9 @@ gun myself =
         pos = myself.mouseData
         px = Tuple.first pos
         py = Tuple.second pos
-        route=Svg.Attributes.d(
-                                      " M 500 500" ++
-                                      " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
-                                      )
+        route=Svg.Attributes.d(" M 500 500" ++
+                               " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
+                              )
         getcolor = 
             if myself.fire then 
                 "red"
@@ -138,3 +179,16 @@ showBullets bullets =
           Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat  model.x, Svg.Attributes.cy <| String.fromFloat  model.y, Svg.Attributes.r <| String.fromFloat model.r][]
     in
         List.map createBulletFormat bullets
+
+
+miniMap : Map -> Html.Html Msg
+miniMap model = 
+    let
+       walls = displayRec model.walls
+       roads = displayRec model.roads
+
+       doors = displayDoors model.doors
+       gate = displayDoors [model.gate] -- todo
+    in
+       Svg.svg [Svg.Attributes.width "300", Svg.Attributes.height "300",Svg.Attributes.viewBox "0 0 100% 100%"]
+               (walls ++ roads ++ doors ++ gate)
