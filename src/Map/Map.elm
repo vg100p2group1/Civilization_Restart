@@ -2,6 +2,7 @@
 module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
 import Config exposing (viewBoxMax)
+import Random exposing (Seed)
 
 type alias Treasure =
     { position : (Int,Int)
@@ -22,6 +23,8 @@ type alias Monster =
     { position : Shape.Circle
     , region : Rectangle
     , monsterType : MonsterType
+    , direction : Int
+    , seed : Seed
     }
 
 

@@ -7,7 +7,6 @@ import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax)
 import Weapon exposing (Bullet, fireBullet, updateBullet)
 import Debug
-import Monster.Monster exposing (allMonsterAct)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
@@ -166,17 +165,17 @@ animate  model =
     let
         me = model.myself
         newMe = speedCase me
-        newMonsters = updateMonster model.map.monsters model.bullet
+        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet model.map.obstacles me
         map = model.map
         newMap = {map | monsters = newMonsters}
         viewbox = model.viewbox
-        newMonstersViewbox = updateMonster model.viewbox.monsters model.bulletViewbox
+        (newMonstersViewbox,newBulletViewbox) = updateMonster model.viewbox.monsters model.bulletViewbox model.map.obstacles me 
         newViewbox_ = {viewbox | monsters = newMonstersViewbox}
         newViewbox = updateViewbox newMe {model | viewbox = newViewbox_}
-        newBullet = updateBullet model.map model.bullet
-        newBulletViewbox = updateBullet model.viewbox model.bulletViewbox
+        newBulletList = updateBullet model.map newBullet
+        newBulletListViewbox = updateBullet model.viewbox model.bulletViewbox
     in
-        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBullet,bulletViewbox=newBulletViewbox },Cmd.none)
+        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
 
 
 speedCase : Me -> Me

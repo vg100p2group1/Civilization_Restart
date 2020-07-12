@@ -4,6 +4,9 @@ import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
 import Shape exposing (circleInit)
 import Weapon exposing(Bullet,ShooterType(..))
+import Model exposing (Me)
+
+import Monster.Monster exposing (allMonsterAct)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
 
@@ -66,7 +69,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 100) (toFloat yTemp + 100) 50 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3
 
     in 
         if number==0 then
@@ -95,11 +98,14 @@ updateMonster_ monster bullets =
     in
         {monster | monsterType = newMonsterType}
 
-updateMonster : List Monster -> List Bullet -> List Monster
-updateMonster monsters bullets =
+updateMonster : List Monster -> List Bullet -> List Rectangle -> Me -> (List Monster,List Bullet)
+updateMonster monsters bullets obstacles me =
     let
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
                      |> List.map (\m -> updateMonster_ m bullets)
+
+
+        
     in
-        finalMonsters
+        allMonsterAct finalMonsters me obstacles bullets
