@@ -38,8 +38,7 @@ view model =
                 Basics.min 1 (w / configheight)
     in
         Html.div
-            [ 
-                Html.Attributes.style "width" "100%"
+            [ Html.Attributes.style "width" "100%"
             , Html.Attributes.style "height" "100%"
             , Html.Attributes.style "position" "absolute"
             , Html.Attributes.style "left" "0"
@@ -48,8 +47,15 @@ view model =
             , Html.Attributes.style "overflow" "scroll"
             , Html.Attributes.style "overflow-x" "hidden"
             ]
-            [   Html.div [Html.Attributes.style "top" "200px",Html.Attributes.style "left" "200px"][showMiniMap model]
-            ,   Html.div
+
+            [ Html.div
+
+                [ Html.Attributes.style "top" "200px"
+                , Html.Attributes.style "left" "200px"
+                ]
+                [showMiniMap model]
+
+            , Html.div
                 [ 
                     Html.Attributes.style "width" (String.fromFloat configwidth ++ "px")
                     , Html.Attributes.style "height" (String.fromFloat configheight ++ "px")
@@ -58,7 +64,8 @@ view model =
                     , Html.Attributes.style "top" (String.fromFloat ((h - configheight*r) / 2) ++ "px")
                     , Html.Attributes.style "transform-origin" "0 0"
                     , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
-                ][playerDemonstrate model]
+                ]
+                [playerDemonstrate model]
             ]
 
 
@@ -74,7 +81,7 @@ playerDemonstrate model =
             [ Html.Attributes.style "width" "50%"
             , Html.Attributes.style "height" "50%"
             , Html.Attributes.style "float" "left"
-            , Html.Attributes.style "border" "inset"
+            --, Html.Attributes.style "border" "inset"
             ]
             [ Svg.svg 
                 [ Mouse.onMove(.clientPos>>MouseMove)
@@ -152,12 +159,14 @@ displayMonster monsters =
             let
                 model = monsterTemp.position
                 monsterType = monsterTemp.monsterType
+                opacity = String.fromFloat (monsterTemp.monsterType.hp / 150)
             in
                 Svg.circle
                     [ Svg.Attributes.cx <| String.fromFloat model.cx
                     , Svg.Attributes.cy <| String.fromFloat model.cy
                     , Svg.Attributes.r <| String.fromFloat model.r
                     , Svg.Attributes.fill monsterType.color
+                    , Svg.Attributes.fillOpacity opacity
                     ]
                 []
     in
@@ -165,7 +174,7 @@ displayMonster monsters =
 
 
 me : Me -> Svg.Svg Msg
-me  myself=
+me myself=
    let 
         createBallFormat model =
           Svg.circle 
@@ -193,7 +202,7 @@ gun myself =
             else
                 "blue"                              
     in
-        Svg.path [ route ,  Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
+        Svg.path [route , Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
 
 
 showBullets : List Bullet -> List ( Svg.Svg Msg) 
@@ -261,6 +270,6 @@ showMiniMap model =
 
        meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
     in
-     Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500",Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
-             (walls ++ roads  ++ gate ++ meTemp)
+        Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
+        (walls ++ roads  ++ gate ++ meTemp)
 

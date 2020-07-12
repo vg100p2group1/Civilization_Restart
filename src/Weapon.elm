@@ -1,4 +1,4 @@
-module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,fireBullet,updateBullet)
+module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,fireBullet,updateBullet,ShooterType(..))
 
 import Shape exposing (Circle, recCollisionTest,circleRecTest,circleCollisonTest)
 import Config exposing (bulletSpeed)
@@ -13,6 +13,7 @@ type alias Bullet =
     , speedY : Float
     , collision : Bool
     , from : ShooterType
+    , force : Float
     }
 type ShooterType
     = Player
@@ -28,7 +29,7 @@ type alias Weapon =
     }
 
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player
+bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player 20
 
 defaultWeapon : Weapon
 defaultWeapon = Weapon defaultBulletGenerator Default "Default Weapon"
@@ -59,11 +60,13 @@ updateBullet map bullets =
                 newHitbox = Circle newX newY b.hitbox.r
             in
                 {b|hitbox = newHitbox,x=newX, y=newY}
-        allBullets = List.map updateXY bullets
-        finalBullets = allBullets
+
+        allBullets = bullets
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.walls)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
-                    |> List.filter (\b -> not (List.any (circleCollisonTest  b.hitbox) (List.map .position map.monsters)))
+                    |> List.filter (\b -> not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters)))
+        finalBullets = List.map updateXY allBullets
     in
         finalBullets
+

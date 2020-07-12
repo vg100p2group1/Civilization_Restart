@@ -19,10 +19,9 @@ type alias MonsterType =
        
     }
 type alias Monster =
-    {
-        position : Shape.Circle
-    ,   region : Rectangle
-   ,   monsterType : MonsterType 
+    { position : Shape.Circle
+    , region : Rectangle
+    , monsterType : MonsterType
     }
 
 

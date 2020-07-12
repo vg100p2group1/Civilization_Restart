@@ -1,9 +1,9 @@
-module Map.MonsterGenerator exposing (monsterGenerator)
-import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate)
+module Map.MonsterGenerator exposing (monsterGenerator,updateMonster)
+import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
 import Shape exposing (circleInit)
-
+import Weapon exposing(Bullet,ShooterType(..))
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
 
@@ -66,7 +66,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 100) (toFloat yTemp + 100) 50 
 
-        monsterNew = Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp
 
     in 
         if number==0 then
@@ -76,3 +76,30 @@ monsterBuilding monsterList number obstacles seed0 =
                 monsterBuilding (monsterNew :: monsterList) (number - 1) obstacles seed3
             else 
                 monsterBuilding  monsterList number obstacles seed3
+
+updateMonster_ : Monster -> List Bullet -> Monster
+updateMonster_ monster bullets =
+    let
+        hitBullets = bullets
+                  |> List.filter (\b -> b.from == Player)
+                  |> List.filter (\b -> circleCollisonTest b.hitbox monster.position)
+        monsterType_ = monster.monsterType
+        newMonsterType = {monsterType_ | hp = monsterType_.hp - List.sum (List.map (\b -> b.force) hitBullets)}
+        {- debug test
+        newMonsterType =
+                if List.isEmpty hitBullets then
+                    monsterType_
+                else
+                    Debug.log "hitMonster" {monsterType_ | hp = monsterType_.hp - toFloat(20 * (List.length hitBullets)), color = "Green"}
+        -}
+    in
+        {monster | monsterType = newMonsterType}
+
+updateMonster : List Monster -> List Bullet -> List Monster
+updateMonster monsters bullets =
+    let
+        finalMonsters = monsters
+                     |> List.filter (\m -> m.monsterType.hp > 0)
+                     |> List.map (\m -> updateMonster_ m bullets)
+    in
+        finalMonsters

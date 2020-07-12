@@ -182,7 +182,6 @@ roomPicking  availableRoom r seed0 =
             roomPicking (newList1 ++ newList2) (r - 1) seed1
 
 
-
 -- view : Model -> Html.Html Msg
 -- view model =
 --     let

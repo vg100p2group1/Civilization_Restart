@@ -66,4 +66,4 @@ miniMapUpdate x y model =
         posListUpdate l =
             List.map (\value -> posUpdate value) l
     in
-        {model|walls = posListUpdate model.walls,roads = posListUpdate model.roads,gate = posUpdate model.gate}
+        {model|walls = posListUpdate model.walls, roads = posListUpdate model.roads,gate = posUpdate model.gate}

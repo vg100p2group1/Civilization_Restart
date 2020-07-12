@@ -12,6 +12,7 @@ import Monster.Monster exposing (allMonsterAct)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
+import Map.MonsterGenerator exposing (updateMonster)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -162,14 +163,20 @@ mouseDataUpdate model mousedata =
 
 animate :  Model -> (Model, Cmd Msg)
 animate  model =
-    let 
+    let
         me = model.myself
         newMe = speedCase me
-        newViewbox = updateViewbox newMe model
+        newMonsters = updateMonster model.map.monsters model.bullet
+        map = model.map
+        newMap = {map | monsters = newMonsters}
+        viewbox = model.viewbox
+        newMonstersViewbox = updateMonster model.viewbox.monsters model.bulletViewbox
+        newViewbox_ = {viewbox | monsters = newMonstersViewbox}
+        newViewbox = updateViewbox newMe {model | viewbox = newViewbox_}
         newBullet = updateBullet model.map model.bullet
         newBulletViewbox = updateBullet model.viewbox model.bulletViewbox
     in
-        ({model| myself = newMe, viewbox=newViewbox, bullet= newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
+        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBullet,bulletViewbox=newBulletViewbox },Cmd.none)
 
 
 speedCase : Me -> Me
@@ -229,12 +236,12 @@ viewUpdate me oneWall =
         recUpdate recTemp
         
 viewUpdateCircle : Me -> Circle -> Shape.Circle
-viewUpdateCircle me circ =
+viewUpdateCircle me circle =
     let 
-        xTemp = circ.cx - me.xSpeed
-        yTemp = circ.cy - me.ySpeed
+        xTemp = circle.cx - me.xSpeed
+        yTemp = circle.cy - me.ySpeed
     in
-        Circle xTemp yTemp circ.r
+        Circle xTemp yTemp circle.r
 
 
 updateViewbox : Me -> Model -> Map
