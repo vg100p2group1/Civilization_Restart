@@ -149,7 +149,8 @@ mouseDataUpdate model mousedata =
 
             else
                 Basics.min 1 (w / configheight)
-        
+        d1=Debug.log "r" r 
+
         xLeft = (w - configwidth*r) / 2 
         yTop = (h - configheight*r) / 2
 
@@ -157,7 +158,7 @@ mouseDataUpdate model mousedata =
             mousedata 
 
     in
-        (mx - xLeft, my - yTop)
+        ((mx - xLeft)/r, (my - yTop)/r)
 
 
 
@@ -168,6 +169,8 @@ animate  model =
         me = model.myself
         newMe = speedCase me
         (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me
+        newMe = speedCase me model.map
+        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet model.map.obstacles me
         map = model.map
         newMap = {map | monsters = newMonsters}
         viewbox = model.viewbox
@@ -180,8 +183,8 @@ animate  model =
         ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
 
 
-speedCase : Me -> Me
-speedCase me = 
+speedCase : Me -> Map-> Me
+speedCase me map= 
     let 
         getNewXSpeed =
             if me.moveLeft then 
@@ -211,14 +214,30 @@ speedCase me =
                     (newXspeed/1.414,newYspeed/1.414)
                 _ ->
                     (newXspeed,newYspeed)
-        (xSpeedFinal,ySpeedFinal) = getSpeed
+        (xSpeedFinalTemp,ySpeedFinalTemp) = getSpeed
         
-        (newX,newY) = (me.x+xSpeedFinal,me.y+ySpeedFinal) --Todo
-        recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
-        
+        (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
+        -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
+        getXY = -- TO DO collide direction 之后要保持非碰撞分量。
+            if (wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++map.walls++map.roads) ) then
+                ((newXTemp,newYTemp),(xSpeedFinalTemp,ySpeedFinalTemp))
+            else
+                ((me.x,me.y),(0,0))
+        ((newX,newY),(xSpeedFinal,ySpeedFinal)) = getXY
         
     in
         {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)}
+
+wallCollisionTest : Circle -> List Rectangle -> Bool
+wallCollisionTest hitbox wallList =
+    let
+        collide model =
+            circleRecTest hitbox model
+        wallColList=List.filter collide <| List.map (\value->value.edge) wallList
+        -- d1=Debug.log "hitbox" hitbox
+        -- d2=Debug.log "Col List" wallColList
+    in
+        List.isEmpty wallColList 
 
 
 

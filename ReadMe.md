@@ -22,6 +22,6 @@ For the MVP project, we only supply the basic mode.  Here are the keys that you 
 
 ## 3. Known Bugs
 
-​	1) We haven't write the collision test between the player and the wall.
+​	1) The collision with the walls. We now just stop the player if he is going to collide with the wall.
 
 ​	2) We haven't write the screen adaptation for the Mini Map, so it may overlap with the Main Map.

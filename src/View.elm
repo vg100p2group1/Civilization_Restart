@@ -266,8 +266,8 @@ showMiniMap model =
        gate = displayDoors [miniMap.gate]
 
        myself = model.myself
-       xTemp = myself.x - toFloat(dx*2500) +500
-       yTemp = myself.y - toFloat(dy*2500) +500
+       xTemp = myself.x - toFloat(dx*2500)
+       yTemp = myself.y - toFloat(dy*2500)
        rTemp = 200
 
        meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
