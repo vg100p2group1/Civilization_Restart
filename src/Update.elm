@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState)
+import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax)
@@ -91,8 +91,10 @@ update msg model =
                     roomGenerator 1 (Tuple.second model.rooms)
 
                 mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                meTemp = model.myself
+                meNew = {defaultMe|weapons=meTemp.weapons}
             in
-                ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
+                ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
         Tick time ->
             model
