@@ -78,10 +78,10 @@ playerDemonstrate model =
         Html.div
         []
         [ Html.div 
-            [ Html.Attributes.style "width" "50%"
-            , Html.Attributes.style "height" "50%"
+            [ Html.Attributes.style "width" "100%"
+            , Html.Attributes.style "height" "100%"
             , Html.Attributes.style "float" "left"
-            --, Html.Attributes.style "border" "inset"
+            , Html.Attributes.style "border" "outset"
             ]
             [ Svg.svg 
                 [ Mouse.onMove(.clientPos>>MouseMove)
