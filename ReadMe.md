@@ -14,6 +14,8 @@ For the MVP project, we only supply the basic mode.  Here are the keys that you 
 
 ​	2) 	M for moving into the next floor.
 
+​	3）  G  to open the test window for Dialogs.  Enter for the next sentence. 
+
 ​	3)	Moving the mouse to aim.
 
 ​	4)	Left-Click  to Shoot	
@@ -22,3 +24,4 @@ For the MVP project, we only supply the basic mode.  Here are the keys that you 
 
 ​	1) We haven't write the collision test between the player and the wall.
 
+​	2) We haven't write the screen adaptation for the Mini Map, so it may overlap with the Main Map.
