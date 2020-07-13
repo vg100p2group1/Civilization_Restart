@@ -1,6 +1,8 @@
+
 module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
-
+import Config exposing (viewBoxMax)
+import Random exposing (Seed)
 
 type alias Treasure =
     { position : (Int,Int)
@@ -12,14 +14,17 @@ type alias Obstacle =
     }
 
 type alias MonsterType =
-    {   hP : Float
+    {   hp : Float
     ,   attack : Float
     ,   color : String     
+       
     }
 type alias Monster =
-    {
-        position : Rectangle
-    ,   monsterType : MonsterType 
+    { position : Shape.Circle
+    , region : Rectangle
+    , monsterType : MonsterType
+    , direction : Int
+    , seed : Seed
     }
 
 
@@ -52,3 +57,15 @@ roomConfig = Room (0,0) False False [] [] treasureConfig [] 0
 
 mapConfig : Map
 mapConfig = Map [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+
+{-
+initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
+initMapUpdate me model =
+    List.map (\value-> {value|x=me.x + viewBoxMax/2 + value.x, y= me.y + viewBoxMax/2 + value.y}) model
+-}
+
+{-
+initMapUpdate : (Float, Float) -> (List Rectangle) -> (List Rectangle)
+initMapUpdate (mePosX, mePosY) model =
+    List.map (\value-> {value|x=mePosX + viewBoxMax/2 + value.x, y= mePosY + viewBoxMax/2 + value.y}) model
+-}

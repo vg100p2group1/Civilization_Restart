@@ -16,3 +16,8 @@ type Msg
     | Noop
     | Resize Int Int
     | GetViewport Viewport
+    -- for testing
+    | ShowDialogue
+    | NextSentence
+
+

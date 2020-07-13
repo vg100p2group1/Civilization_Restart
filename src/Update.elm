@@ -1,22 +1,26 @@
-module Update exposing (..)
+module Update exposing (update)
+
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me)
+import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit)
 import Map.Map exposing (Map,mapConfig)
-import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
-import Weapon exposing (bulletConfig,Bullet)
+import Config exposing (playerSpeed,viewBoxMax)
+import Weapon exposing (Bullet, fireBullet, updateBullet)
 import Debug
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
-import Map.MapDisplay exposing (mapWithGate)
+import Map.MapDisplay exposing (showMap, mapWithGate)
+import Map.MonsterGenerator exposing (updateMonster)
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
 
         MoveLeft on ->
             let 
-                pTemp =  model.myself 
+                pTemp = model.myself 
                 me= {pTemp | moveLeft = on, moveRight =  False}
             in
                 ( {model| myself= me}
@@ -33,7 +37,7 @@ update msg model =
                 )
 
         MoveUp on ->
-            let 
+            let
                 pTemp =  model.myself 
                 me= {pTemp | moveUp = on, moveDown =  False}
             in
@@ -67,7 +71,10 @@ update msg model =
                 pTemp =  model.myself
                 me= {pTemp | fire = True}
                 -- bulletnow = model.bullet
-                (newBullet,newBulletViewbox) = fireBullet me model.bullet model.bulletViewbox
+                newShoot = fireBullet me.mouseData (me.x,me.y)
+                newBullet = newShoot :: model.bullet 
+                newCircle = Circle 500 500 newShoot.hitbox.r
+                newBulletViewbox = {newShoot|hitbox = newCircle, x = 500, y = 500, r = 5} :: model.bulletViewbox
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
                 ({model|myself = me, bullet = newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
@@ -84,11 +91,23 @@ update msg model =
                     roomGenerator 1 (Tuple.second model.rooms)
 
                 mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                meTemp = model.myself
+                meNew = {defaultMe|weapons=meTemp.weapons}
             in
-                ({model|rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
+                ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
 
         Tick time ->
-           animate model
+            model
+                --|> updateSentence (min time 25)
+                |> animate
+
+
+        NextSentence ->
+            (updateSentence 0 model, Cmd.none)
+
+        -- the dialogue should be displayed when the player enters a new room actually
+        ShowDialogue ->
+            ({ model | state = Dialogue}, Cmd.none)
 
 
         Resize width height ->
@@ -138,21 +157,27 @@ mouseDataUpdate model mousedata =
             mousedata 
 
     in
-        (mx-xLeft,my-yTop)
+        (mx - xLeft, my - yTop)
 
 
 
 
 animate :  Model -> (Model, Cmd Msg)
 animate  model =
-    let 
+    let
         me = model.myself
         newMe = speedCase me
-        newViewbox = updateViewbox newMe model
-        newBullet = updateBullet model.bullet
-        newBulletViewbox = updateBullet model.bulletViewbox
+        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet model.map.obstacles me
+        map = model.map
+        newMap = {map | monsters = newMonsters}
+        viewbox = model.viewbox
+        (newMonstersViewbox,newBulletViewbox) = updateMonster model.viewbox.monsters model.bulletViewbox model.map.obstacles me 
+        newViewbox_ = {viewbox | monsters = newMonstersViewbox}
+        newViewbox = updateViewbox newMe {model | viewbox = newViewbox_}
+        newBulletList = updateBullet model.map newBullet
+        newBulletListViewbox = updateBullet model.viewbox model.bulletViewbox
     in
-        ({model| myself = newMe, viewbox=newViewbox,bullet= newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
+        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
 
 
 speedCase : Me -> Me
@@ -210,28 +235,24 @@ viewUpdate me oneWall =
         recTemp = Rectangle xTemp yTemp oneWall.width oneWall.height recInit
     in
         recUpdate recTemp
+        
+viewUpdateCircle : Me -> Circle -> Shape.Circle
+viewUpdateCircle me circle =
+    let 
+        xTemp = circle.cx - me.xSpeed
+        yTemp = circle.cy - me.ySpeed
+    in
+        Circle xTemp yTemp circle.r
 
 
 updateViewbox : Me -> Model -> Map
 updateViewbox me model =
-    -- let
-    --     -- recs = model.walls
-    --     -- d1 =Debug.log "Edge" me.edge
-    --     -- viewedRecTemp = List.filter (\value -> (recCollisionTest me.edge value.edge)) model.walls
-    --     -- d2 =Debug.log "viewedRecTemp" viewedRecTemp
-    --     -- left = me.x - viewBoxMax/2
-    --     -- right = me.x + viewBoxMax/2
-    --     -- top = me.y - viewBoxMax/2
-    --     -- bottom = me.y + viewBoxMax/2
-        
-
-
-    --     -- viewRec = List.map viewUpdate viewedRecTemp
+    -- viewRec = List.map viewUpdate viewedRecTemp
     -- in
     -- let
     --     meTemp = model.myself
     --     d = Debug.log "mouse2" meTemp.mouseData 
-    --     -- d=Debug.log "recs" model.viewbox
+    --     d=Debug.log "recs" model.viewbox
     -- in
     let
         mapTemp = model.viewbox
@@ -240,34 +261,52 @@ updateViewbox me model =
         newDoors = List.map (viewUpdate me) mapTemp.doors
         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
 
-        newMonsters = List.map (\value -> {value| position = viewUpdate me value.position}) mapTemp.monsters 
+        newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position,region = viewUpdate me value.region}) mapTemp.monsters 
 
         newGate = viewUpdate me mapTemp.gate
 
     in
         {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters,gate=newGate}
-        
-fireBullet : Me -> List Bullet -> List Bullet-> (List Bullet, List Bullet)
-fireBullet me bullets viewBox=
-    let
-        posX = Tuple.first me.mouseData
-        posY = Tuple.second me.mouseData
-        unitV = sqrt ((posX-500)*(posX-500) + (posY-500)*(posY-500)) 
-        xTemp = bulletSpeed / unitV * (posX - 500)
-        yTemp = bulletSpeed / unitV * (posY - 500)
-        newBullet = {bulletConfig | x=me.x,y=me.y,speedX=xTemp,speedY=yTemp}
-    in
-        (List.append bullets [newBullet],List.append viewBox [{newBullet|x=500,y=500}])
 
-updateBullet : List Bullet -> List Bullet
-updateBullet bullets =
+
+
+activateUpdate : Float -> Float -> { a | active : Bool, elapsed : Float } -> { a | active : Bool, elapsed : Float }
+activateUpdate interval elapsed state =
     let
-        updateXY model =
-            let
-                newX = model.x + model.speedX
-                newY = model.y + model.speedY
-            in
-                {model|x=newX,y=newY}
-            --ToDo filter
+        elapsed_ = state.elapsed + elapsed
     in
-        List.map updateXY bullets
+        if elapsed_ > interval then
+            {state | active = True, elapsed = elapsed_ - interval}
+        else
+            {state | elapsed = elapsed_}
+
+{-
+startUpdateSen : Model -> Model
+startUpdateSen model =
+    if model.changeSentence then
+        { model | sentenceState = Just {active = True, elapsed = 0}}
+    else
+        { model | sentenceState = Nothing}
+-}
+updateSentence : Float -> Model -> Model
+updateSentence elapsed model =
+    case model.state of
+        Dialogue ->
+            let
+                head = List.head model.currentDialogues
+                end =
+                    case head of
+                        Just a ->
+                            False
+                        Nothing ->
+                            True
+                (state, newDialogues) =
+                    if end then
+                        (Others, model.currentDialogues)
+                    else
+                        (Dialogue, List.drop 1 model.currentDialogues)
+            in
+                {model | state = state, currentDialogues = newDialogues}
+        _ ->
+            model
+

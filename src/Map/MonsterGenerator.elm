@@ -1,8 +1,12 @@
-module Map.MonsterGenerator exposing (monsterGenerator)
-import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate)
+module Map.MonsterGenerator exposing (monsterGenerator,updateMonster)
+import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
+import Shape exposing (circleInit)
+import Weapon exposing(Bullet,ShooterType(..))
+import Model exposing (Me)
 
+import Monster.Monster exposing (allMonsterAct)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
 
@@ -36,10 +40,10 @@ monsterGenerator seed0 obstacle =
 checkMonsterCollison : Monster -> List Obstacle -> List Monster -> Bool
 checkMonsterCollison monster obstacles monsterList=
     let
-        monsterPos=monster.position
+        monsterRegion=monster.region
         obstaclePosList = List.map (\value -> value.position) obstacles
-        monsterPosList = List.map (\value->value.position) monsterList
-        obstacleCol=List.filter (recCollisionTest monsterPos.edge) <| List.map (\value->value.edge) (obstaclePosList++monsterPosList)
+        monsterRegList = List.map (\value->value.region) monsterList
+        obstacleCol=List.filter (recCollisionTest monsterRegion.edge) <| List.map (\value->value.edge) (obstaclePosList++monsterRegList)
     in
         List.isEmpty obstacleCol
 
@@ -48,8 +52,8 @@ checkMonsterCollison monster obstacles monsterList=
 monsterBuilding : List Monster -> Int -> List Obstacle -> Random.Seed -> (List Monster,Random.Seed)
 monsterBuilding monsterList number obstacles seed0 =
     let
-        (xTemp,seed1) = Random.step (Random.int 300 1700) seed0
-        (yTemp,seed2) = Random.step (Random.int 300 1700) seed1
+        (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
+        (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
         (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
         getMonsterType = 
             let
@@ -62,14 +66,46 @@ monsterBuilding monsterList number obstacles seed0 =
                         MonsterType 0 0 ""
         monsterTypeTemp = getMonsterType
 
-        monsterPos = Rectangle (toFloat xTemp) (toFloat yTemp) 50 50 recInit
-        monsterNew = Monster (recUpdate monsterPos) monsterTypeTemp
+        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit
+        monsterPos = Shape.Circle  (toFloat xTemp + 100) (toFloat yTemp + 100) 50 
+
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3
 
     in 
         if number==0 then
             (monsterList,seed3)
         else
             if checkMonsterCollison monsterNew obstacles monsterList then
-                monsterBuilding (monsterNew :: monsterList) (number-1) obstacles seed3
+                monsterBuilding (monsterNew :: monsterList) (number - 1) obstacles seed3
             else 
                 monsterBuilding  monsterList number obstacles seed3
+
+updateMonster_ : Monster -> List Bullet -> Monster
+updateMonster_ monster bullets =
+    let
+        hitBullets = bullets
+                  |> List.filter (\b -> b.from == Player)
+                  |> List.filter (\b -> circleCollisonTest b.hitbox monster.position)
+        monsterType_ = monster.monsterType
+        newMonsterType = {monsterType_ | hp = monsterType_.hp - List.sum (List.map (\b -> b.force) hitBullets)}
+        {- debug test
+        newMonsterType =
+                if List.isEmpty hitBullets then
+                    monsterType_
+                else
+                    Debug.log "hitMonster" {monsterType_ | hp = monsterType_.hp - toFloat(20 * (List.length hitBullets)), color = "Green"}
+        -}
+    in
+        {monster | monsterType = newMonsterType}
+
+updateMonster : List Monster -> List Bullet -> List Rectangle -> Me -> (List Monster,List Bullet)
+updateMonster monsters bullets obstacles me =
+    let
+        finalMonsters = monsters
+                     |> List.filter (\m -> m.monsterType.hp > 0)
+                     |> List.map (\m -> updateMonster_ m bullets)
+
+
+        
+    in
+        allMonsterAct finalMonsters me obstacles bullets

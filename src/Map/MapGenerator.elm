@@ -1,4 +1,4 @@
-module Map.MapGenerator exposing (roomGenerator)
+module Map.MapGenerator exposing (roomGenerator,roomInit)
 import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator)
@@ -7,8 +7,9 @@ import Map.MonsterGenerator exposing (monsterGenerator)
 -- import Html.Events exposing (onClick)
 -- import Browser
 
-
-
+roomInit : (List Room, Random.Seed)
+roomInit = 
+    roomGenerator 1 (Random.initialSeed 0)
 
 roomGenerator : Int -> Random.Seed -> (List Room,Random.Seed)
 roomGenerator storey seed0 = 
@@ -30,8 +31,6 @@ roomUpdate room =
                 {model|road=model.road++appendList}  
     in
         List.map findRoom room 
-
-
 
 roomPositionGenerator : Int -> Random.Seed -> (List Room, Random.Seed)
 roomPositionGenerator storey seed0= 
@@ -77,9 +76,9 @@ firstRoomGenerator number seed0=
         (monsterTemp,seed3) = monsterGenerator seed2 obstacleTemp
     in
         if room0Direction == 0 then
-            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number-1,seed3)
+            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number - 1,seed3)
         else 
-            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number-1,seed3)
+            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number - 1,seed3)
 
 otherRoomGenerator : List Room -> List Room -> Int -> Random.Seed -> (List Room, Random.Seed)
 otherRoomGenerator roomList rooms number seed0 = 
@@ -111,7 +110,7 @@ otherRoomGenerator roomList rooms number seed0 =
         r = min rTemp number
 
         -- pick r rooms from available Room 
-        (roomAdded,seed2) = roomPicking availableRoom (t-r) seed1
+        (roomAdded,seed2) = roomPicking availableRoom (t - r) seed1
 
         (obstacleTemp,seed3) = obstacleGenerator seed2
         (monsterTemp,seed4) = monsterGenerator seed3 obstacleTemp
@@ -144,9 +143,9 @@ leavesUpdate  roomUpdated roomList num seed0=
             roomUpdated
         else
             if checkOverlap roomNew roomListNew then 
-                leavesUpdate (roomUpdated) roomListNew (num-1) seed2
+                leavesUpdate (roomUpdated) roomListNew (num - 1) seed2
             else 
-                leavesUpdate (roomUpdated++[roomNew]) roomListNew (num-1) seed2
+                leavesUpdate (roomUpdated++[roomNew]) roomListNew (num - 1) seed2
         
 checkOverlap : Room -> List Room -> Bool
 checkOverlap room roomList =
@@ -158,11 +157,12 @@ checkOverlap room roomList =
 
 
 
+
 checkroom : Room -> List Room -> (List Room, Int)
 checkroom position rooms=
     let 
         (x,y) = (Tuple.first position.position,Tuple.second position.position)
-        initRoomList = [{roomConfig|position=(x+1,y)},{roomConfig|position=(x,y+1)},{roomConfig|position=(x-1,y)},{roomConfig|position=(x,y-1)}]
+        initRoomList = [{roomConfig|position=(x+1,y)},{roomConfig|position=(x,y+1)},{roomConfig|position=(x - 1, y)},{roomConfig|position=(x, y - 1)}]
         availableRoom = List.filter (\value -> not (List.member value.position (List.map (\roomTemp -> roomTemp.position) rooms)) ) initRoomList 
     in 
         (availableRoom,  List.length availableRoom)
@@ -170,7 +170,7 @@ checkroom position rooms=
 roomPicking : List Room -> Int -> Random.Seed -> ((List Room),Random.Seed)
 roomPicking  availableRoom r seed0 =
     let
-        randomFunction = Random.int 0 ((List.length availableRoom)-1)
+        randomFunction = Random.int 0 ((List.length availableRoom) - 1)
         (num,seed1) = Random.step randomFunction seed0 
         -- d = Debug.log "roompicking" num
         newList1 = List.take (num) availableRoom
@@ -179,14 +179,7 @@ roomPicking  availableRoom r seed0 =
         if r==0 then 
             (availableRoom,seed1)
         else 
-            roomPicking (newList1 ++ newList2) (r-1) seed1 
-
-
-
-
-
-
-
+            roomPicking (newList1 ++ newList2) (r - 1) seed1
 
 
 -- view : Model -> Html.Html Msg
