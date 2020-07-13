@@ -69,7 +69,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 100) (toFloat yTemp + 100) 50 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1
 
     in 
         if number==0 then
@@ -98,8 +98,8 @@ updateMonster_ monster bullets =
     in
         {monster | monsterType = newMonsterType}
 
-updateMonster : List Monster -> List Bullet -> List Rectangle -> Me -> (List Monster,List Bullet)
-updateMonster monsters bullets obstacles me =
+updateMonster : List Monster -> List Bullet -> Me -> (List Monster,List Bullet)
+updateMonster monsters bullets me =
     let
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
@@ -108,4 +108,4 @@ updateMonster monsters bullets obstacles me =
 
         
     in
-        allMonsterAct finalMonsters me obstacles bullets
+        allMonsterAct finalMonsters me bullets
