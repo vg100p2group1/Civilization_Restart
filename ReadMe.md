@@ -25,3 +25,5 @@ For the MVP project, we only supply the basic mode.  Here are the keys that you 
 ​	1) The collision with the walls. We now just stop the player if he is going to collide with the wall.
 
 ​	2) We haven't write the screen adaptation for the Mini Map, so it may overlap with the Main Map.
+
+​	3) For test reason, the Players' speed is faster than the bullet's speed, so if you are shooting while moving, it will look weird.
