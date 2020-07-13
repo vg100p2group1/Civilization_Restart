@@ -2,8 +2,6 @@
 
 ### [0.1.0] - 2020-07-13
 
-
-
 #### Added:
 
 * Add the random behaviors of the AI monsters. 
@@ -18,16 +16,14 @@
 * Add the basic view interface of the game.
 * Design the basic frame of the game.
 
-### Fixed:
+#### Fixed:
 
 * The bug that players can cross through the walls.
 * The bug that monsters will not HP after they are shot by bullets.
 * The bug that minimap cannot accurately corresponds to the real map the players are in.
 * The bug that players are not in the center of the screen.
 
-
-
-### Deprecated:
+#### Deprecated:
 
 * Players will no more need to press **G** to show the dialogues during interactions with bosses. The interface of dialogues will automatically pop out once the players enter a new boss room
 
