@@ -26,7 +26,7 @@ type alias Me =
     }
 
 defaultMe : Me
-defaultMe = Me 0 0 50 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 50) []
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 50) []
 
 type alias Model =
     { myself : Me

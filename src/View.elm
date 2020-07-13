@@ -160,12 +160,14 @@ displayMonster monsters =
                 model = monsterTemp.position
                 monsterType = monsterTemp.monsterType
                 opacity = String.fromFloat (monsterTemp.monsterType.hp / 150)
+
+                monsterColor = if monsterTemp.active then "black" else monsterType.color
             in
                 Svg.circle
                     [ Svg.Attributes.cx <| String.fromFloat model.cx
                     , Svg.Attributes.cy <| String.fromFloat model.cy
                     , Svg.Attributes.r <| String.fromFloat model.r
-                    , Svg.Attributes.fill monsterType.color
+                    , Svg.Attributes.fill monsterColor
                     , Svg.Attributes.fillOpacity opacity
                     ]
                 []
@@ -264,8 +266,8 @@ showMiniMap model =
        gate = displayDoors [miniMap.gate]
 
        myself = model.myself
-       xTemp = myself.x - toFloat(dx*2500) +500
-       yTemp = myself.y - toFloat(dy*2500) +500
+       xTemp = myself.x - toFloat(dx*2500)
+       yTemp = myself.y - toFloat(dy*2500)
        rTemp = 200
 
        meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
