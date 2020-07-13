@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe)
+import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit,circleRecTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax)
@@ -60,8 +60,8 @@ update msg model =
         MouseMove newMouseData ->
             let 
                 pTemp = model.myself 
-                d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
-                d = Debug.log "mouse" newMouseData 
+                -- d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
+                -- d = Debug.log "mouse" newMouseData 
                 me = {pTemp | mouseData = mouseDataUpdate model newMouseData}
             in 
                 ({model|myself = me},Cmd.none)
@@ -165,18 +165,20 @@ mouseDataUpdate model mousedata =
 
 animate :  Model -> (Model, Cmd Msg)
 animate  model =
+    -- (model,Cmd.none)
     let
         me = model.myself
         newMe = speedCase me model.map
+
         (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet model.map.obstacles me
         map = model.map
         newMap = {map | monsters = newMonsters}
-        viewbox = model.viewbox
-        (newMonstersViewbox,newBulletViewbox) = updateMonster model.viewbox.monsters model.bulletViewbox model.map.obstacles me 
-        newViewbox_ = {viewbox | monsters = newMonstersViewbox}
-        newViewbox = updateViewbox newMe {model | viewbox = newViewbox_}
+
+        newViewbox = mapToViewBox me newMap
+        
         newBulletList = updateBullet model.map newBullet
         newBulletListViewbox = updateBullet model.viewbox model.bulletViewbox
+    
     in
         ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
 
@@ -215,7 +217,7 @@ speedCase me map=
         (xSpeedFinalTemp,ySpeedFinalTemp) = getSpeed
         
         (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
-        -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
+        -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
         getXY = -- TO DO collide direction 之后要保持非碰撞分量。
             if (wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++map.walls++map.roads) ) then
                 ((newXTemp,newYTemp),(xSpeedFinalTemp,ySpeedFinalTemp))
@@ -239,51 +241,51 @@ wallCollisionTest hitbox wallList =
 
 
 
-viewUpdate : Me -> Rectangle -> Rectangle
-viewUpdate me oneWall =
-    let
-        -- x = max oneWall.x left
-        -- y = max oneWall.y top  
+-- viewUpdate : Me -> Rectangle -> Rectangle
+-- viewUpdate me oneWall =
+--     let
+--         -- x = max oneWall.x left
+--         -- y = max oneWall.y top  
         
-        -- width = min oneWall.width (right - x)
-        -- height = min oneWall.height (bottom - y)
-        xTemp = oneWall.x - me.xSpeed
-        yTemp = oneWall.y - me.ySpeed
-        recTemp = Rectangle xTemp yTemp oneWall.width oneWall.height recInit
-    in
-        recUpdate recTemp
+--         -- width = min oneWall.width (right - x)
+--         -- height = min oneWall.height (bottom - y)
+--         xTemp = oneWall.x - me.xSpeed
+--         yTemp = oneWall.y - me.ySpeed
+--         recTemp = Rectangle xTemp yTemp oneWall.width oneWall.height recInit
+--     in
+--         recUpdate recTemp
         
-viewUpdateCircle : Me -> Circle -> Shape.Circle
-viewUpdateCircle me circle =
-    let 
-        xTemp = circle.cx - me.xSpeed
-        yTemp = circle.cy - me.ySpeed
-    in
-        Circle xTemp yTemp circle.r
+-- viewUpdateCircle : Me -> Circle -> Shape.Circle
+-- viewUpdateCircle me circle =
+--     let 
+--         xTemp = circle.cx - me.xSpeed
+--         yTemp = circle.cy - me.ySpeed
+--     in
+--         Circle xTemp yTemp circle.r
 
 
-updateViewbox : Me -> Model -> Map
-updateViewbox me model =
-    -- viewRec = List.map viewUpdate viewedRecTemp
-    -- in
-    -- let
-    --     meTemp = model.myself
-    --     d = Debug.log "mouse2" meTemp.mouseData 
-    --     d=Debug.log "recs" model.viewbox
-    -- in
-    let
-        mapTemp = model.viewbox
-        newWalls = List.map (viewUpdate me) mapTemp.walls
-        newRoads = List.map (viewUpdate me) mapTemp.roads
-        newDoors = List.map (viewUpdate me) mapTemp.doors
-        newObstacles = List.map (viewUpdate me) mapTemp.obstacles
+-- updateViewbox : Me -> Model -> Map
+-- updateViewbox me model =
+--     -- viewRec = List.map viewUpdate viewedRecTemp
+--     -- in
+--     -- let
+--     --     meTemp = model.myself
+--     --     d = Debug.log "mouse2" meTemp.mouseData 
+--     --     d=Debug.log "recs" model.viewbox
+--     -- in
+--     let
+--         mapTemp = model.viewbox
+--         newWalls = List.map (viewUpdate me) mapTemp.walls
+--         newRoads = List.map (viewUpdate me) mapTemp.roads
+--         newDoors = List.map (viewUpdate me) mapTemp.doors
+--         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
 
-        newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position,region = viewUpdate me value.region}) mapTemp.monsters 
+--         newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position,region = viewUpdate me value.region}) mapTemp.monsters 
 
-        newGate = viewUpdate me mapTemp.gate
+--         newGate = viewUpdate me mapTemp.gate
 
-    in
-        {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters,gate=newGate}
+--     in
+--         {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters,gate=newGate}
 
 
 
