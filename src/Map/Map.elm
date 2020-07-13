@@ -25,8 +25,6 @@ type alias Monster =
     , monsterType : MonsterType
     , direction : Int
     , seed : Seed
-    , active : Bool
-    , timeBeforeAttack : Int
     }
 
 
