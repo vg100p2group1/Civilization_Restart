@@ -9,10 +9,9 @@ import Messages exposing (Msg(..))
 import Task
 import View exposing (view)
 import Update
-import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit)
+import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox)
 import Map.MapDisplay exposing (mapInit)
 import Map.MapGenerator exposing (roomInit)
-
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -71,9 +70,10 @@ init =
     , bulletViewbox = []
     , map = mapInit
     , rooms = roomInit
-    , viewbox = mapInit
+    , viewbox = mapToViewBox defaultMe mapInit
     , size = (0, 0)
     , state = Others
     , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
     }
+
 
