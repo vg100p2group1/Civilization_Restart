@@ -167,10 +167,9 @@ animate :  Model -> (Model, Cmd Msg)
 animate  model =
     let
         me = model.myself
-        newMe = speedCase me
-        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me
+        
         newMe = speedCase me model.map
-        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet model.map.obstacles me
+        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me 
         map = model.map
         newMap = {map | monsters = newMonsters}
         viewbox = model.viewbox
