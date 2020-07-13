@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState)
+import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe)
 import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
