@@ -48,9 +48,13 @@ monsterAct  me monster =
 
         newPosition = {nowPosition|cx=Tuple.first newPos,cy=Tuple.second newPos}
         
+        distx = me.x - monster.position.cx
+        disty = me.y - monster.position.cy
+
+        dist= sqrt ((distx)^2 + (disty)^2)
 
         checkActive = 
-            ((abs (monster.position.cx)) + (abs (monster.position.cy)))<=1000
+            dist <= 500
                 
 
         checkCanShoot =
@@ -69,12 +73,12 @@ monsterShoot monsterList me bulletList =
          
 
         activemonster =  
-             List.filter (\m -> m.timeBeforeAttack==0) 
+            --  List.filter (\m -> m.timeBeforeAttack==0) 
                 (List.filter (\m -> m.active) monsterList)
         newBullets= List.map newBullet activemonster
 
-        distx monster =  -monster.position.cx
-        disty monster = -monster.position.cy
+        distx monster = me.x - monster.position.cx
+        disty monster = me.y - monster.position.cy
 
         dist monster = sqrt ((distx monster)^2 + (disty monster)^2)
 
@@ -86,9 +90,10 @@ monsterShoot monsterList me bulletList =
         newBullet : Monster -> Bullet
 
         newBullet monster  =
+                -- Bullet me.x me.y 5 (Circle me.x me.y 5) (10*(speedx monster)) (10*(speedy monster)) False Weapon.Monster monster.monsterType.attack
              Bullet monster.position.cx monster.position.cy 5 (Circle monster.position.cx monster.position.cy 5) (bulletSpeed*(speedx monster)) (10*(speedy monster)) False Weapon.Monster monster.monsterType.attack
     in 
 
-    List.append  bulletList newBullets
+    newBullets
 
 

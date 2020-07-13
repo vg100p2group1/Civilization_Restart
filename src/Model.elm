@@ -1,10 +1,10 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState, defaultMe, sentenceInit)
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState, defaultMe, sentenceInit,mapToViewBox)
 import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon)
-import Config exposing (playerSpeed)
+import Config exposing (playerSpeed,viewBoxMax)
 
 type alias Me =
     { x : Float
@@ -22,11 +22,11 @@ type alias Me =
   --   , name : String
   --   , score : Float
     , hitBox : Circle
-    , weapons : List Weapon     -- the first element is the one in use
+    , weapons : List Weapon     -- the first element is the one in uses
     }
 
 defaultMe : Me
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 50) []
+defaultMe = Me 500 500 30 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 25) []
 
 type alias Model =
     { myself : Me
@@ -71,3 +71,21 @@ type alias AnimationState =
     , elapsed: Float
     , size : (Float,Float)
     }
+
+mapToViewBox : Me -> Map ->Map
+mapToViewBox me map =
+    let 
+        recListUpdate model= 
+            List.map (\value-> {value|x=-me.x + viewBoxMax/2 + value.x, y= -me.y + viewBoxMax/2 + value.y}) model
+        recUpdate value =
+            {value|x=-me.x + viewBoxMax/2 + value.x, y= -me.y + viewBoxMax/2 + value.y}
+        circleUpdate value =
+            {value|cx=-me.x + viewBoxMax/2 + value.cx, cy= -me.y + viewBoxMax/2 + value.cy}
+        -- monsterList = map.monsters
+        monsterUpdate monster= 
+            {monster| position = circleUpdate monster.position}
+        monstersUpdated = List.map monsterUpdate map.monsters
+        -- monsterListUpdate model =
+        --     List.map (\value -> {value| position = circleUpdate value.position}) model
+    in
+        {map| walls= recListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,gate=recUpdate map.gate}
