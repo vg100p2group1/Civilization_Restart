@@ -2,7 +2,6 @@ module Map.MonsterGenerator exposing (monsterGenerator,updateMonster)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
-import Shape exposing (circleInit)
 import Weapon exposing(Bullet,ShooterType(..))
 import Model exposing (Me)
 
