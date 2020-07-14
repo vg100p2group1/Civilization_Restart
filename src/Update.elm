@@ -166,7 +166,7 @@ animate  model =
     let
         me = model.myself
         
-        newMe = speedCase me model.map
+        (newMe,collision) = speedCase me model.map
 
         (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me
         map = model.map
@@ -174,14 +174,14 @@ animate  model =
 
         newViewbox = mapToViewBox newMe newMap
         
-        newBulletList = updateBullet newMe model.map (List.append model.bullet newBullet)
+        newBulletList = updateBullet newMe model.map (List.append model.bullet newBullet) collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
     
     in
         ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
 
 
-speedCase : Me -> Map-> Me
+speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
         getNewXSpeed =
@@ -231,41 +231,41 @@ speedCase me map=
         getXY = -- TO DO Road 2墙重合有 bug
             case (typeA,typeB) of
                 (FromRight a,NoCollide b) ->
-                    ((newXTemp-a,newYTemp),(ySpeedFinalTemp-a,ySpeedFinalTemp))
+                    ((newXTemp-a,newYTemp),(ySpeedFinalTemp-a,ySpeedFinalTemp),(True,False))
                 (FromLeft a,NoCollide b) ->
-                    ((newXTemp-a,newYTemp),(ySpeedFinalTemp-a,ySpeedFinalTemp))
+                    ((newXTemp-a,newYTemp),(ySpeedFinalTemp-a,ySpeedFinalTemp),(True,False))
                 (FromUp a,NoCollide b) ->
-                    ((newXTemp,newYTemp-a),(xSpeedFinalTemp,ySpeedFinalTemp-a))
+                    ((newXTemp,newYTemp-a),(xSpeedFinalTemp,ySpeedFinalTemp-a),(False,True))
                 (FromDown a,NoCollide b) ->
-                    ((newXTemp,newYTemp-a),(xSpeedFinalTemp,ySpeedFinalTemp-a))
+                    ((newXTemp,newYTemp-a),(xSpeedFinalTemp,ySpeedFinalTemp-a),(False,True))
                 
                 (FromLeft a, FromUp b) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 (FromLeft a, FromDown b) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 (FromRight a, FromUp b) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 (FromRight a, FromDown b) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 
                 (FromUp b, FromLeft a) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 (FromUp b, FromRight a) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 (FromDown b, FromLeft a) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
                 (FromDown b, FromRight a) ->
-                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b))
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
 
                 (NoCollide a,NoCollide b) ->
-                    ((newXTemp,newYTemp),(xSpeedFinalTemp,ySpeedFinalTemp))
+                    ((newXTemp,newYTemp),(xSpeedFinalTemp,ySpeedFinalTemp),(False,False))
                 _ ->
-                    ((me.x,me.y),(0,0))
+                    ((me.x,me.y),(0,0),(False,False))
         
-        ((newX,newY),(xSpeedFinal,ySpeedFinal)) = getXY
+        ((newX,newY),(xSpeedFinal,ySpeedFinal),(collisionX,collisionY)) = getXY
         
     in
-        {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)}
+        ({me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)},(collisionX,collisionY))
 
 wallCollisionTest : Circle -> List Rectangle -> List CollideDirection
 wallCollisionTest hitbox wallList =
@@ -350,6 +350,7 @@ fireBullet (mouseX,mouseY) (meX, meY) =
         posY = mouseY
 
         -- d1=Debug.log "mouse" (posX,posY)
+        -- d2=Debug.log "me" (meX,meY)
         unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500)) 
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
@@ -357,18 +358,19 @@ fireBullet (mouseX,mouseY) (meX, meY) =
     in
         {bulletConfig | x=meX,y=meY,hitbox = newCircle, speedX=xTemp, speedY=yTemp}
 
-updateBullet : Me-> Map -> List Bullet -> List Bullet
-updateBullet me map bullets =
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
+updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
             let
+                d2=Debug.log "meX" me.xSpeed
                 newX = 
-                    if b.from == Player then 
+                    if (b.from == Player) && (not collisionX) then 
                         b.hitbox.cx + b.speedX + me.xSpeed
                     else 
                         b.hitbox.cx + b.speedX
                 newY = 
-                    if b.from == Player then
+                    if (b.from == Player) && (not collisionY) then
                         b.hitbox.cy + b.speedY + me.ySpeed
                     else 
                         b.hitbox.cy + b.speedY
