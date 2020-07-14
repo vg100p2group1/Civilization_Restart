@@ -28,7 +28,7 @@ type alias Weapon =
     }
 
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player 20
+bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player 50
 
 defaultWeapon : Weapon
 defaultWeapon = Weapon defaultBulletGenerator Default "Default Weapon"
