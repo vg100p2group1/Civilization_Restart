@@ -362,8 +362,16 @@ updateBullet me map bullets =
     let
         updateXY b =
             let
-                newX = b.hitbox.cx + b.speedX 
-                newY = b.hitbox.cy + b.speedY 
+                newX = 
+                    if b.from == Player then 
+                        b.hitbox.cx + b.speedX + me.xSpeed
+                    else 
+                        b.hitbox.cx + b.speedX
+                newY = 
+                    if b.from == Player then
+                        b.hitbox.cy + b.speedY + me.ySpeed
+                    else 
+                        b.hitbox.cy + b.speedY
                 newHitbox = Circle newX newY b.hitbox.r
             in
                 {b|hitbox = newHitbox,x=newX, y=newY}
