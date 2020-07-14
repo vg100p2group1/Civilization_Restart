@@ -22,11 +22,11 @@ type alias Me =
   --   , name : String
   --   , score : Float
     , hitBox : Circle
-    , weapons : List Weapon     -- the first element is the one in use
+    , weapons : List Weapon     -- the first element is the one in uses
     }
 
 defaultMe : Me
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 0 0 50) []
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) []
 
 type alias Model =
     { myself : Me

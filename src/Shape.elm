@@ -1,4 +1,6 @@
-module Shape exposing (Rec,Rectangle,Circle,recInit,recCollisionTest,recUpdate,circleRecTest,circleCollisonTest,circleInit)
+module Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recInit,recCollisionTest,recUpdate,circleRecTest,circleCollisonTest,circleInit,circleRecDirection)
+
+-- import Css exposing (relative)
 
 type alias Rec =
     { cx : Float
@@ -56,3 +58,50 @@ circleRecTest circle rec =
 circleCollisonTest : Circle -> Circle -> Bool
 circleCollisonTest c1 c2 =
     sqrt((c1.cx - c2.cx) ^ 2 + (c1.cy - c2.cy) ^ 2) <= c1.r + c2.r
+
+type CollideDirection 
+    =FromLeft Float 
+    |FromRight Float 
+    |FromUp Float
+    |FromDown Float 
+    -- |FromLeftUp
+    -- |FromLeftDown
+    -- |FromRightUp
+    -- |FromRightDown
+    |NoCollide Float
+
+circleRecDirection : Circle -> Rec -> CollideDirection
+circleRecDirection circle rec =
+    let
+        relativeX = circle.cx - rec.cx
+        relativeY = circle.cy - rec.cy
+        dx = clamp -rec.halfWidth rec.halfWidth relativeX
+        dy = clamp -rec.halfHeight rec.halfHeight relativeY
+        collide =  (dx - relativeX) ^ 2 + (dy - relativeY) ^ 2 < circle.r ^ 2
+        
+
+        getCollideType =
+            if collide then
+                
+                if (rec.cx-rec.halfWidth<=circle.cx)&&(rec.cx + rec.halfWidth>=circle.cx)  && relativeY> 0 then
+                    FromDown (relativeY-rec.halfHeight-circle.r)
+                else if (rec.cx-rec.halfWidth<=circle.cx)&&(rec.cx + rec.halfWidth>=circle.cx)  && relativeY< 0 then 
+                    FromUp (rec.halfHeight+circle.r+relativeY)
+                else if (rec.cx+rec.halfWidth<=circle.cx) && relativeX> 0 then
+                    FromRight (relativeX-rec.halfWidth-circle.r)
+                else if (rec.cx-rec.halfWidth>=circle.cx) && relativeX< 0 then
+                    FromLeft (relativeX+rec.halfWidth+circle.r)
+                -- else if relativeX<0 && relativeY<0 then
+                --     FromLeftUp
+                -- else if relativeX<0 && relativeY>0 then
+                --     FromLeftDown
+                -- else if relativeX>0 && relativeY<0 then
+                --     FromRightUp
+                -- else if relativeX>0 && relativeY>0 then
+                --     FromRightDown
+                else
+                    NoCollide 0
+            else 
+                NoCollide 0
+    in
+        getCollideType

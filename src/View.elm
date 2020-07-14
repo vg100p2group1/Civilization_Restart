@@ -160,12 +160,14 @@ displayMonster monsters =
                 model = monsterTemp.position
                 monsterType = monsterTemp.monsterType
                 opacity = String.fromFloat (monsterTemp.monsterType.hp / 150)
+
+                monsterColor = if monsterTemp.active then "black" else monsterType.color
             in
                 Svg.circle
                     [ Svg.Attributes.cx <| String.fromFloat model.cx
                     , Svg.Attributes.cy <| String.fromFloat model.cy
                     , Svg.Attributes.r <| String.fromFloat model.r
-                    , Svg.Attributes.fill monsterType.color
+                    , Svg.Attributes.fill monsterColor
                     , Svg.Attributes.fillOpacity opacity
                     ]
                 []
