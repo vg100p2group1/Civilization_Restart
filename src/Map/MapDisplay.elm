@@ -118,11 +118,11 @@ drawRoads room =
         recPosition model =
             case model of 
                 (2,1) ->
-                    [Rectangle (newX + 2000) (newY + 800) 500 100 recInit,Rectangle (newX + 2000) (newY + 1100) 500 100 recInit]
+                    [Rectangle (newX + 1800) (newY + 800) 900 100 recInit,Rectangle (newX + 1800) (newY + 1100) 900 100 recInit]
                 (1,2) ->
                     [Rectangle (newX + 800) (newY + 2000) 100 500 recInit,Rectangle (newX + 1100) (newY + 2000) 100 500 recInit]
                 (0,1) ->
-                    [Rectangle (newX - 500) (newY + 800) 500 100 recInit,Rectangle (newX - 500) (newY + 1100) 500 100 recInit]
+                    [Rectangle (newX - 700) (newY + 800) 900 100 recInit,Rectangle (newX - 700) (newY + 1100) 900 100 recInit]
                 (1,0) ->
                     [Rectangle (newX + 800) (newY - 500) 100 500 recInit,Rectangle (newX + 1100) (newY - 500) 100 500 recInit]
                 _ ->
@@ -153,7 +153,7 @@ drawWalls room=
         -- d3 = Debug.log "update" roadList2 
         newRec1 = 
             if List.member (0,1) roadList2 then
-                [Rectangle newX newY 200 900 recInit,Rectangle newX (newY+1100) 200 900 recInit]
+                [Rectangle newX newY 200 800 recInit,Rectangle newX (newY+1200) 200 800 recInit]
                 -- []
             else
                 [Rectangle newX newY 200 2000 recInit]
@@ -165,7 +165,7 @@ drawWalls room=
                 [Rectangle newX newY 2000 200 recInit]
         newRec3 = 
             if List.member (2,1) roadList2 then
-                [Rectangle (newX+1800) newY 200 900 recInit,Rectangle (newX+1800) (newY+1100) 200 900 recInit]
+                [Rectangle (newX+1800) newY 200 800 recInit,Rectangle (newX+1800) (newY+1100) 200 800 recInit]
                 -- []
             else 
                 [Rectangle (newX+1800) newY 200 2000 recInit]
