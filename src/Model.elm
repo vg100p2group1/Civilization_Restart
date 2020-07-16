@@ -41,6 +41,7 @@ type alias Model =
     }
 
 type State = Dialogue
+           | NextStage
            | Others
 
 type Side = Left

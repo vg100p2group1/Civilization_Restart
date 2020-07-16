@@ -83,16 +83,20 @@ update msg model =
             in
                 ({model|myself = me},Cmd.none) 
         NextFloor ->
-            let
-                roomNew = 
-                    roomGenerator 1 (Tuple.second model.rooms)
+            if model.state == NextStage then
+                let
+                    roomNew =
+                        roomGenerator 1 (Tuple.second model.rooms)
 
-                mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
-                meTemp = model.myself
-                meNew = {defaultMe|weapons=meTemp.weapons}
-            in
-                ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
-
+                    mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                    meTemp = model.myself
+                    meNew = {defaultMe|weapons=meTemp.weapons}
+                    -- it should be updated when dialogues are saved in every room
+                    newDialogues = updateDialogues model
+                in
+                    ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues},Cmd.none)
+            else
+                (model, Cmd.none)
         Tick time ->
             model
                 --|> updateSentence (min time 25)
@@ -173,12 +177,11 @@ animate  model =
         newMap = {map | monsters = newMonsters}
 
         newViewbox = mapToViewBox newMe newMap
-        
         newBulletList = updateBullet newMe model.map (List.append model.bullet newBullet) collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
-    
+        newState = updateState model
     in
-        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
+        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState },Cmd.none)
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
@@ -300,7 +303,7 @@ listUniq num orignial now=
         if num==0 then
             now
         else
-            listUniq (num-1) newOriginal newNow
+            listUniq (num - 1) newOriginal newNow
 
 
 activateUpdate : Float -> Float -> { a | active : Bool, elapsed : Float } -> { a | active : Bool, elapsed : Float }
@@ -390,4 +393,23 @@ updateBullet me map bullets (collisionX,collisionY) =
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
 bulletToViewBox me bullets=
-    List.map (\value->{value|x=viewBoxMax/2+value.x-me.x,y=viewBoxMax/2 +value.y-me.y}) bullets
+    List.map (\value->{ value | x=viewBoxMax/2+value.x-me.x,y=viewBoxMax/2 +value.y-me.y}) bullets
+
+
+updateState : Model -> State
+updateState model =
+    let
+        collideGate = circleRecTest model.myself.hitBox model.map.gate.edge
+        newState =
+            if collideGate then
+                NextStage
+            else if model.state == Dialogue then
+                Dialogue
+            else
+                Others
+    in
+        newState
+
+updateDialogues : Model -> Dialogues
+updateDialogues model =
+    model.currentDialogues
