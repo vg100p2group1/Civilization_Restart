@@ -11,7 +11,7 @@ import Svg
 import Svg.Attributes 
 
 import MiniMap exposing (getMiniMap)
-import Move.PlayerMoving exposing (playerMove)
+
 
 -- view : Model -> Html.Html Msg
 -- view model =
@@ -173,16 +173,8 @@ displayMonster monsters =
 
 me : Me -> Svg.Svg Msg
 me myself=
-    playerMove myself
---    let 
---         createBallFormat model =
---           Svg.circle 
---             [ Svg.Attributes.cx "500"
---             , Svg.Attributes.cy "500"
---             ] 
---             [ playerMove myself]
---     in
---         createBallFormat myself
+    Svg.image [Svg.Attributes.x "460", Svg.Attributes.y "460", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
+                   Svg.Attributes.width "80", Svg.Attributes.height "80"][]
 
 gun : Me -> Svg.Svg Msg
 gun myself =
