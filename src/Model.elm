@@ -1,5 +1,5 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState, defaultMe, sentenceInit,mapToViewBox)
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox)
 import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
@@ -24,10 +24,19 @@ type alias Me =
     , hitBox : Circle
     , weapons : List Weapon     -- the first element is the one in uses
     , currentWeapon : Weapon
+    , counter : Int
+    , url : String
+    , preDirection : Direction
+    , weaponDirection : Direction
     }
+type Direction
+    = DirectionRight
+    | DirectionLeft
+
 
 defaultMe : Me
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon
+
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight
 
 type alias Model =
     { myself : Me

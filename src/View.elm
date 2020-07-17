@@ -6,11 +6,7 @@ import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-
-
-
 import Html.Events.Extra.Mouse as Mouse
-
 import Svg 
 import Svg.Attributes 
 
@@ -177,17 +173,8 @@ displayMonster monsters =
 
 me : Me -> Svg.Svg Msg
 me myself=
-   let 
-        createBallFormat model =
-          Svg.circle 
-            [ Svg.Attributes.fill "green"
-            , Svg.Attributes.cx "500"
-            , Svg.Attributes.cy "500"
-            , Svg.Attributes.r <| String.fromFloat model.r
-            ] 
-            []
-    in
-        createBallFormat myself
+    Svg.image [Svg.Attributes.x "460", Svg.Attributes.y "460", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
+                   Svg.Attributes.width "80", Svg.Attributes.height "80"][]
 
 gun : Me -> Svg.Svg Msg
 gun myself =

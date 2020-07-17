@@ -1,7 +1,7 @@
 module Update exposing (update)
 
 import Messages exposing (Msg(..))
-import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
+import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
@@ -12,6 +12,7 @@ import Debug
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
+import Move.PlayerMoving exposing (playerMove)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -20,7 +21,7 @@ update msg model =
         MoveLeft on ->
             let 
                 pTemp = model.myself 
-                me= {pTemp | moveLeft = on, moveRight =  False}
+                me= {pTemp | moveLeft = on, moveRight =  False, preDirection=DirectionLeft}
             in
                 ( {model| myself= me}
                 , Cmd.none
@@ -29,7 +30,7 @@ update msg model =
         MoveRight on ->
             let 
                 pTemp =  model.myself
-                me= {pTemp | moveRight = on, moveLeft = False}
+                me= {pTemp | moveRight = on, moveLeft = False, preDirection=DirectionRight}
             in
                 ( {model| myself= me}
                 , Cmd.none
@@ -62,8 +63,13 @@ update msg model =
                 -- d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
                 -- d = Debug.log "mouse" newMouseData 
                 me = {pTemp | mouseData = mouseDataUpdate model newMouseData}
+                getDirection = 
+                    if (Tuple.first me.mouseData)>=500 then
+                        DirectionRight
+                    else 
+                        DirectionLeft
             in 
-                ({model|myself = me},Cmd.none)
+                ({model|myself = {me|weaponDirection=getDirection}},Cmd.none)
         
         MouseDown ->
             let
@@ -200,7 +206,7 @@ animate  model =
         newBulletListViewbox = bulletToViewBox newMe newBulletList
         newState = updateState model
     in
-        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState },Cmd.none)
+        ({model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe}, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState},Cmd.none)
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))

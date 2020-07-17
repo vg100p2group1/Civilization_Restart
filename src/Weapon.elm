@@ -2,6 +2,7 @@ module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),b
 
 import Shape exposing (Circle)
 
+
 type alias Bullet =
     { x : Float
     , y : Float
