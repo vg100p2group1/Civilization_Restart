@@ -1,6 +1,6 @@
 module Update exposing (update)
 
-import Messages exposing (Msg(..))
+import Messages exposing (Msg(..), SkillMsg(..))
 import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
@@ -125,7 +125,9 @@ update msg model =
               }
             , Cmd.none
             )
-
+        
+        Skill skillMsg ->
+            UpdateSkill skillMsg model
 
         Noop ->
             let 
@@ -413,3 +415,7 @@ updateState model =
 updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
+
+updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
+updateSkill msg model =
+    (model, Cmd.none)

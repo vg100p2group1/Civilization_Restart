@@ -1,5 +1,4 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill)
-import Css exposing (true)
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, switchSubSystem, choose, unlockChosen)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem

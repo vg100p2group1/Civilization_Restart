@@ -1,4 +1,4 @@
-module Messages exposing (Msg(..))
+module Messages exposing (Msg(..), SkillMsg(..))
 import Css exposing (Resize)
 import Browser.Dom exposing (Viewport)
 -- import Model exposing (MouseMoveData)
@@ -13,11 +13,15 @@ type Msg
     | MouseUp
     -- | Map
     | NextFloor
-    | Noop
     | Resize Int Int
     | GetViewport Viewport
+    | Skill SkillMsg
+    | Noop
     -- for testing
     | ShowDialogue
     | NextSentence
 
-
+type SkillMsg
+    = TriggleSkillWindow Bool
+    | SubSystemChange Bool      -- Ture for next page and False for last page
+    | ChooseSkill Int Int       -- When Skill at (id, Level) is chosen
