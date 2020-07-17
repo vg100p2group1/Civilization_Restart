@@ -23,13 +23,13 @@ monsterAct :  Me -> Monster ->  Monster
 monsterAct  me monster = 
     let 
         numtodir num = 
-            (3*(sin (degrees <|toFloat num)),3*(cos (degrees <|toFloat num))  )
+            ((sin (degrees <|toFloat num)),(cos (degrees <|toFloat num))  )
 
         (directiondiff,seed1) =  Random.step (Random.int -30 30) monster.seed
         
         nowdir = monster.direction
 
-        newdir = nowdir + directiondiff
+        newdir = nowdir 
 
         direction = numtodir newdir
 
@@ -44,7 +44,9 @@ monsterAct  me monster =
 
         nowPosition = monster.position
 
-        newPos = (Tuple.first nowPos + Tuple.first direction,Tuple.second nowPos + Tuple.second direction)
+        speed = monster.speed
+
+        newPos = (Tuple.first nowPos + (Tuple.first direction)* speed,Tuple.second nowPos + (Tuple.second direction)* speed)
 
         newPosition = {nowPosition|cx=Tuple.first newPos,cy=Tuple.second newPos}
         
