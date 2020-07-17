@@ -27,6 +27,7 @@ type alias Monster =
     , seed : Seed
     , active : Bool
     , timeBeforeAttack : Int
+    , speed : Float
     }
 
 
