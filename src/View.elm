@@ -6,16 +6,12 @@ import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-
-
-
 import Html.Events.Extra.Mouse as Mouse
-
 import Svg 
 import Svg.Attributes 
 
 import MiniMap exposing (getMiniMap)
-
+import Move.PlayerMoving exposing (playerMove)
 
 -- view : Model -> Html.Html Msg
 -- view model =
@@ -177,17 +173,16 @@ displayMonster monsters =
 
 me : Me -> Svg.Svg Msg
 me myself=
-   let 
-        createBallFormat model =
-          Svg.circle 
-            [ Svg.Attributes.fill "green"
-            , Svg.Attributes.cx "500"
-            , Svg.Attributes.cy "500"
-            , Svg.Attributes.r <| String.fromFloat model.r
-            ] 
-            []
-    in
-        createBallFormat myself
+    playerMove myself
+--    let 
+--         createBallFormat model =
+--           Svg.circle 
+--             [ Svg.Attributes.cx "500"
+--             , Svg.Attributes.cy "500"
+--             ] 
+--             [ playerMove myself]
+--     in
+--         createBallFormat myself
 
 gun : Me -> Svg.Svg Msg
 gun myself =

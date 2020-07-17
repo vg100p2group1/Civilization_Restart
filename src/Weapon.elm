@@ -1,7 +1,7 @@
 module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig)
 
 import Shape exposing (Circle)
-import Map.Map exposing (Map)
+-- import Map.Map exposing (Map)
 
 type alias Bullet =
     { x : Float
