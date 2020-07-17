@@ -36,15 +36,31 @@ type alias Weapon =
     , color : String
     , bulletNumber : Int
     , auto : Bool
-    , period : Float
+    , period : Int
     , image : String
+    , counter : Int
+    , hasFired : Bool
     }
 
 bulletConfig : Bullet
 bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player 20
 
 defaultWeapon : Weapon
-defaultWeapon = Weapon defaultBulletGenerator Pistol "Pistol" 1 "green" 0 False 0 ""
+defaultWeapon =
+    { bulletGenerator = defaultBulletGenerator
+    , extraInfo = Pistol
+    , name  = "Pistol"
+    -- newly added
+    , number = 1
+    , color = "green"
+    , bulletNumber = 0
+    , auto = False
+    , period = 10
+    , image = ""
+    , counter = 1
+    , hasFired = False
+    }
+
 
 defaultBulletGenerator : WeaponInfo -> Bullet
 defaultBulletGenerator _ =
@@ -70,8 +86,8 @@ weaponList : List Weapon
 weaponList =
     let
         pistol = defaultWeapon
-        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "red" 0 True 0 ""
-        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 0 ""
-        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 0 ""
+        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 "" 1 False
+        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 "" 1 False
+        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 "" 1 False
     in
         [pistol, gatling, mortar, shotgun]

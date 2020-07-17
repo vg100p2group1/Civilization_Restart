@@ -104,8 +104,5 @@ updateMonster monsters bullets me =
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
                      |> List.map (\m -> updateMonster_ m bullets)
-
-
-        
     in
         allMonsterAct finalMonsters me bullets

@@ -94,8 +94,8 @@ monsterShoot monsterList me bulletList =
         newBullet monster  =
                 -- Bullet me.x me.y 5 (Circle me.x me.y 5) (10*(speedx monster)) (10*(speedy monster)) False Weapon.Monster monster.monsterType.attack
              Bullet monster.position.cx monster.position.cy 5 (Circle monster.position.cx monster.position.cy 5) (bulletSpeed*(speedx monster)) (10*(speedy monster)) False Weapon.Monster monster.monsterType.attack
-    in 
+    in
 
-    newBullets
+        bulletList ++ newBullets
 
 
