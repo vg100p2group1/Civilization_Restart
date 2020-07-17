@@ -54,6 +54,7 @@ monsterBuilding monsterList number obstacles seed0 =
         (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
         (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
+        (monsterSpeed, seed4) = Random.step (Random.float 2 6) seed3
         getMonsterType = 
             let
                 headType =List.head <| List.drop typeTemp monsterTypeList 
@@ -65,10 +66,10 @@ monsterBuilding monsterList number obstacles seed0 =
                         MonsterType 0 0 ""
         monsterTypeTemp = getMonsterType
 
-        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit
-        monsterPos = Shape.Circle  (toFloat xTemp + 100) (toFloat yTemp + 100) 50 
+        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
+        monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed
 
     in 
         if number==0 then
@@ -77,7 +78,7 @@ monsterBuilding monsterList number obstacles seed0 =
             if checkMonsterCollison monsterNew obstacles monsterList then
                 monsterBuilding (monsterNew :: monsterList) (number - 1) obstacles seed3
             else 
-                monsterBuilding  monsterList number obstacles seed3
+                monsterBuilding  monsterList number obstacles seed4
 
 updateMonster_ : Monster -> List Bullet -> Monster
 updateMonster_ monster bullets =
