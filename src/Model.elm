@@ -28,6 +28,7 @@ type alias Me =
     , url : String
     , preDirection : Direction
     , weaponDirection : Direction
+    , isFire : Bool
     }
 type Direction
     = DirectionRight
@@ -36,7 +37,7 @@ type Direction
 
 defaultMe : Me
 
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight False
 
 type alias Model =
     { myself : Me

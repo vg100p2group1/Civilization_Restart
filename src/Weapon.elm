@@ -36,7 +36,7 @@ type alias Weapon =
     , color : String
     , bulletNumber : Int
     , auto : Bool
-    , frequency : Float
+    , period : Float
     , image : String
     }
 
