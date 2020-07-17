@@ -3,13 +3,13 @@ module Skill exposing (SkillSystem, SkillSubSystem, Skill)
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
     , current : Int
+    , points : Int
     }
 
 type alias SkillSubSystem = 
     { skills : List Skill
     , name : String
     , chosen : (Int, Int)  -- The (id, level) of chosen Skill
-    , points : Int
     , text : String
     }
 
@@ -20,6 +20,9 @@ type alias Skill =
     , desciption : String
     }
 
+emptySkill : Skill
+emptySkill = Skill 0 0 False ""
+
 switchSubSystem : SkillSystem -> Int -> SkillSystem
 switchSubSystem sys dir =
     let 
@@ -27,3 +30,11 @@ switchSubSystem sys dir =
         newCurr = sys.current + dir % total
     in
         {sys|current = newCurr}
+
+choose : SkillSubSystem -> (Int, Int) -> SkillSubSystem
+choose sys (id, level) =
+    let 
+        chosenList = List.filter (\sk -> sk.id == id && sk.level == level) sys.skills
+        skill = Maybe.withDefault emptySkill (List.head chosenList)
+    in
+        {sys|chosen = (skill.id, skill.level), text = skill.desciption}
