@@ -73,7 +73,7 @@ monsterShoot monsterList me bulletList =
          
 
         activemonster =  
-            --  List.filter (\m -> m.timeBeforeAttack==0) 
+             List.filter (\m -> m.timeBeforeAttack==0) 
                 (List.filter (\m -> m.active) monsterList)
         newBullets= List.map newBullet activemonster
 

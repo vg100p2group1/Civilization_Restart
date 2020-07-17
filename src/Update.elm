@@ -2,7 +2,7 @@ module Update exposing (update)
 
 import Messages exposing (Msg(..))
 import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
-import Shape exposing (Rec,Rectangle,Circle,recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
+import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..))
@@ -12,7 +12,6 @@ import Debug
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
-
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -73,11 +72,9 @@ update msg model =
                 -- bulletnow = model.bullet
                 newShoot = fireBullet me.mouseData (me.x,me.y)
                 newBullet = newShoot :: model.bullet 
-                newCircle = Circle 500 500 newShoot.hitbox.r
-                newBulletViewbox = {newShoot|hitbox = newCircle, x = 500, y = 500, r = 5} :: model.bulletViewbox
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
-                ({model|myself = me, bullet = newBullet,bulletViewbox=newBulletViewbox},Cmd.none)
+                ({model|myself = me, bullet = newBullet},Cmd.none)
         
         MouseUp ->
             let
@@ -86,16 +83,20 @@ update msg model =
             in
                 ({model|myself = me},Cmd.none) 
         NextFloor ->
-            let
-                roomNew = 
-                    roomGenerator 1 (Tuple.second model.rooms)
+            if model.state == NextStage then
+                let
+                    roomNew =
+                        roomGenerator 1 (Tuple.second model.rooms)
 
-                mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
-                meTemp = model.myself
-                meNew = {defaultMe|weapons=meTemp.weapons}
-            in
-                ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew},Cmd.none)
-
+                    mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                    meTemp = model.myself
+                    meNew = {defaultMe|weapons=meTemp.weapons}
+                    -- it should be updated when dialogues are saved in every room
+                    newDialogues = updateDialogues model
+                in
+                    ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues},Cmd.none)
+            else
+                (model, Cmd.none)
         Tick time ->
             model
                 --|> updateSentence (min time 25)
@@ -149,7 +150,7 @@ mouseDataUpdate model mousedata =
 
             else
                 Basics.min 1 (w / configheight)
-        d1=Debug.log "r" r 
+        -- d1=Debug.log "r" r 
 
         xLeft = (w - configwidth*r) / 2 
         yTop = (h - configheight*r) / 2
@@ -169,22 +170,21 @@ animate  model =
     let
         me = model.myself
         
-        newMe = speedCase me model.map
+        (newMe,collision) = speedCase me model.map
 
         (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me
         map = model.map
         newMap = {map | monsters = newMonsters}
 
-        newViewbox = mapToViewBox me newMap
-        
-        newBulletList = updateBullet me model.map (List.append model.bullet newBullet)
-        newBulletListViewbox = updateBullet me model.viewbox   (List.append model.bulletViewbox newBullet)
-    
+        newViewbox = mapToViewBox newMe newMap
+        newBulletList = updateBullet newMe model.map (List.append model.bullet newBullet) collision
+        newBulletListViewbox = bulletToViewBox newMe newBulletList
+        newState = updateState model
     in
-        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox },Cmd.none)
+        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState },Cmd.none)
 
 
-speedCase : Me -> Map-> Me
+speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
         getNewXSpeed =
@@ -219,75 +219,91 @@ speedCase me map=
         
         (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
-        getXY = -- TO DO collide direction 之后要保持非碰撞分量。
-            if (wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++map.walls++map.roads) ) then
-                ((newXTemp,newYTemp),(xSpeedFinalTemp,ySpeedFinalTemp))
-            else
-                ((me.x,me.y),(0,0))
-        ((newX,newY),(xSpeedFinal,ySpeedFinal)) = getXY
+
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++map.walls++map.roads) 
+        -- d = Debug.log "Type" collideType
+        -- d = Debug.log "x"
+        getCollideType collideList  = 
+            case List.head collideList of 
+                Just a ->
+                    a
+                _ ->
+                    NoCollide 0
+        (typeA,typeB) = (getCollideType collideType, getCollideType<|List.drop 1 collideType)
+
+        getXY = -- TO DO Road 2墙重合有 bug
+            case (typeA,typeB) of
+                (FromRight a,NoCollide b) ->
+                    ((newXTemp-a,newYTemp),(ySpeedFinalTemp-a,ySpeedFinalTemp),(True,False))
+                (FromLeft a,NoCollide b) ->
+                    ((newXTemp-a,newYTemp),(ySpeedFinalTemp-a,ySpeedFinalTemp),(True,False))
+                (FromUp a,NoCollide b) ->
+                    ((newXTemp,newYTemp-a),(xSpeedFinalTemp,ySpeedFinalTemp-a),(False,True))
+                (FromDown a,NoCollide b) ->
+                    ((newXTemp,newYTemp-a),(xSpeedFinalTemp,ySpeedFinalTemp-a),(False,True))
+                
+                (FromLeft a, FromUp b) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                (FromLeft a, FromDown b) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                (FromRight a, FromUp b) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                (FromRight a, FromDown b) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                
+                (FromUp b, FromLeft a) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                (FromUp b, FromRight a) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                (FromDown b, FromLeft a) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+                (FromDown b, FromRight a) ->
+                    ((newXTemp-a,newYTemp-b),(xSpeedFinalTemp-a,ySpeedFinalTemp-b),(True,True))
+
+                (NoCollide a,NoCollide b) ->
+                    ((newXTemp,newYTemp),(xSpeedFinalTemp,ySpeedFinalTemp),(False,False))
+                _ ->
+                    ((me.x,me.y),(0,0),(False,False))
+        
+        ((newX,newY),(xSpeedFinal,ySpeedFinal),(collisionX,collisionY)) = getXY
         
     in
-        {me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)}
+        ({me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)},(collisionX,collisionY))
 
-wallCollisionTest : Circle -> List Rectangle -> Bool
+wallCollisionTest : Circle -> List Rectangle -> List CollideDirection
 wallCollisionTest hitbox wallList =
     let
         collide model =
-            circleRecTest hitbox model
+            (Shape.circleRecDirection hitbox model) /= Shape.NoCollide 0
         wallColList=List.filter collide <| List.map (\value->value.edge) wallList
+        wallColType = List.map (\value-> Shape.circleRecDirection hitbox value )wallColList
         -- d1=Debug.log "hitbox" hitbox
         -- d2=Debug.log "Col List" wallColList
     in
-        List.isEmpty wallColList 
+        -- List.isEmpty wallColList
+        listUniq (List.length wallColType) wallColType [] 
 
+listUniq : Int -> List CollideDirection -> List CollideDirection -> List CollideDirection
+listUniq num orignial now=
+    let
+        getHead = 
+            case List.head orignial of 
+                Just a ->
+                    a
+                _ ->
+                    NoCollide 0
+        newOriginal = List.drop 1 orignial
+        newNow = 
+            if List.member getHead now then
+                now
+            else 
+                now ++ [getHead]
 
-
--- viewUpdate : Me -> Rectangle -> Rectangle
--- viewUpdate me oneWall =
---     let
---         -- x = max oneWall.x left
---         -- y = max oneWall.y top  
-        
---         -- width = min oneWall.width (right - x)
---         -- height = min oneWall.height (bottom - y)
---         xTemp = oneWall.x - me.xSpeed
---         yTemp = oneWall.y - me.ySpeed
---         recTemp = Rectangle xTemp yTemp oneWall.width oneWall.height recInit
---     in
---         recUpdate recTemp
-        
--- viewUpdateCircle : Me -> Circle -> Shape.Circle
--- viewUpdateCircle me circle =
---     let 
---         xTemp = circle.cx - me.xSpeed
---         yTemp = circle.cy - me.ySpeed
---     in
---         Circle xTemp yTemp circle.r
-
-
--- updateViewbox : Me -> Model -> Map
--- updateViewbox me model =
---     -- viewRec = List.map viewUpdate viewedRecTemp
---     -- in
---     -- let
---     --     meTemp = model.myself
---     --     d = Debug.log "mouse2" meTemp.mouseData 
---     --     d=Debug.log "recs" model.viewbox
---     -- in
---     let
---         mapTemp = model.viewbox
---         newWalls = List.map (viewUpdate me) mapTemp.walls
---         newRoads = List.map (viewUpdate me) mapTemp.roads
---         newDoors = List.map (viewUpdate me) mapTemp.doors
---         newObstacles = List.map (viewUpdate me) mapTemp.obstacles
-
---         newMonsters = List.map (\value -> {value| position = viewUpdateCircle me value.position,region = viewUpdate me value.region}) mapTemp.monsters 
-
---         newGate = viewUpdate me mapTemp.gate
-
---     in
---         {mapTemp| walls = newWalls, roads = newRoads,doors=newDoors,obstacles=newObstacles,monsters=newMonsters,gate=newGate}
-
+    in 
+        if num==0 then
+            now
+        else
+            listUniq (num - 1) newOriginal newNow
 
 
 activateUpdate : Float -> Float -> { a | active : Bool, elapsed : Float } -> { a | active : Bool, elapsed : Float }
@@ -335,20 +351,32 @@ fireBullet (mouseX,mouseY) (meX, meY) =
     let
         posX = mouseX
         posY = mouseY
+
+        -- d1=Debug.log "mouse" (posX,posY)
+        -- d2=Debug.log "me" (meX,meY)
         unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500)) 
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
         newCircle = Circle meX meY 5
     in
-        {bulletConfig | hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        {bulletConfig | x=meX,y=meY,hitbox = newCircle, speedX=xTemp, speedY=yTemp}
 
-updateBullet : Me-> Map -> List Bullet -> List Bullet
-updateBullet me map bullets =
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
+updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
             let
-                newX = b.hitbox.cx + b.speedX - me.xSpeed
-                newY = b.hitbox.cy + b.speedY - me.ySpeed
+                d2=Debug.log "meX" me.xSpeed
+                newX = 
+                    if (b.from == Player) && (not collisionX) then 
+                        b.hitbox.cx + b.speedX + me.xSpeed
+                    else 
+                        b.hitbox.cx + b.speedX
+                newY = 
+                    if (b.from == Player) && (not collisionY) then
+                        b.hitbox.cy + b.speedY + me.ySpeed
+                    else 
+                        b.hitbox.cy + b.speedY
                 newHitbox = Circle newX newY b.hitbox.r
             in
                 {b|hitbox = newHitbox,x=newX, y=newY}
@@ -362,3 +390,26 @@ updateBullet me map bullets =
     in
         finalBullets
 
+
+bulletToViewBox : Me -> List Bullet -> List Bullet
+bulletToViewBox me bullets=
+    List.map (\value->{ value | x=viewBoxMax/2+value.x-me.x,y=viewBoxMax/2 +value.y-me.y}) bullets
+
+
+updateState : Model -> State
+updateState model =
+    let
+        collideGate = circleRecTest model.myself.hitBox model.map.gate.edge
+        newState =
+            if collideGate then
+                NextStage
+            else if model.state == Dialogue then
+                Dialogue
+            else
+                Others
+    in
+        newState
+
+updateDialogues : Model -> Dialogues
+updateDialogues model =
+    model.currentDialogues
