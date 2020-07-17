@@ -31,10 +31,17 @@ switchSubSystem sys dir =
     in
         {sys|current = newCurr}
 
+getSkill : SkillSubSystem -> (Int, Int) -> Maybe Skill
+getSkill sys (id, level) =
+    let
+        chosenList = List.filter (\sk -> sk.id == id && sk.level == level) sys.skills
+    in
+        List.head chosenList
+
 choose : SkillSubSystem -> (Int, Int) -> SkillSubSystem
 choose sys (id, level) =
     let 
-        chosenList = List.filter (\sk -> sk.id == id && sk.level == level) sys.skills
-        skill = Maybe.withDefault emptySkill (List.head chosenList)
+        maybeSkill = getSkill sys (id, level)
+        skill = Maybe.withDefault emptySkill maybeSkill
     in
         {sys|chosen = (skill.id, skill.level), text = skill.desciption}
