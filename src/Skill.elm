@@ -12,6 +12,7 @@ type alias SkillSubSystem =
     , name : String
     , chosen : (Int, Int)  -- The (id, level) of chosen Skill
     , text : String
+    , unlockLevel : Int
     }
 
 type alias Skill = 
@@ -25,10 +26,10 @@ emptySkill : Skill
 emptySkill = Skill -1 -1 False ""
 
 switchSubSystem : SkillSystem -> Int -> SkillSystem
-switchSubSystem sys dir =
+switchSubSystem sys dire =
     let 
         total = List.length sys.subsys
-        newCurr = sys.current + dir % total
+        newCurr = sys.current + modBy total dire
     in
         {sys|current = newCurr}
 
@@ -47,9 +48,12 @@ choose sys (id, level) =
     in
         {sys|chosen = (skill.id, skill.level), text = skill.desciption}
 
+canUnlockLevel : SkillSubSystem -> Int -> Bool
+canUnlockLevel sys level =
+    sys.unlockLevel + 1 >= level
 
 -- return Nothing if the skill not exist (player currently choose nothing).
--- return (inputSubsystem,0) back if the skill is already unlocked.
+-- return (inputSubsystem,0) back if the skill is already unlocked or some requirements are not satisfied.
 -- return (newSubsystem, cost) where newSubsystem have the skill unlocked and 
 -- cost is the cost for this unlock if success
 unlockChosen : SkillSubSystem -> Maybe (SkillSubSystem, Int)
@@ -61,13 +65,14 @@ unlockChosen sys =
         case maybeSkill of 
             Maybe.Nothing -> Maybe.Nothing
             Just skill ->
-                if skill.unlocked then  -- the skill is already unlocked
-                    (sys, 0)
+                if skill.unlocked || not (canUnlockLevel sys skill.level) then  -- the skill is already unlocked
+                    Just (sys, 0)
                 else  -- unlock the skill
                 let
-                    newSkill = {skill|unlocked = true}
-                    newSkills = List.filter (\sk -> not (sk.id == id && sk.level == level)) sys.skills :: skill
+                    newSkill = {skill|unlocked = True}
+                    newSkills = newSkill :: List.filter (\sk -> not (sk.id == id && sk.level == level)) sys.skills
+                    newUnlocklevel = Basics.max sys.unlockLevel skill.level
+                    newSubsystem = {sys | skills = newSkills, unlockLevel = newUnlocklevel}
                     cost = skill.level
-                    newSubsystem = {sys | skills = newSkills}
                 in
-                    (newSubsystem, cost)
+                    Just (newSubsystem, cost)
