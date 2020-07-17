@@ -5,6 +5,7 @@ import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon)
 import Config exposing (playerSpeed,viewBoxMax)
+import Skill exposing (SkillSystem)
 
 type alias Me =
     { x : Float
@@ -25,10 +26,11 @@ type alias Me =
     , weapons : List Weapon     -- the first element is the one in uses
     , counter : Int
     -- , direction : Int 
+    , skillSys : SkillSystem
     }
 
 defaultMe : Me
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) [] 0
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) [] 0 
 
 type alias Model =
     { myself : Me

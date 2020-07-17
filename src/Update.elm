@@ -326,6 +326,7 @@ startUpdateSen model =
     else
         { model | sentenceState = Nothing}
 -}
+
 updateSentence : Float -> Model -> Model
 updateSentence elapsed model =
     case model.state of
