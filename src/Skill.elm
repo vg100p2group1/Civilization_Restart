@@ -20,5 +20,10 @@ type alias Skill =
     , desciption : String
     }
 
-emptySkill : Skill
-emptySkill = Skill 0 0 False ""
+switchSubSystem : SkillSystem -> Int -> SkillSystem
+switchSubSystem sys dir =
+    let 
+        total = List.length sys.subsys
+        newCurr = sys.current + dir % total
+    in
+        {sys|current = newCurr}
