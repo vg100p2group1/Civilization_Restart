@@ -5,7 +5,7 @@ import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,de
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
-import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon)
+import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
@@ -69,9 +69,8 @@ update msg model =
             let
                 pTemp =  model.myself
                 me= {pTemp | fire = True}
-                -- bulletnow = model.bullet
-                newShoot = fireBullet me.mouseData (me.x,me.y)
-                newBullet = newShoot :: model.bullet 
+                newShoot = fireBullet model.myself.currentWeapon me.mouseData (me.x,me.y)
+                newBullet = newShoot ++ model.bullet
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
                 ({model|myself = me, bullet = newBullet},Cmd.none)
@@ -366,8 +365,8 @@ updateSentence elapsed model =
         _ ->
             model
 
-fireBullet : (Float, Float) -> (Float, Float) -> Bullet
-fireBullet (mouseX,mouseY) (meX, meY) =
+fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> List Bullet
+fireBullet weapon (mouseX,mouseY) (meX, meY) =
     let
         posX = mouseX
         posY = mouseY
@@ -379,9 +378,23 @@ fireBullet (mouseX,mouseY) (meX, meY) =
 
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
-        newCircle = Circle meX meY 5
+        bullet = generateBullet weapon
+        newCircle = Circle meX meY bullet.r
+        newBullet = {bullet | x=meX,y=meY,hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        bulletList =
+            case weapon.extraInfo of
+                Shotgun ->
+                    -- the shotgun will shoot three bullets at one time and has an angle of 30 degrees
+                    let
+                        bullet1 = {newBullet|speedX=(sqrt 3)/2*xTemp+0.5*yTemp,speedY=(sqrt 3)/2*yTemp-0.5*xTemp}
+                        bullet2 = {newBullet|speedX=(sqrt 3)/2*xTemp-0.5*yTemp,speedY=(sqrt 3)/2*yTemp+0.5*xTemp}
+                    in
+                    [newBullet, bullet1, bullet2]
+                _ ->
+                    [newBullet]
     in
-        {bulletConfig | x=meX,y=meY,hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        bulletList
+
 
 updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
 updateBullet me map bullets (collisionX,collisionY) =
