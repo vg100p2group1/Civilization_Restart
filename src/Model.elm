@@ -74,6 +74,7 @@ type alias AnimationState =
     , size : (Float,Float)
     }
 
+
 mapToViewBox : Me -> Map ->Map
 mapToViewBox me map =
     let 

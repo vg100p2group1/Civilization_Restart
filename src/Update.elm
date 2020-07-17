@@ -376,6 +376,7 @@ fireBullet (mouseX,mouseY) (meX, meY) =
         -- d2=Debug.log "me" (meX,meY)
         unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500))
         -- velocity decomposition
+
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
         newCircle = Circle meX meY 5
