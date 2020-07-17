@@ -5,7 +5,7 @@ import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,de
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
-import Weapon exposing (Bullet,bulletConfig,ShooterType(..))
+import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon)
 import Debug
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
@@ -110,6 +110,11 @@ update msg model =
         ShowDialogue ->
             ({ model | state = Dialogue}, Cmd.none)
 
+        ChangeWeapon number ->
+            (changeWeapon (number - 1) model, Cmd.none)
+
+        ChangeWeapon_ ->
+            (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
 
         Resize width height ->
             ( { model | size = ( toFloat width, toFloat height ) }
@@ -135,6 +140,21 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+
+changeWeapon : Int -> Model -> Model
+changeWeapon number model =
+    let
+        weapon = List.head (List.drop number model.myself.weapons)
+        newWeapon =
+            case weapon of
+                Just a ->
+                    a
+                Nothing ->
+                    defaultWeapon
+        pTemp = model.myself
+        me = { pTemp | currentWeapon = newWeapon}
+    in
+        {model | myself = me}
 
 mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
 mouseDataUpdate model mousedata = 
@@ -354,7 +374,8 @@ fireBullet (mouseX,mouseY) (meX, meY) =
 
         -- d1=Debug.log "mouse" (posX,posY)
         -- d2=Debug.log "me" (meX,meY)
-        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500)) 
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500))
+        -- velocity decomposition
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 500)
         newCircle = Circle meX meY 5

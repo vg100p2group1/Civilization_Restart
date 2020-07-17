@@ -202,7 +202,7 @@ gun myself =
             if myself.fire then 
                 "red"
             else
-                "blue"                              
+                myself.currentWeapon.color
     in
         Svg.path [route , Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
 

@@ -19,5 +19,7 @@ type Msg
     -- for testing
     | ShowDialogue
     | NextSentence
+    | ChangeWeapon Int
+    | ChangeWeapon_
 
 
