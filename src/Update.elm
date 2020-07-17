@@ -181,7 +181,7 @@ animate  model =
         newBulletListViewbox = bulletToViewBox newMe newBulletList
         newState = updateState model
     in
-        ({ model| myself = newMe, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState },Cmd.none)
+        ({model| myself = {newMe|counter=newMe.counter+1}, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState},Cmd.none)
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
