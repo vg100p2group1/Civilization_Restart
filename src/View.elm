@@ -260,7 +260,7 @@ showSkill model =
         let
             curr = getCurrentSubSystem sys
             skills = curr.skills
-            points = sys.points
+            points = String.fromInt sys.points
             txt = curr.text
             sysName = curr.name
         in
@@ -278,9 +278,10 @@ showSkill model =
             [ button [onClick <| SkillChange <| SubSystemChange False, style "margin" "20px 0 0 100px",style "float" "left"] [text "<"]
             , div [style "margin" "20px 0 0 20px", style "color" "red", style "float" "left"] [text sysName]
             , button [onClick <| SkillChange <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
+            , div [style "margin" "20px 0 0 180px"] [text points]
             , div
                 [style "margin" "40px 0 0 120px"]
-                (List.map skillToButton skills)
+                (List.map (skillToButton curr.chosen) skills)
             , div
                 [ style "margin" "190px 0 0 0"
                 , style "padding" "5px 10px 5px 10px"
@@ -291,19 +292,23 @@ showSkill model =
     else
         div [] []
 
-skillToButton : Skill -> Html Msg
-skillToButton skill =
+skillToButton : (Int, Int) -> Skill -> Html Msg
+skillToButton (chosenId, chosenLevel) skill =
     let
         id = skill.id
         level = skill.level
+        isChosen = id == chosenId && level == chosenLevel
         top = (String.fromInt ((level-1) * 50)) ++ "px"
         left = (String.fromInt (id * 80)) ++ "px"
+        color = if skill.unlocked then "blue" else "gray"
+        border = if isChosen then [style "border" "1px solid purple"] else []
     in
     button
-    [ onClick <| SkillChange <| ChooseSkill skill.id skill.level
+    ([ onClick <| SkillChange <| ChooseSkill skill.id skill.level
     , style "position" "absolute"
     , style "margin" (top ++ " 0 0 " ++ left)
-    ]
+    , style "background" color
+    ] ++ border)
     [text ("(" ++ String.fromInt id ++ "," ++ String.fromInt level ++ ")")]
 
 
