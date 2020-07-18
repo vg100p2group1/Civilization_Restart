@@ -1,5 +1,5 @@
 
-module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..))
+module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion)
 
 import Shape exposing (Circle)
 
@@ -93,3 +93,15 @@ weaponList =
     in
 
         [pistol, gatling, mortar, shotgun]
+
+type alias ExplosionEffect =
+    {
+        x : Float,
+        y : Float,
+        r : Float,
+        counter : Int
+    }
+
+bulletToExplosion : Bullet -> ExplosionEffect 
+bulletToExplosion model = 
+    ExplosionEffect model.x model.y model.r 0

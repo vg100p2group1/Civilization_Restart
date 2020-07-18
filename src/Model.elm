@@ -3,7 +3,7 @@ module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(.
 import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
-import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon)
+import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
 
 type alias Me =
@@ -48,6 +48,8 @@ type alias Model =
     , size : (Float, Float)
     , state : State
     , currentDialogues: Dialogues
+    , explosion : List ExplosionEffect
+    , explosionViewbox : List ExplosionEffect
     }
 
 type State = Dialogue

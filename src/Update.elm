@@ -14,7 +14,7 @@ import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
 import Animation.PlayerMoving exposing (playerMove)
-
+import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -226,11 +226,17 @@ animate  model =
         map = model.map
         newMap = {map | monsters = newMonsters}
         newViewbox = mapToViewBox newMe newMap
-        newBulletList = updateBullet newMe model.map newBullet collision
+        (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
+
+        newExplosion = updateExplosion model.explosion filteredBulletList
+        newExplosionViewbox = explosionToViewbox newMe newExplosion
+
         newState = updateState model
     in
-        {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState}
+        {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
+                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
+                explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
@@ -426,19 +432,20 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
         bulletList
 
 
-updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
+
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet)
 updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
             let
                 -- d2=Debug.log "meX" me.xSpeed
                 newX = 
-                    if (b.from == Player) && (not collisionX) then 
+                    if (b.from == Player) &&  not collisionX then 
                         b.hitbox.cx + b.speedX + me.xSpeed
                     else 
                         b.hitbox.cx + b.speedX
                 newY = 
-                    if (b.from == Player) && (not collisionY) then
+                    if (b.from == Player) &&  not collisionY then
                         b.hitbox.cy + b.speedY + me.ySpeed
                     else 
                         b.hitbox.cy + b.speedY
@@ -450,10 +457,15 @@ updateBullet me map bullets (collisionX,collisionY) =
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.walls)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
-                    |> List.filter (\b -> (not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters)))||(b.from == Monster))
+                    |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
         finalBullets = List.map updateXY allBullets
+
+        filteredBullets= List.filter (\value -> value.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        
+        -- d1=Debug.log "f" filteredBullets  
+
     in
-        finalBullets
+        (finalBullets,filteredBullets)
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
