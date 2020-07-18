@@ -1,18 +1,21 @@
+
 module Update exposing (update)
 
-import Messages exposing (Msg(..))
-import Model exposing (Model,Me,State(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
+import Messages exposing (Msg(..), SkillMsg(..))
+import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
-import Weapon exposing (Bullet,bulletConfig,ShooterType(..))
+import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
+import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
-
+import Animation.PlayerMoving exposing (playerMove)
+import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -20,7 +23,7 @@ update msg model =
         MoveLeft on ->
             let 
                 pTemp = model.myself 
-                me= {pTemp | moveLeft = on, moveRight =  False}
+                me= {pTemp | moveLeft = on, moveRight =  False, preDirection=DirectionLeft}
             in
                 ( {model| myself= me}
                 , Cmd.none
@@ -29,7 +32,7 @@ update msg model =
         MoveRight on ->
             let 
                 pTemp =  model.myself
-                me= {pTemp | moveRight = on, moveLeft = False}
+                me= {pTemp | moveRight = on, moveLeft = False, preDirection=DirectionRight}
             in
                 ( {model| myself= me}
                 , Cmd.none
@@ -62,24 +65,31 @@ update msg model =
                 -- d2 = Debug.log "mePos" (pTemp.x,pTemp.y)
                 -- d = Debug.log "mouse" newMouseData 
                 me = {pTemp | mouseData = mouseDataUpdate model newMouseData}
+                getDirection = 
+                    if (Tuple.first me.mouseData)>=500 then
+                        DirectionRight
+                    else 
+                        DirectionLeft
             in 
-                ({model|myself = me},Cmd.none)
+                ({model|myself = {me|weaponDirection=getDirection}},Cmd.none)
         
         MouseDown ->
             let
-                pTemp =  model.myself
-                me= {pTemp | fire = True}
-                -- bulletnow = model.bullet
-                newShoot = fireBullet me.mouseData (me.x,me.y)
-                newBullet = newShoot :: model.bullet 
+                pTemp = model.myself
+                me = {pTemp | fire = True}
+                {-
+                newShoot = fireBullet model.myself.currentWeapon me.mouseData (me.x,me.y)
+                newBullet = newShoot ++ model.bullet
+                -}
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
-                ({model|myself = me, bullet = newBullet},Cmd.none)
+                ({model|myself = me},Cmd.none)
         
         MouseUp ->
             let
                 pTemp =  model.myself
-                me= {pTemp | fire = False}
+                weapon=pTemp.currentWeapon
+                me= {pTemp|fire=False,currentWeapon={weapon|hasFired=False}}
             in
                 ({model|myself = me},Cmd.none) 
         NextFloor ->
@@ -90,7 +100,7 @@ update msg model =
 
                     mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                     meTemp = model.myself
-                    meNew = {defaultMe|weapons=meTemp.weapons}
+                    meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
                     -- it should be updated when dialogues are saved in every room
                     newDialogues = updateDialogues model
                 in
@@ -98,10 +108,7 @@ update msg model =
             else
                 (model, Cmd.none)
         Tick time ->
-            model
-                --|> updateSentence (min time 25)
-                |> animate
-
+            (animate model, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
@@ -110,6 +117,11 @@ update msg model =
         ShowDialogue ->
             ({ model | state = Dialogue}, Cmd.none)
 
+        ChangeWeapon number ->
+            (changeWeapon (number - 1) model, Cmd.none)
+
+        ChangeWeapon_ ->
+            (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
 
         Resize width height ->
             ( { model | size = ( toFloat width, toFloat height ) }
@@ -125,7 +137,9 @@ update msg model =
               }
             , Cmd.none
             )
-
+        
+        SkillChange skillMsg ->
+            updateSkill skillMsg model
 
         Noop ->
             let 
@@ -135,6 +149,21 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+
+changeWeapon : Int -> Model -> Model
+changeWeapon number model =
+    let
+        weapon = List.head (List.drop number model.myself.weapons)
+        newWeapon =
+            case weapon of
+                Just a ->
+                    a
+                Nothing ->
+                    defaultWeapon
+        pTemp = model.myself
+        me = { pTemp | currentWeapon = newWeapon}
+    in
+        {model | myself = me}
 
 mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
 mouseDataUpdate model mousedata = 
@@ -162,26 +191,55 @@ mouseDataUpdate model mousedata =
         ((mx - xLeft)/r, (my - yTop)/r)
 
 
+fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> (List Bullet, Weapon)
+fireBullet_ weapon (mouseX,mouseY) (meX, meY) =
+    let
+        bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
+        (newShoot, fireFlag, counter) =
+            if weapon.counter == 0 then
+                if weapon.auto then
+                    (bullet, False, weapon.period)
+                else if weapon.hasFired then
+                    ([], True, 0)
+                else
+                    (bullet, True, weapon.period)
+            else
+                ([], weapon.hasFired, weapon.counter)
+    in
+        (newShoot, {weapon|hasFired=fireFlag,counter=counter})
 
-
-animate :  Model -> (Model, Cmd Msg)
+animate :  Model -> Model
 animate  model =
     -- (model,Cmd.none)
     let
         me = model.myself
-        
         (newMe,collision) = speedCase me model.map
+        (newShoot, weapon) = if model.myself.fire then
+                                fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
+                             else
+                                ([], model.myself.currentWeapon)
 
-        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me
+        weaponCounter =
+            if weapon.counter == 0 then
+                0
+            else
+                weapon.counter - 1
+        newBullet_ = Debug.log "newBullets" newShoot ++ model.bullet
+        (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         map = model.map
         newMap = {map | monsters = newMonsters}
-
         newViewbox = mapToViewBox newMe newMap
-        newBulletList = updateBullet newMe model.map (List.append model.bullet newBullet) collision
+        (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
+
+        newExplosion = updateExplosion model.explosion filteredBulletList
+        newExplosionViewbox = explosionToViewbox newMe newExplosion
+
         newState = updateState model
     in
-        ({model| myself = {newMe|counter=newMe.counter+1}, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState},Cmd.none)
+        {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
+                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
+                explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
@@ -324,6 +382,7 @@ startUpdateSen model =
     else
         { model | sentenceState = Nothing}
 -}
+
 updateSentence : Float -> Model -> Model
 updateSentence elapsed model =
     case model.state of
@@ -346,34 +405,51 @@ updateSentence elapsed model =
         _ ->
             model
 
-fireBullet : (Float, Float) -> (Float, Float) -> Bullet
-fireBullet (mouseX,mouseY) (meX, meY) =
+fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> List Bullet
+fireBullet weapon (mouseX,mouseY) (meX, meY) =
     let
         posX = mouseX
         posY = mouseY
 
         -- d1=Debug.log "mouse" (posX,posY)
         -- d2=Debug.log "me" (meX,meY)
-        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500)) 
-        xTemp = bulletSpeed / unitV * (posX - 500)
-        yTemp = bulletSpeed / unitV * (posY - 500)
-        newCircle = Circle meX meY 5
-    in
-        {bulletConfig | x=meX,y=meY,hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+        -- velocity decomposition
 
-updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
+        xTemp = bulletSpeed / unitV * (posX - 500)
+        yTemp = bulletSpeed / unitV * (posY - 520)
+        bullet = generateBullet weapon
+        newCircle = Circle meX (meY+20) bullet.r
+        newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        bulletList =
+            case weapon.extraInfo of
+                Shotgun ->
+                    -- the shotgun will shoot three bullets at one time and has an angle of 30 degrees
+                    let
+                        bullet1 = {newBullet|speedX=(sqrt 3)/2*xTemp+0.5*yTemp,speedY=(sqrt 3)/2*yTemp-0.5*xTemp}
+                        bullet2 = {newBullet|speedX=(sqrt 3)/2*xTemp-0.5*yTemp,speedY=(sqrt 3)/2*yTemp+0.5*xTemp}
+                    in
+                    [newBullet, bullet1, bullet2]
+                _ ->
+                    [newBullet]
+    in
+        bulletList
+
+
+
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet)
 updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
             let
-                d2=Debug.log "meX" me.xSpeed
+                -- d2=Debug.log "meX" me.xSpeed
                 newX = 
-                    if (b.from == Player) && (not collisionX) then 
+                    if (b.from == Player) &&  not collisionX then 
                         b.hitbox.cx + b.speedX + me.xSpeed
                     else 
                         b.hitbox.cx + b.speedX
                 newY = 
-                    if (b.from == Player) && (not collisionY) then
+                    if (b.from == Player) &&  not collisionY then
                         b.hitbox.cy + b.speedY + me.ySpeed
                     else 
                         b.hitbox.cy + b.speedY
@@ -385,10 +461,16 @@ updateBullet me map bullets (collisionX,collisionY) =
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.walls)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
-                    |> List.filter (\b -> (not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters)))||(b.from == Monster))
+                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
+                    |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
         finalBullets = List.map updateXY allBullets
+
+        filteredBullets= List.filter (\value -> value.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        
+        -- d1=Debug.log "f" filteredBullets  
+
     in
-        finalBullets
+        (finalBullets,filteredBullets)
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
@@ -413,3 +495,56 @@ updateState model =
 updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
+
+updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
+updateSkill msg model =
+    let
+        me = model.myself
+        sys = me.skillSys
+    in
+    case msg of
+        TriggerSkillWindow ->
+            let 
+                active = sys.active
+                subList = sys.subsys
+                newSub = List.map (\sub -> choose sub (0,0)) subList
+                newSys = {sys|active = not active, subsys = newSub}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        SubSystemChange change ->
+            let 
+                delta = if change then 1 else -1
+                newSys = switchSubSystem sys delta
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        ChooseSkill id level->
+            let 
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                newSub = choose sub (id, level)
+                newSubList = List.take sys.current subList ++ [newSub] ++ (List.drop (sys.current+1) subList)
+                newSys = {sys|subsys = newSubList}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        UnlockSkill ->
+            let
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                (newSub,cost) = unlockChosen sub
+                (finalSub, points) = 
+                    if cost > sys.points then     -- only apply if player can afford it
+                        ({sub|text ="it requires more points than you have"}, sys.points)
+                    else
+                        (newSub, sys.points - cost)
+                newSubList = List.take sys.current subList ++ [finalSub] ++ List.drop (sys.current+1) subList
+                newSys = {sys|subsys = newSubList, points = points}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)

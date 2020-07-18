@@ -2,3 +2,5 @@
 elm-stuff
 # rm index.html
 index.html
+# rm .idea
+.idea

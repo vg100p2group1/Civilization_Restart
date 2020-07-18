@@ -1,3 +1,4 @@
+
 module Map.MonsterGenerator exposing (monsterGenerator,updateMonster)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
@@ -104,8 +105,5 @@ updateMonster monsters bullets me =
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
                      |> List.map (\m -> updateMonster_ m bullets)
-
-
-        
     in
         allMonsterAct finalMonsters me bullets

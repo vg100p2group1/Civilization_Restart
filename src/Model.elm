@@ -1,10 +1,11 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..), AnimationState, defaultMe, sentenceInit,mapToViewBox)
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox)
 import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
-import Weapon exposing (Bullet,Weapon)
+import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
+import Skill exposing (SkillSystem, defaultSystem)
 
 type alias Me =
     { x : Float
@@ -23,12 +24,22 @@ type alias Me =
   --   , score : Float
     , hitBox : Circle
     , weapons : List Weapon     -- the first element is the one in uses
+    , currentWeapon : Weapon
     , counter : Int
+    , url : String
+    , preDirection : Direction
+    , weaponDirection : Direction
     -- , direction : Int 
+    , skillSys : SkillSystem
     }
+type Direction
+    = DirectionRight
+    | DirectionLeft
+
 
 defaultMe : Me
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) [] 0
+
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight defaultSystem
 
 type alias Model =
     { myself : Me
@@ -40,6 +51,8 @@ type alias Model =
     , size : (Float, Float)
     , state : State
     , currentDialogues: Dialogues
+    , explosion : List ExplosionEffect
+    , explosionViewbox : List ExplosionEffect
     }
 
 type State = Dialogue
@@ -74,6 +87,7 @@ type alias AnimationState =
     , elapsed: Float
     , size : (Float,Float)
     }
+
 
 mapToViewBox : Me -> Map ->Map
 mapToViewBox me map =
