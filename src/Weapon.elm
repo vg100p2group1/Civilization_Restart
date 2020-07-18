@@ -104,4 +104,4 @@ type alias ExplosionEffect =
 
 bulletToExplosion : Bullet -> ExplosionEffect 
 bulletToExplosion model = 
-    ExplosionEffect model.x model.y 15 0
+    ExplosionEffect model.x model.y (model.r^2) 0
