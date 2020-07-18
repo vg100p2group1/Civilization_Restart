@@ -5,7 +5,17 @@ import Config exposing (viewBoxMax)
 import Random exposing (Seed)
 
 type alias Treasure =
-    { position : (Int,Int)
+    { position : Rectangle
+    , treasureType : TreasureType
+    , seed : Seed
+    
+    }
+
+type alias TreasureType =
+    {   level : Int
+    ,   size : Float
+    ,   color : String     
+    
     }
 
 type alias Obstacle =
