@@ -1,9 +1,10 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, switchSubSystem, choose, unlockChosen)
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
     , current : Int
     , points : Int
+    , active : Bool
     }
 
 type alias SkillSubSystem = 
@@ -22,7 +23,14 @@ type alias Skill =
     }
 
 emptySkill : Skill
-emptySkill = Skill -1 -1 False "Nothing"
+emptySkill = Skill -1 1000 False "Nothing"
+
+getCurrentSubSystem : SkillSystem -> SkillSubSystem
+getCurrentSubSystem sys = 
+    sys.subsys
+    |> List.drop sys.current
+    |> List.head
+    |> Maybe.withDefault defaultSubSystem
 
 switchSubSystem : SkillSystem -> Int -> SkillSystem
 switchSubSystem sys dire =
@@ -51,21 +59,21 @@ canUnlockLevel : SkillSubSystem -> Int -> Bool
 canUnlockLevel sys level =
     sys.unlockLevel + 1 >= level
 
--- return Nothing if the skill not exist (player currently choose nothing).
--- return (inputSubsystem,0) back if the skill is already unlocked or some requirements are not satisfied.
+-- return (inputSubsystem,0) back if the skill is already unlocked, some requirements are not satisfied,
+-- or the skill not exist (player currently choose nothing).
 -- return (newSubsystem, cost) where newSubsystem have the skill unlocked and 
 -- cost is the cost for this unlock if success
-unlockChosen : SkillSubSystem -> Maybe (SkillSubSystem, Int)
+unlockChosen : SkillSubSystem -> (SkillSubSystem, Int)
 unlockChosen sys = 
     let 
         (id, level) = sys.chosen
         maybeSkill = getSkill sys (id, level)
     in
         case maybeSkill of 
-            Maybe.Nothing -> Maybe.Nothing
+            Maybe.Nothing -> (sys, 0)
             Just skill ->
                 if skill.unlocked || not (canUnlockLevel sys skill.level) then  -- the skill is already unlocked
-                    Just (sys, 0)
+                    (sys, 0)
                 else  -- unlock the skill
                 let
                     newSkill = {skill|unlocked = True}
@@ -74,7 +82,7 @@ unlockChosen sys =
                     newSubsystem = {sys | skills = newSkills, unlockLevel = newUnlocklevel}
                     cost = skill.level
                 in
-                    Just (newSubsystem, cost)
+                    (newSubsystem, cost)
 
 -- Define all the skills:
 skill010 : Skill
@@ -248,9 +256,13 @@ subSys2 =
     , unlockLevel = 0
     }
 
+defaultSubSystem : SkillSubSystem
+defaultSubSystem = subSys0
+
 defaultSystem : SkillSystem
 defaultSystem = 
     { subsys = [subSys0, subSys1, subSys2]
     , current = 0
     , points = 0
+    , active = False
     }

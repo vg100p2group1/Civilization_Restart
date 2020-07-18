@@ -7,6 +7,7 @@ import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..))
 import Debug
+import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
@@ -419,4 +420,49 @@ updateDialogues model =
 
 updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
 updateSkill msg model =
-    (model, Cmd.none)
+    let
+        sys = model.me.skillSys
+    in
+    case msg of
+        TriggerSkillWindow on ->
+            let 
+                newSys = {sys|active = on}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|me = newMe}
+            in
+                (newModel, Cmd.none)
+        SubSystemChange change ->
+            let 
+                delta = if change then 1 else -1
+                newSys = switchSubSystem sys delta
+                newMe = {me|skillSys = newSys}
+                newModel = {model|me = newMe}
+            in
+                (newModel, Cmd.none)
+        ChooseSkill id level->
+            let 
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                newSub = choose sub (id, level)
+                newSubList = List.take n subList :: [newSub] :: List.drop (n+1) subList
+                newSys = {sys|subsys = newSub}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|me = newMe}
+            in
+                (newModel, Cmd.none)
+        UnlockSkill ->
+            let
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                (newSub,cost) = unlockChosen sub
+                (finalSub, points) = 
+                    if points > sys.points then     -- only apply if player can afford it
+                        ({sub|text ="it requires more points than you have"}, sys.points)
+                    else
+                        (newSub, sys.points - points)
+                newSubList = List.take n subList :: [finalSub] :: List.drop (n+1) subList
+                newSys = {sys|subsys = newSub, points = points}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|me = newMe}
+            in
+                (newModel, Cmd.none)
