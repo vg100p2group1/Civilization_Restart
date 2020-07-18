@@ -70,7 +70,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0
 
     in 
         if number==0 then

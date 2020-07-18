@@ -187,6 +187,17 @@ displayTreasure treasure =
 
                 treasureColor = treasureType.color
             in
+                if treasureTemp.roomNum == 3 then 
+                Svg.rect
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill "purple"
+                
+                    ]
+                []
+                else
                 Svg.rect
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y

@@ -47,7 +47,7 @@ treasureBuilding treasureList number obstacles seed0 =
     let
         (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
-        (typeTemp, seed3) = Random.step (Random.int 0 treasureTypeNum) seed2
+        (typeTemp, seed3) = Random.step (Random.int 0 (treasureTypeNum-1)) seed2
         getTreasureType = 
             let
                 headType =List.head <| List.drop typeTemp treasureTypeList 
@@ -59,10 +59,10 @@ treasureBuilding treasureList number obstacles seed0 =
                         TreasureType 0 0 ""
         treasureTypeTemp = getTreasureType
 
-        treasurePos = Rectangle (toFloat xTemp) (toFloat yTemp) treasureTypeTemp.size treasureTypeTemp.size recInit 
+        treasurePos = Rectangle (toFloat xTemp) (toFloat yTemp) treasureTypeTemp.size treasureTypeTemp.size recInit  
 
 
-        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed2 False
+        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed2 False 0
 
     in 
         if number==0 then

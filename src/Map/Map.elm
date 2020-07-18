@@ -9,6 +9,7 @@ type alias Treasure =
     , treasureType : TreasureType
     , seed : Seed
     , canshow : Bool
+    , roomNum : Int
     
     }
 
@@ -39,6 +40,7 @@ type alias Monster =
     , active : Bool
     , timeBeforeAttack : Int
     , speed : Float
+    , roomNum : Int
     }
 
 
@@ -51,6 +53,7 @@ type alias Room =
     , treasure : List Treasure
     , road : List (Int,Int) -- 邻接表
     , rank : Int -- rank 越低，怪难度越高？
+    , roomNum : Int
     }
 
 type alias Map =
@@ -67,7 +70,7 @@ type alias Map =
 
 
 roomConfig : Room
-roomConfig = Room (0,0) False False [] [] [] [] 0
+roomConfig = Room (0,0) False False [] [] [] [] 0 0
 
 mapConfig : Map
 mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit)

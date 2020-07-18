@@ -33,8 +33,8 @@ showMap rooms number drawnrooms=
         roomNow = getRoomNow 
         newRooms = List.drop 1 rooms
 
-        monstersNew = drawMonsters roomNow 
-        treasureNew = drawTreasure roomNow
+        monstersNew = drawMonsters roomNow number
+        treasureNew = drawTreasure roomNow number
         obstaclesNew= drawObstacle roomNow 
         roadsNew=drawRoads roomNow
 
@@ -46,8 +46,8 @@ showMap rooms number drawnrooms=
         else 
             showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew,treasure=drawnrooms.treasure++treasureNew}
 
-drawMonsters : Room -> List Monster
-drawMonsters room =
+drawMonsters : Room -> Int -> List Monster
+drawMonsters room number=
     let
         (x,y) = room.position
         newX = toFloat (2500*x)
@@ -65,10 +65,10 @@ drawMonsters room =
             in
                 newModel
     in
-        List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position}) monsterList
+        List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position,roomNum=number}) monsterList
 
-drawTreasure : Room -> List Treasure
-drawTreasure room =
+drawTreasure : Room -> Int -> List Treasure
+drawTreasure room number=
     let
         (x,y) = room.position
         newX = Debug.log "build" toFloat (2500*x)
@@ -81,7 +81,7 @@ drawTreasure room =
                 recUpdate newModel
 
     in
-        List.map (\value->{value| position = movingRectangle value.position}) treasureList
+        List.map (\value->{value| position = movingRectangle value.position,roomNum=number}) treasureList
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =
