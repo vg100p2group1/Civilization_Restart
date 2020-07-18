@@ -281,6 +281,12 @@ showSkill model =
             , div
                 [style "margin" "40px 0 0 120px"]
                 (List.map skillToButton skills)
+            , div
+                [ style "margin" "190px 0 0 0"
+                , style "padding" "5px 10px 5px 10px"
+                , style "height" "60px"
+                , style "background" "#FFF"]
+                [text txt]
             ]
     else
         div [] []
