@@ -1,3 +1,4 @@
+
 module Update exposing (update)
 
 import Messages exposing (Msg(..))
@@ -13,7 +14,7 @@ import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
 import Animation.PlayerMoving exposing (playerMove)
-
+import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -73,18 +74,21 @@ update msg model =
         
         MouseDown ->
             let
-                pTemp =  model.myself
-                me= {pTemp | fire = True}
+                pTemp = model.myself
+                me = {pTemp | fire = True}
+                {-
                 newShoot = fireBullet model.myself.currentWeapon me.mouseData (me.x,me.y)
                 newBullet = newShoot ++ model.bullet
+                -}
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
-                ({model|myself = me, bullet = newBullet},Cmd.none)
+                ({model|myself = me},Cmd.none)
         
         MouseUp ->
             let
                 pTemp =  model.myself
-                me= {pTemp | fire = False}
+                weapon=pTemp.currentWeapon
+                me= {pTemp|fire=False,currentWeapon={weapon|hasFired=False}}
             in
                 ({model|myself = me},Cmd.none) 
         NextFloor ->
@@ -103,10 +107,7 @@ update msg model =
             else
                 (model, Cmd.none)
         Tick time ->
-            model
-                --|> updateSentence (min time 25)
-                |> animate
-
+            (animate model, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
@@ -187,26 +188,55 @@ mouseDataUpdate model mousedata =
         ((mx - xLeft)/r, (my - yTop)/r)
 
 
+fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> (List Bullet, Weapon)
+fireBullet_ weapon (mouseX,mouseY) (meX, meY) =
+    let
+        bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
+        (newShoot, fireFlag, counter) =
+            if weapon.counter == 0 then
+                if weapon.auto then
+                    (bullet, False, weapon.period)
+                else if weapon.hasFired then
+                    ([], True, 0)
+                else
+                    (bullet, True, weapon.period)
+            else
+                ([], weapon.hasFired, weapon.counter)
+    in
+        (newShoot, {weapon|hasFired=fireFlag,counter=counter})
 
-
-animate :  Model -> (Model, Cmd Msg)
+animate :  Model -> Model
 animate  model =
     -- (model,Cmd.none)
     let
         me = model.myself
-        
         (newMe,collision) = speedCase me model.map
+        (newShoot, weapon) = if model.myself.fire then
+                                fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
+                             else
+                                ([], model.myself.currentWeapon)
 
-        (newMonsters,newBullet) = updateMonster model.map.monsters model.bullet me
+        weaponCounter =
+            if weapon.counter == 0 then
+                0
+            else
+                weapon.counter - 1
+        newBullet_ = Debug.log "newBullets" newShoot ++ model.bullet
+        (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         map = model.map
         newMap = {map | monsters = newMonsters}
-
         newViewbox = mapToViewBox newMe newMap
-        newBulletList = updateBullet newMe model.map (List.append model.bullet newBullet) collision
+        (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
+
+        newExplosion = updateExplosion model.explosion filteredBulletList
+        newExplosionViewbox = explosionToViewbox newMe newExplosion
+
         newState = updateState model
     in
-        ({model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe}, viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState},Cmd.none)
+        {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
+                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
+                explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
@@ -402,19 +432,20 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
         bulletList
 
 
-updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
+
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet)
 updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
             let
                 -- d2=Debug.log "meX" me.xSpeed
                 newX = 
-                    if (b.from == Player) && (not collisionX) then 
+                    if (b.from == Player) &&  not collisionX then 
                         b.hitbox.cx + b.speedX + me.xSpeed
                     else 
                         b.hitbox.cx + b.speedX
                 newY = 
-                    if (b.from == Player) && (not collisionY) then
+                    if (b.from == Player) &&  not collisionY then
                         b.hitbox.cy + b.speedY + me.ySpeed
                     else 
                         b.hitbox.cy + b.speedY
@@ -426,10 +457,15 @@ updateBullet me map bullets (collisionX,collisionY) =
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.walls)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
-                    |> List.filter (\b -> (not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters)))||(b.from == Monster))
+                    |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
         finalBullets = List.map updateXY allBullets
+
+        filteredBullets= List.filter (\value -> value.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        
+        -- d1=Debug.log "f" filteredBullets  
+
     in
-        finalBullets
+        (finalBullets,filteredBullets)
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet

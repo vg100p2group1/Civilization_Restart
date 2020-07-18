@@ -12,7 +12,7 @@ import Svg.Attributes
 
 import MiniMap exposing (getMiniMap)
 import Animation.ShowGun exposing (showGun)
-
+import Animation.Explosion exposing (showExplosion)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -87,7 +87,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself] ++ [showGun model.myself])
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
         ]
