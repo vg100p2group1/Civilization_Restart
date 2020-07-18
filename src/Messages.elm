@@ -22,7 +22,7 @@ type Msg
     | NextSentence
 
 type SkillMsg
-    = TriggerSkillWindow Bool
+    = TriggerSkillWindow
     | SubSystemChange Bool      -- Ture for next page and False for last page
     | ChooseSkill Int Int       -- When Skill at (id, Level) is chosen
     | UnlockSkill

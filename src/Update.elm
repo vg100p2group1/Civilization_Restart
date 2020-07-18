@@ -425,9 +425,12 @@ updateSkill msg model =
         sys = me.skillSys
     in
     case msg of
-        TriggerSkillWindow on ->
+        TriggerSkillWindow ->
             let 
-                newSys = {sys|active = on}
+                active = sys.active
+                subList = sys.subsys
+                newSub = List.map (\sub -> choose sub (0,0)) subList
+                newSys = {sys|active = not active, subsys = newSub}
                 newMe = {me|skillSys = newSys}
                 newModel = {model|myself = newMe}
             in
