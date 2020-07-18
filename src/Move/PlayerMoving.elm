@@ -1,8 +1,7 @@
 module Move.PlayerMoving exposing (playerMove)
 
 -- import Html exposing (Html)
-import Svg 
-import Svg.Attributes
+
 
 import Model exposing (Me,Direction(..))
 
