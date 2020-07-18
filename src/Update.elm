@@ -12,7 +12,7 @@ import Debug
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
-import Move.PlayerMoving exposing (playerMove)
+import Animation.PlayerMoving exposing (playerMove)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =

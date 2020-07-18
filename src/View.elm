@@ -11,7 +11,7 @@ import Svg
 import Svg.Attributes 
 
 import MiniMap exposing (getMiniMap)
-import ShowGun exposing (showGun)
+import Animation.ShowGun exposing (showGun)
 
 -- view : Model -> Html.Html Msg
 -- view model =
