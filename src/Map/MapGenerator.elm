@@ -3,6 +3,7 @@ import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator)
 import Map.MonsterGenerator exposing (monsterGenerator)
+import Map.TreasureGenerator exposing (treasureGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
 -- import Browser

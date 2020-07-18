@@ -1,5 +1,5 @@
 
-module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig,mapConfig)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
 import Config exposing (viewBoxMax)
 import Random exposing (Seed)
@@ -47,7 +47,7 @@ type alias Room =
     , boss : Bool
     , obstacles : List Obstacle
     , monsters : List Monster
-    , treasure : Treasure
+    , treasure : List Treasure
     , road : List (Int,Int) -- 邻接表
     , rank : Int -- rank 越低，怪难度越高？
     }
@@ -62,11 +62,10 @@ type alias Map =
     }
 
 
-treasureConfig : Treasure
-treasureConfig = Treasure (0,0) 
+
 
 roomConfig : Room
-roomConfig = Room (0,0) False False [] [] treasureConfig [] 0
+roomConfig = Room (0,0) False False [] [] [] [] 0
 
 mapConfig : Map
 mapConfig = Map [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
