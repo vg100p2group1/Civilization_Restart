@@ -128,7 +128,7 @@ update msg model =
             )
         
         Skill skillMsg ->
-            UpdateSkill skillMsg model
+            updateSkill skillMsg model
 
         Noop ->
             let 
@@ -421,14 +421,15 @@ updateDialogues model =
 updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
 updateSkill msg model =
     let
-        sys = model.me.skillSys
+        me = model.myself
+        sys = me.skillSys
     in
     case msg of
         TriggerSkillWindow on ->
             let 
                 newSys = {sys|active = on}
                 newMe = {me|skillSys = newSys}
-                newModel = {model|me = newMe}
+                newModel = {model|myself = newMe}
             in
                 (newModel, Cmd.none)
         SubSystemChange change ->
@@ -436,7 +437,7 @@ updateSkill msg model =
                 delta = if change then 1 else -1
                 newSys = switchSubSystem sys delta
                 newMe = {me|skillSys = newSys}
-                newModel = {model|me = newMe}
+                newModel = {model|myself = newMe}
             in
                 (newModel, Cmd.none)
         ChooseSkill id level->
@@ -444,10 +445,10 @@ updateSkill msg model =
                 sub = getCurrentSubSystem sys
                 subList = sys.subsys
                 newSub = choose sub (id, level)
-                newSubList = List.take n subList :: [newSub] :: List.drop (n+1) subList
-                newSys = {sys|subsys = newSub}
+                newSubList = List.take sys.current subList ++ [newSub] ++ (List.drop (sys.current+1) subList)
+                newSys = {sys|subsys = newSubList}
                 newMe = {me|skillSys = newSys}
-                newModel = {model|me = newMe}
+                newModel = {model|myself = newMe}
             in
                 (newModel, Cmd.none)
         UnlockSkill ->
@@ -456,13 +457,13 @@ updateSkill msg model =
                 subList = sys.subsys
                 (newSub,cost) = unlockChosen sub
                 (finalSub, points) = 
-                    if points > sys.points then     -- only apply if player can afford it
+                    if cost > sys.points then     -- only apply if player can afford it
                         ({sub|text ="it requires more points than you have"}, sys.points)
                     else
-                        (newSub, sys.points - points)
-                newSubList = List.take n subList :: [finalSub] :: List.drop (n+1) subList
-                newSys = {sys|subsys = newSub, points = points}
+                        (newSub, sys.points - cost)
+                newSubList = List.take sys.current subList ++ [finalSub] ++ List.drop (sys.current+1) subList
+                newSys = {sys|subsys = newSubList, points = points}
                 newMe = {me|skillSys = newSys}
-                newModel = {model|me = newMe}
+                newModel = {model|myself = newMe}
             in
                 (newModel, Cmd.none)

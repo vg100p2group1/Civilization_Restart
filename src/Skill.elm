@@ -1,4 +1,4 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem)
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -87,147 +87,147 @@ unlockChosen sys =
 -- Define all the skills:
 skill010 : Skill
 skill010 = 
-	{ id = 0
-	, level = 1
-	, unlocked = False
-	, desciption = "Skill 0 level 1 in subsystem 0"
-}
+    { id = 0
+    , level = 1
+    , unlocked = False
+    , desciption = "Skill 0 level 1 in subsystem 0"
+    }
 
 skill011 : Skill
 skill011 = 
-	{ id = 1
-	, level = 1
-	, unlocked = False
-	, desciption = "Skill 1 level 1 in subsystem 0"
-}
+    { id = 1
+    , level = 1
+    , unlocked = False
+    , desciption = "Skill 1 level 1 in subsystem 0"
+    }
 
 skill020 : Skill
 skill020 = 
-	{ id = 0
-	, level = 2
-	, unlocked = False
-	, desciption = "Skill 0 level 2 in subsystem 0"
-}
+    { id = 0
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill 0 level 2 in subsystem 0"
+    }
 
 skill021 : Skill
 skill021 = 
-	{ id = 1
-	, level = 2
-	, unlocked = False
-	, desciption = "Skill 1 level 2 in subsystem 0"
-}
+    { id = 1
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill 1 level 2 in subsystem 0"
+    }
 
 skill030 : Skill
 skill030 = 
-	{ id = 0
-	, level = 3
-	, unlocked = False
-	, desciption = "Skill 0 level 3 in subsystem 0"
-}
+    { id = 0
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill 0 level 3 in subsystem 0"
+    }
 
 skill031 : Skill
 skill031 = 
-	{ id = 1
-	, level = 3
-	, unlocked = False
-	, desciption = "Skill 1 level 3 in subsystem 0"
-}
+    { id = 1
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill 1 level 3 in subsystem 0"
+    }
 
 skill110 : Skill
 skill110 = 
-	{ id = 0
-	, level = 1
-	, unlocked = False
-	, desciption = "Skill 0 level 1 in subsystem 1"
-}
+    { id = 0
+    , level = 1
+    , unlocked = False
+    , desciption = "Skill 0 level 1 in subsystem 1"
+    }
 
 skill111 : Skill
 skill111 = 
-	{ id = 1
-	, level = 1
-	, unlocked = False
-	, desciption = "Skill 1 level 1 in subsystem 1"
-}
+    { id = 1
+    , level = 1
+    , unlocked = False
+    , desciption = "Skill 1 level 1 in subsystem 1"
+    }
 
 skill120 : Skill
 skill120 = 
-	{ id = 0
-	, level = 2
-	, unlocked = False
-	, desciption = "Skill 0 level 2 in subsystem 1"
-}
+    { id = 0
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill 0 level 2 in subsystem 1"
+    }
 
 skill121 : Skill
 skill121 = 
-	{ id = 1
-	, level = 2
-	, unlocked = False
-	, desciption = "Skill 1 level 2 in subsystem 1"
-}
+    { id = 1
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill 1 level 2 in subsystem 1"
+    }
 
 skill130 : Skill
 skill130 = 
-	{ id = 0
-	, level = 3
-	, unlocked = False
-	, desciption = "Skill 0 level 3 in subsystem 1"
-}
+    { id = 0
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill 0 level 3 in subsystem 1"
+    }
 
 skill131 : Skill
 skill131 = 
-	{ id = 1
-	, level = 3
-	, unlocked = False
-	, desciption = "Skill 1 level 3 in subsystem 1"
-}
+    { id = 1
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill 1 level 3 in subsystem 1"
+    }
 
 skill210 : Skill
 skill210 = 
-	{ id = 0
-	, level = 1
-	, unlocked = False
-	, desciption = "Skill 0 level 1 in subsystem 2"
-}
+    { id = 0
+    , level = 1
+    , unlocked = False
+    , desciption = "Skill 0 level 1 in subsystem 2"
+    }
 
 skill211 : Skill
 skill211 = 
-	{ id = 1
-	, level = 1
-	, unlocked = False
-	, desciption = "Skill 1 level 1 in subsystem 2"
-}
+    { id = 1
+    , level = 1
+    , unlocked = False
+    , desciption = "Skill 1 level 1 in subsystem 2"
+    }
 
 skill220 : Skill
 skill220 = 
-	{ id = 0
-	, level = 2
-	, unlocked = False
-	, desciption = "Skill 0 level 2 in subsystem 2"
-}
+    { id = 0
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill 0 level 2 in subsystem 2"
+    }
 
 skill221 : Skill
 skill221 = 
-	{ id = 1
-	, level = 2
-	, unlocked = False
-	, desciption = "Skill 1 level 2 in subsystem 2"
-}
+    { id = 1
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill 1 level 2 in subsystem 2"
+    }
 
 skill230 : Skill
 skill230 = 
-	{ id = 0
-	, level = 3
-	, unlocked = False
-	, desciption = "Skill 0 level 3 in subsystem 2"
-}
+    { id = 0
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill 0 level 3 in subsystem 2"
+    }
 
 skill231 : Skill
 skill231 = 
-	{ id = 1
-	, level = 3
-	, unlocked = False
-	, desciption = "Skill 1 level 3 in subsystem 2"
-}   
+    { id = 1
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill 1 level 3 in subsystem 2"
+    }   
 
 subSys0 : SkillSubSystem
 subSys0 = 
