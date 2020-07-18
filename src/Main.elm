@@ -5,7 +5,7 @@ import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp, onResiz
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode
 import Json.Encode exposing (Value)
-import Messages exposing (Msg(..))
+import Messages exposing (Msg(..),SkillMsg(..))
 import Task
 import View exposing (view)
 import Update
@@ -60,6 +60,11 @@ key on keycode =
                 Noop
         71 ->
             ShowDialogue
+        66 ->
+            if on then
+                Skill TriggerSkillWindow
+            else
+                Noop
         _ ->
             Noop
 

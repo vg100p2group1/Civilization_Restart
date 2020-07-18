@@ -2,6 +2,7 @@ module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
 import Map.Map exposing (Map,Monster,Room)
 import Weapon exposing (Bullet)
+import Skill exposing (getCurrentSubSystem)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..))
 import Html exposing (Html, div, text)
@@ -90,6 +91,7 @@ playerDemonstrate model =
               ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself])
             ]
             , showDialogue model 0
+            , showSkill model
         ]
 
 
@@ -248,7 +250,35 @@ showDialogue model deltaTime =
         _ ->
             div [] []
 
-
+showSkill : Model -> Html Msg
+showSkill model =
+    let
+        sys = model.myself.skillSys
+    in
+    if sys.active then
+        let
+            curr = getCurrentSubSystem sys
+            points = sys.points
+            txt = curr.text
+            sysName = curr.name
+        in
+            div
+            [ style "background" "rgba(236, 240, 241, 0.89)"
+            , style "color" "#34495f"
+            , style "height" "400px"
+            , style "left" "280px"
+            , style "padding" "0 140px"
+            , style "position" "absolute"
+            , style "top" "155px"
+            , style "width" "400px"
+            , style "background-size" "100% 100%"
+            ]
+            [ div [style "margin" "20px 0 0 120px", style "color" "red"] [text sysName]
+            , div
+                [][]
+            ]
+    else
+        div [] []
 
 
 showMiniMap : Model -> Html.Html Msg
