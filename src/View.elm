@@ -2,11 +2,11 @@ module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
 import Map.Map exposing (Map,Monster,Room)
 import Weapon exposing (Bullet)
-import Skill exposing (getCurrentSubSystem, Skill)
+import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..), SkillMsg(..))
 import Html exposing (Html, div, text, button)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, disabled)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
 import Svg 
@@ -263,6 +263,8 @@ showSkill model =
             points = String.fromInt sys.points
             txt = curr.text
             sysName = curr.name
+            currentCost = Tuple.second (unlockChosen curr)
+            chosenCanUnlock = currentCost > 0 && currentCost < sys.points 
         in
             div
             [ style "background" "rgba(236, 240, 241, 0.89)"
@@ -288,6 +290,12 @@ showSkill model =
                 , style "height" "60px"
                 , style "background" "#FFF"]
                 [text txt]
+            , button
+                [ onClick <| SkillChange <| UnlockSkill
+                , style "margin" "20px 0 0 180px"
+                , disabled (not chosenCanUnlock)
+                ]
+                [text "Unlock"]
             ]
     else
         div [] []

@@ -263,6 +263,6 @@ defaultSystem : SkillSystem
 defaultSystem = 
     { subsys = [subSys0, subSys1, subSys2]
     , current = 0
-    , points = 0
+    , points = 10
     , active = False
     }
