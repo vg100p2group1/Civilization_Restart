@@ -20,6 +20,8 @@ type Msg
     -- for testing
     | ShowDialogue
     | NextSentence
+    | ChangeWeapon Int
+    | ChangeWeapon_
 
 type SkillMsg
     = TriggerSkillWindow

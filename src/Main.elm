@@ -60,6 +60,21 @@ key on keycode =
                 Noop
         71 ->
             ShowDialogue
+<<<<<<< HEAD
+=======
+        49 ->
+            ChangeWeapon 1
+        50 ->
+            ChangeWeapon 2
+        51 ->
+            ChangeWeapon 3
+        52 ->
+            ChangeWeapon 4
+        81 ->
+            if on then
+                ChangeWeapon_
+            else Noop
+>>>>>>> dev
         66 ->
             if on then
                 SkillChange TriggerSkillWindow
@@ -79,6 +94,8 @@ init =
     , size = (0, 0)
     , state = Others
     , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+    , explosion = []
+    , explosionViewbox = []
     }
 
 

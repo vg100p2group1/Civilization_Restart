@@ -13,8 +13,8 @@ import Svg
 import Svg.Attributes 
 
 import MiniMap exposing (getMiniMap)
-import Move.PlayerMoving exposing (playerMove)
-
+import Animation.ShowGun exposing (showGun)
+import Animation.Explosion exposing (showExplosion)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -89,7 +89,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself])
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model
@@ -176,16 +176,8 @@ displayMonster monsters =
 
 me : Me -> Svg.Svg Msg
 me myself=
-    playerMove myself
---    let 
---         createBallFormat model =
---           Svg.circle 
---             [ Svg.Attributes.cx "500"
---             , Svg.Attributes.cy "500"
---             ] 
---             [ playerMove myself]
---     in
---         createBallFormat myself
+    Svg.image [Svg.Attributes.x "460", Svg.Attributes.y "460", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
+                   Svg.Attributes.width "80", Svg.Attributes.height "80"][]
 
 gun : Me -> Svg.Svg Msg
 gun myself =
@@ -193,14 +185,14 @@ gun myself =
         pos = myself.mouseData
         px = Tuple.first pos
         py = Tuple.second pos
-        route=Svg.Attributes.d(" M 500 500" ++
+        route=Svg.Attributes.d(" M 500 520" ++
                                " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
                               )
         getcolor = 
             if myself.fire then 
                 "red"
             else
-                "blue"                              
+                myself.currentWeapon.color
     in
         Svg.path [route , Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
 
