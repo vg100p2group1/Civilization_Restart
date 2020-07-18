@@ -3,7 +3,7 @@ module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(.
 import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
-import Weapon exposing (Bullet,Weapon)
+import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon)
 import Config exposing (playerSpeed,viewBoxMax)
 
 type alias Me =
@@ -23,6 +23,7 @@ type alias Me =
   --   , score : Float
     , hitBox : Circle
     , weapons : List Weapon     -- the first element is the one in uses
+    , currentWeapon : Weapon
     , counter : Int
     , url : String
     , preDirection : Direction
@@ -34,7 +35,8 @@ type Direction
 
 
 defaultMe : Me
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) [] 0 "" DirectionRight DirectionRight
+
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight
 
 type alias Model =
     { myself : Me
@@ -80,6 +82,7 @@ type alias AnimationState =
     , elapsed: Float
     , size : (Float,Float)
     }
+
 
 mapToViewBox : Me -> Map ->Map
 mapToViewBox me map =

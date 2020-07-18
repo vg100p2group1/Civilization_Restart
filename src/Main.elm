@@ -60,6 +60,18 @@ key on keycode =
                 Noop
         71 ->
             ShowDialogue
+        49 ->
+            ChangeWeapon 1
+        50 ->
+            ChangeWeapon 2
+        51 ->
+            ChangeWeapon 3
+        52 ->
+            ChangeWeapon 4
+        81 ->
+            if on then
+                ChangeWeapon_
+            else Noop
         _ ->
             Noop
 

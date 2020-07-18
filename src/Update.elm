@@ -5,14 +5,14 @@ import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, Ani
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
-import Weapon exposing (Bullet,bulletConfig,ShooterType(..))
+import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
 import Map.MonsterGenerator exposing (updateMonster)
-import Move.PlayerMoving exposing (playerMove)
+import Animation.PlayerMoving exposing (playerMove)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -75,9 +75,8 @@ update msg model =
             let
                 pTemp =  model.myself
                 me= {pTemp | fire = True}
-                -- bulletnow = model.bullet
-                newShoot = fireBullet me.mouseData (me.x,me.y)
-                newBullet = newShoot :: model.bullet 
+                newShoot = fireBullet model.myself.currentWeapon me.mouseData (me.x,me.y)
+                newBullet = newShoot ++ model.bullet
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
                 ({model|myself = me, bullet = newBullet},Cmd.none)
@@ -116,6 +115,11 @@ update msg model =
         ShowDialogue ->
             ({ model | state = Dialogue}, Cmd.none)
 
+        ChangeWeapon number ->
+            (changeWeapon (number - 1) model, Cmd.none)
+
+        ChangeWeapon_ ->
+            (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
 
         Resize width height ->
             ( { model | size = ( toFloat width, toFloat height ) }
@@ -141,6 +145,21 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+
+changeWeapon : Int -> Model -> Model
+changeWeapon number model =
+    let
+        weapon = List.head (List.drop number model.myself.weapons)
+        newWeapon =
+            case weapon of
+                Just a ->
+                    a
+                Nothing ->
+                    defaultWeapon
+        pTemp = model.myself
+        me = { pTemp | currentWeapon = newWeapon}
+    in
+        {model | myself = me}
 
 mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
 mouseDataUpdate model mousedata = 
@@ -352,20 +371,36 @@ updateSentence elapsed model =
         _ ->
             model
 
-fireBullet : (Float, Float) -> (Float, Float) -> Bullet
-fireBullet (mouseX,mouseY) (meX, meY) =
+fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> List Bullet
+fireBullet weapon (mouseX,mouseY) (meX, meY) =
     let
         posX = mouseX
         posY = mouseY
 
         -- d1=Debug.log "mouse" (posX,posY)
         -- d2=Debug.log "me" (meX,meY)
-        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520)) 
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+        -- velocity decomposition
+
         xTemp = bulletSpeed / unitV * (posX - 500)
         yTemp = bulletSpeed / unitV * (posY - 520)
-        newCircle = Circle meX (meY+20) 5
+        bullet = generateBullet weapon
+        newCircle = Circle meX (meY+20) bullet.r
+        newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        bulletList =
+            case weapon.extraInfo of
+                Shotgun ->
+                    -- the shotgun will shoot three bullets at one time and has an angle of 30 degrees
+                    let
+                        bullet1 = {newBullet|speedX=(sqrt 3)/2*xTemp+0.5*yTemp,speedY=(sqrt 3)/2*yTemp-0.5*xTemp}
+                        bullet2 = {newBullet|speedX=(sqrt 3)/2*xTemp-0.5*yTemp,speedY=(sqrt 3)/2*yTemp+0.5*xTemp}
+                    in
+                    [newBullet, bullet1, bullet2]
+                _ ->
+                    [newBullet]
     in
-        {bulletConfig | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        bulletList
+
 
 updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> List Bullet
 updateBullet me map bullets (collisionX,collisionY) =
