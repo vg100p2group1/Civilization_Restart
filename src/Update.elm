@@ -224,7 +224,7 @@ animate  model =
                 0
             else
                 weapon.counter - 1
-        newBullet_ = Debug.log "newBullets" newShoot ++ model.bullet
+        newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         map = model.map
         newMap = {map | monsters = newMonsters}

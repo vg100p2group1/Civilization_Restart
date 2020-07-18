@@ -71,7 +71,7 @@ drawTreasure : Room -> List Treasure
 drawTreasure room =
     let
         (x,y) = room.position
-        newX = toFloat (2500*x)
+        newX = Debug.log "build" toFloat (2500*x)
         newY = toFloat (2500*y)
         treasureList = room.treasure
         movingRectangle model =
