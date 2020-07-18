@@ -75,11 +75,12 @@ firstRoomGenerator number seed0=
         (room0Direction,seed1) = Random.step (Random.int 0 1) seed0
         (obstacleTemp,seed2) = obstacleGenerator seed1
         (monsterTemp,seed3) = monsterGenerator seed2 obstacleTemp
+        (treasureTemp,seed4) = treasureGenerator seed3 obstacleTemp
     in
         if room0Direction == 0 then
-            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number - 1,seed3)
+            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp},number - 1,seed4)
         else 
-            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number - 1,seed3)
+            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp},number - 1,seed4)
 
 otherRoomGenerator : List Room -> List Room -> Int -> Random.Seed -> (List Room, Random.Seed)
 otherRoomGenerator roomList rooms number seed0 = 
@@ -115,8 +116,9 @@ otherRoomGenerator roomList rooms number seed0 =
 
         (obstacleTemp,seed3) = obstacleGenerator seed2
         (monsterTemp,seed4) = monsterGenerator seed3 obstacleTemp
+        (treasureTemp,seed5) = treasureGenerator seed4 obstacleTemp
 
-        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp,monsters=monsterTemp}
+        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp}
     in 
         if number == 0 then 
             ((rooms ++ (leavesUpdate [] roomList (List.length roomList) seed3)),seed4)

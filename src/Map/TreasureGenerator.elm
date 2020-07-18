@@ -59,10 +59,10 @@ treasureBuilding treasureList number obstacles seed0 =
                         TreasureType 0 0 ""
         treasureTypeTemp = getTreasureType
 
-        treasurePos = Rectangle (toFloat xTemp) (toFloat yTemp) treasureTypeTemp.size treasureTypeTemp.size recInit
+        treasurePos = Rectangle (toFloat xTemp) (toFloat yTemp) treasureTypeTemp.size treasureTypeTemp.size recInit 
 
 
-        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed2 
+        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed2 False
 
     in 
         if number==0 then

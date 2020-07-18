@@ -1,7 +1,7 @@
 
 module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,Monster,roomConfig,mapConfig)
+import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig)
 import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
@@ -34,15 +34,17 @@ showMap rooms number drawnrooms=
         newRooms = List.drop 1 rooms
 
         monstersNew = drawMonsters roomNow 
+        treasureNew = drawTreasure roomNow
         obstaclesNew= drawObstacle roomNow 
         roadsNew=drawRoads roomNow
+
         wallsNew=drawWalls roomNow
         doorsNew=drawDoors roomNow
     in
         if number == 0 then 
             drawnrooms
         else 
-            showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew}
+            showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew,treasure=drawnrooms.treasure++treasureNew}
 
 drawMonsters : Room -> List Monster
 drawMonsters room =
@@ -64,6 +66,22 @@ drawMonsters room =
                 newModel
     in
         List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position}) monsterList
+
+drawTreasure : Room -> List Treasure
+drawTreasure room =
+    let
+        (x,y) = room.position
+        newX = toFloat (2500*x)
+        newY = toFloat (2500*y)
+        treasureList = room.treasure
+        movingRectangle model =
+            let
+                newModel = {model|x=model.x+newX,y=model.y+newY}
+            in
+                recUpdate newModel
+
+    in
+        List.map (\value->{value| position = movingRectangle value.position}) treasureList
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =
