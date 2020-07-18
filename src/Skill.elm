@@ -36,7 +36,7 @@ switchSubSystem : SkillSystem -> Int -> SkillSystem
 switchSubSystem sys dire =
     let 
         total = List.length sys.subsys
-        newCurr = sys.current + modBy total dire
+        newCurr = modBy total (sys.current + dire)
     in
         {sys|current = newCurr}
 

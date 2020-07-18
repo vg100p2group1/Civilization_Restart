@@ -4,9 +4,10 @@ import Map.Map exposing (Map,Monster,Room)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem)
 import Shape exposing (Rectangle)
-import Messages exposing (Msg(..))
-import Html exposing (Html, div, text)
+import Messages exposing (Msg(..), SkillMsg(..))
+import Html exposing (Html, div, text, button)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
 import Svg 
 import Svg.Attributes 
@@ -273,7 +274,9 @@ showSkill model =
             , style "width" "400px"
             , style "background-size" "100% 100%"
             ]
-            [ div [style "margin" "20px 0 0 120px", style "color" "red"] [text sysName]
+            [ button [onClick <| Skill <| SubSystemChange False] [text "<"]
+            , div [style "margin" "20px 0 0 120px", style "color" "red"] [text sysName]
+            , button [onClick <| Skill <| SubSystemChange True] [text ">"]
             , div
                 [][]
             ]
