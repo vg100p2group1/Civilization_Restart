@@ -1,4 +1,4 @@
-module Move.PlayerMoving exposing (playerMove)
+module Animation.PlayerMoving exposing (playerMove)
 
 -- import Html exposing (Html)
 
