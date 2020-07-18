@@ -274,9 +274,9 @@ showSkill model =
             , style "width" "400px"
             , style "background-size" "100% 100%"
             ]
-            [ button [onClick <| Skill <| SubSystemChange False] [text "<"]
-            , div [style "margin" "20px 0 0 120px", style "color" "red"] [text sysName]
-            , button [onClick <| Skill <| SubSystemChange True] [text ">"]
+            [ button [onClick <| Skill <| SubSystemChange False, style "margin" "20px 0 0 100px",style "float" "left"] [text "<"]
+            , div [style "margin" "20px 0 0 20px", style "color" "red", style "float" "left"] [text sysName]
+            , button [onClick <| Skill <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
             , div
                 [][]
             ]
