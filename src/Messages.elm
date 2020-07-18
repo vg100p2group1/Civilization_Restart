@@ -15,7 +15,7 @@ type Msg
     | NextFloor
     | Resize Int Int
     | GetViewport Viewport
-    | Skill SkillMsg
+    | SkillChange SkillMsg
     | Noop
     -- for testing
     | ShowDialogue

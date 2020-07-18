@@ -2,7 +2,7 @@ module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
 import Map.Map exposing (Map,Monster,Room)
 import Weapon exposing (Bullet)
-import Skill exposing (getCurrentSubSystem)
+import Skill exposing (getCurrentSubSystem, Skill)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..), SkillMsg(..))
 import Html exposing (Html, div, text, button)
@@ -259,6 +259,7 @@ showSkill model =
     if sys.active then
         let
             curr = getCurrentSubSystem sys
+            skills = curr.skills
             points = sys.points
             txt = curr.text
             sysName = curr.name
@@ -274,14 +275,30 @@ showSkill model =
             , style "width" "400px"
             , style "background-size" "100% 100%"
             ]
-            [ button [onClick <| Skill <| SubSystemChange False, style "margin" "20px 0 0 100px",style "float" "left"] [text "<"]
+            [ button [onClick <| SkillChange <| SubSystemChange False, style "margin" "20px 0 0 100px",style "float" "left"] [text "<"]
             , div [style "margin" "20px 0 0 20px", style "color" "red", style "float" "left"] [text sysName]
-            , button [onClick <| Skill <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
+            , button [onClick <| SkillChange <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
             , div
-                [][]
+                [style "margin" "40px 0 0 120px"]
+                (List.map skillToButton skills)
             ]
     else
         div [] []
+
+skillToButton : Skill -> Html Msg
+skillToButton skill =
+    let
+        id = skill.id
+        level = skill.level
+        top = (String.fromInt ((level-1) * 50)) ++ "px"
+        left = (String.fromInt (id * 80)) ++ "px"
+    in
+    button
+    [ onClick <| SkillChange <| ChooseSkill skill.id skill.level
+    , style "position" "absolute"
+    , style "margin" (top ++ " 0 0 " ++ left)
+    ]
+    [text ("(" ++ String.fromInt id ++ "," ++ String.fromInt level ++ ")")]
 
 
 showMiniMap : Model -> Html.Html Msg

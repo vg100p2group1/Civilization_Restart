@@ -127,7 +127,7 @@ update msg model =
             , Cmd.none
             )
         
-        Skill skillMsg ->
+        SkillChange skillMsg ->
             updateSkill skillMsg model
 
         Noop ->

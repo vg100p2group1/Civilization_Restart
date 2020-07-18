@@ -62,7 +62,7 @@ key on keycode =
             ShowDialogue
         66 ->
             if on then
-                Skill TriggerSkillWindow
+                SkillChange TriggerSkillWindow
             else
                 Noop
         _ ->
