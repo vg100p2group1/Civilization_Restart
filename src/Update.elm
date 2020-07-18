@@ -379,14 +379,14 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
 
         -- d1=Debug.log "mouse" (posX,posY)
         -- d2=Debug.log "me" (meX,meY)
-        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500))
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
         -- velocity decomposition
 
         xTemp = bulletSpeed / unitV * (posX - 500)
-        yTemp = bulletSpeed / unitV * (posY - 500)
+        yTemp = bulletSpeed / unitV * (posY - 520)
         bullet = generateBullet weapon
-        newCircle = Circle meX meY bullet.r
-        newBullet = {bullet | x=meX,y=meY,hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        newCircle = Circle meX (meY+20) bullet.r
+        newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp, speedY=yTemp}
         bulletList =
             case weapon.extraInfo of
                 Shotgun ->
@@ -407,7 +407,7 @@ updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
             let
-                d2=Debug.log "meX" me.xSpeed
+                -- d2=Debug.log "meX" me.xSpeed
                 newX = 
                     if (b.from == Player) && (not collisionX) then 
                         b.hitbox.cx + b.speedX + me.xSpeed

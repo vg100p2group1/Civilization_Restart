@@ -11,7 +11,7 @@ import Svg
 import Svg.Attributes 
 
 import MiniMap exposing (getMiniMap)
-
+import ShowGun exposing (showGun)
 
 -- view : Model -> Html.Html Msg
 -- view model =
@@ -87,7 +87,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself])
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself] ++ [showGun model.myself])
             ]
             , showDialogue model 0
         ]
@@ -182,7 +182,7 @@ gun myself =
         pos = myself.mouseData
         px = Tuple.first pos
         py = Tuple.second pos
-        route=Svg.Attributes.d(" M 500 500" ++
+        route=Svg.Attributes.d(" M 500 520" ++
                                " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
                               )
         getcolor = 
