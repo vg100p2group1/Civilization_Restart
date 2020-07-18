@@ -457,6 +457,7 @@ updateBullet me map bullets (collisionX,collisionY) =
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.walls)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
+                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
                     |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
         finalBullets = List.map updateXY allBullets
 
