@@ -1,13 +1,14 @@
 
 module Update exposing (update)
 
-import Messages exposing (Msg(..))
+import Messages exposing (Msg(..), SkillMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
+import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
@@ -136,7 +137,9 @@ update msg model =
               }
             , Cmd.none
             )
-
+        
+        SkillChange skillMsg ->
+            updateSkill skillMsg model
 
         Noop ->
             let 
@@ -379,6 +382,7 @@ startUpdateSen model =
     else
         { model | sentenceState = Nothing}
 -}
+
 updateSentence : Float -> Model -> Model
 updateSentence elapsed model =
     case model.state of
@@ -491,3 +495,56 @@ updateState model =
 updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
+
+updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
+updateSkill msg model =
+    let
+        me = model.myself
+        sys = me.skillSys
+    in
+    case msg of
+        TriggerSkillWindow ->
+            let 
+                active = sys.active
+                subList = sys.subsys
+                newSub = List.map (\sub -> choose sub (0,0)) subList
+                newSys = {sys|active = not active, subsys = newSub}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        SubSystemChange change ->
+            let 
+                delta = if change then 1 else -1
+                newSys = switchSubSystem sys delta
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        ChooseSkill id level->
+            let 
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                newSub = choose sub (id, level)
+                newSubList = List.take sys.current subList ++ [newSub] ++ (List.drop (sys.current+1) subList)
+                newSys = {sys|subsys = newSubList}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        UnlockSkill ->
+            let
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                (newSub,cost) = unlockChosen sub
+                (finalSub, points) = 
+                    if cost > sys.points then     -- only apply if player can afford it
+                        ({sub|text ="it requires more points than you have"}, sys.points)
+                    else
+                        (newSub, sys.points - cost)
+                newSubList = List.take sys.current subList ++ [finalSub] ++ List.drop (sys.current+1) subList
+                newSys = {sys|subsys = newSubList, points = points}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)

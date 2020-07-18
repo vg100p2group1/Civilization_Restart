@@ -5,6 +5,7 @@ import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
+import Skill exposing (SkillSystem, defaultSystem)
 
 type alias Me =
     { x : Float
@@ -28,6 +29,8 @@ type alias Me =
     , url : String
     , preDirection : Direction
     , weaponDirection : Direction
+    -- , direction : Int 
+    , skillSys : SkillSystem
     }
 type Direction
     = DirectionRight
@@ -36,7 +39,7 @@ type Direction
 
 defaultMe : Me
 
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight defaultSystem
 
 type alias Model =
     { myself : Me
