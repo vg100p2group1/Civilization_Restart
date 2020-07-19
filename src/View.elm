@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
-import Map.Map exposing (Map,Monster,Room)
+import Map.Map exposing (Map,Monster,Room,Treasure)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle)
@@ -107,10 +107,12 @@ showMap model =
        obstacles = displayRec model.obstacles
        monsters = displayMonster model.monsters
 
+       treasure = displayTreasure model.treasure
+
        gate = displayDoors [model.gate]
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure
     --    walls++gate
 
 
@@ -172,6 +174,41 @@ displayMonster monsters =
                 []
     in
         List.map createBricksFormat monsters
+
+displayTreasure : List Treasure  -> List (Svg.Svg Msg)
+displayTreasure treasure =
+    let
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat treasureTemp =
+            let
+                model = treasureTemp.position
+                treasureType = treasureTemp.treasureType
+                
+
+                treasureColor = treasureType.color
+            in
+                if not treasureTemp.canShow  then 
+                Svg.rect
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill "purple"
+                
+                    ]
+                []
+                else
+                Svg.rect
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill treasureColor
+                
+                    ]
+                []
+    in
+        List.map createBricksFormat treasure
 
 
 me : Me -> Svg.Svg Msg

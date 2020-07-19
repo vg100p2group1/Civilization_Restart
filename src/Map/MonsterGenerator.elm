@@ -1,5 +1,5 @@
 
-module Map.MonsterGenerator exposing (monsterGenerator,updateMonster)
+module Map.MonsterGenerator exposing (monsterGenerator,updateMonster,updateRoomList)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
@@ -52,10 +52,10 @@ checkMonsterCollison monster obstacles monsterList=
 monsterBuilding : List Monster -> Int -> List Obstacle -> Random.Seed -> (List Monster,Random.Seed)
 monsterBuilding monsterList number obstacles seed0 =
     let
-        (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
-        (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
+        (xTemp,seed1) = Random.step (Random.int 300 1500) seed0
+        (yTemp,seed2) = Random.step (Random.int 300 1500) seed1
         (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
-        (monsterSpeed, seed4) = Random.step (Random.float 2 6) seed3
+        (monsterSpeed, seed4) = Random.step (Random.float 1 3 ) seed3
         getMonsterType = 
             let
                 headType =List.head <| List.drop typeTemp monsterTypeList 
@@ -70,7 +70,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0
 
     in 
         if number==0 then
@@ -107,3 +107,19 @@ updateMonster monsters bullets me =
                      |> List.map (\m -> updateMonster_ m bullets)
     in
         allMonsterAct finalMonsters me bullets
+
+updateRoomList : List Monster -> Int  -> List Int -> List Int 
+updateRoomList monsterList number nowRoomList= 
+    
+    if number <= 0 then nowRoomList 
+        else if checkClearRoom number monsterList then number :: (updateRoomList  monsterList (number - 1)  nowRoomList )
+            else updateRoomList monsterList (number - 1) nowRoomList
+
+
+checkClearRoom : Int -> List Monster -> Bool
+checkClearRoom roomNumber monsterList =
+    let
+        monsterInRoom = List.filter (\b -> b.roomNum == roomNumber) monsterList
+        
+    in
+        (List.length monsterInRoom) == 0

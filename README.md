@@ -1,4 +1,4 @@
-# Civilization Restart MVP
+# Civilization Restart Alpha
 
 ## 1. Config
 
@@ -8,22 +8,18 @@
 
 ## 2. How to play
 
-For the MVP project, we only supply the basic mode.  Here are the keys that you will be used in the game
+For the alpha project, we only supply the basic mode.  Here are the keys that you will be used in the game
 
 ​	1)	WASD for moving Up,Left,Down and Right.
 
-​	2) 	M for moving into the next floor.
+​	2) 	When getting near the gate, press to move into the next floor.
 
 ​	3）  G  to open the test window for Dialogs.  Enter for the next sentence. 
 
 ​	3)	Moving the mouse to aim.
 
-​	4)	Left-Click  to Shoot	
+​	4)	Left-Click  to Shoot.
 
-## 3. Known Bugs
+​	5)	Press 1,2,3,4 for different guns or Press Q to shift Guns.	
 
-​	1) The collision with the walls. We now just stop the player if he is going to collide with the wall.
-
-​	2) We haven't write the screen adaptation for the Mini Map, so it may overlap with the Main Map.
-
-​	3) For test reason, the Players' speed is faster than the bullet's speed, so if you are shooting while moving, it will look weird.
+​	6） Press B To open the skill window and press B again to close the window.

@@ -38,10 +38,12 @@ monsterAct  me monster =
 
         region = (monster.region.edge.cx , monster.region.edge.cy)
 
-        difference = monster.region.edge.halfWidth - monster.position.r
+        differenceWidth = monster.region.edge.halfWidth - monster.position.r
 
-        checkfeasible pos reg diff= 
-            (abs ((Tuple.first pos) - (Tuple.first reg))<=diff) && (abs ((Tuple.second pos) - (Tuple.second reg))<=diff)
+        differenceHeight = monster.region.edge.halfHeight - monster.position.r
+
+        checkfeasible pos reg diffwidth diffheight= 
+            (abs ((Tuple.first pos) - (Tuple.first reg))<=diffwidth) && (abs ((Tuple.second pos) - (Tuple.second reg))<=diffheight)
 
         nowPosition = monster.position
 
@@ -62,12 +64,12 @@ monsterAct  me monster =
 
         checkCanShoot =
             let count = monster.timeBeforeAttack
-            in  if monster.active then if count ==0 then 10 else  count-1  else count
+            in  if monster.active then if count ==0 then 30 else  count-1  else count
 
         
         
     in 
-        if checkfeasible newPos region difference  then {monster|position=newPosition,seed=seed1,active=checkActive,timeBeforeAttack=checkCanShoot}  else monsterAct me {monster|seed=seed1,direction = nowdir+90}
+        if checkfeasible newPos region  differenceWidth differenceHeight   then {monster|position=newPosition,seed=seed1,active=checkActive,timeBeforeAttack=checkCanShoot}  else monsterAct me {monster|seed=seed1,direction = nowdir+90}
 
 monsterShoot : List Monster -> Me -> List Bullet -> List Bullet
 monsterShoot monsterList me bulletList = 
