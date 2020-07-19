@@ -55,7 +55,7 @@ monsterBuilding monsterList number obstacles seed0 =
         (xTemp,seed1) = Random.step (Random.int 300 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 300 1500) seed1
         (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
-        (monsterSpeed, seed4) = Random.step (Random.float 2 6) seed3
+        (monsterSpeed, seed4) = Random.step (Random.float 1 3 ) seed3
         getMonsterType = 
             let
                 headType =List.head <| List.drop typeTemp monsterTypeList 
