@@ -193,7 +193,7 @@ displayTreasure treasure =
                     , Svg.Attributes.y <| String.fromFloat model.y
                     , Svg.Attributes.width <| String.fromFloat 0
                     , Svg.Attributes.height <| String.fromFloat 0
-                    , Svg.Attributes.fill "purple"
+                    , Svg.Attributes.fill treasureColor
                 
                     ]
                 []
