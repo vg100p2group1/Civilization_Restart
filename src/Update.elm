@@ -19,7 +19,6 @@ import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-
         MoveLeft on ->
             let 
                 pTemp = model.myself 
@@ -108,7 +107,10 @@ update msg model =
             else
                 (model, Cmd.none)
         Tick time ->
-            (animate model, Cmd.none)
+            if model.paused then
+                (model, Cmd.none)
+            else
+                (animate model, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
@@ -510,7 +512,7 @@ updateSkill msg model =
                 newSub = List.map (\sub -> choose sub (0,0)) subList
                 newSys = {sys|active = not active, subsys = newSub}
                 newMe = {me|skillSys = newSys}
-                newModel = {model|myself = newMe}
+                newModel = {model|myself = newMe, paused = not model.paused}
             in
                 (newModel, Cmd.none)
         SubSystemChange change ->
