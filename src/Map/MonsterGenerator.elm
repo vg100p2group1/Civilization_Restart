@@ -110,9 +110,10 @@ updateMonster monsters bullets me =
 
 updateRoomList : List Monster -> Int  -> List Int -> List Int 
 updateRoomList monsterList number nowRoomList= 
-    if number == 0 then nowRoomList 
-        else if checkClearRoom number monsterList then updateRoomList  monsterList (number - 1) (number :: nowRoomList )
-            else updateRoomList monsterList number nowRoomList
+    
+    if number <= 0 then nowRoomList 
+        else if checkClearRoom number monsterList then number :: (updateRoomList  monsterList (number - 1)  nowRoomList )
+            else updateRoomList monsterList (number - 1) nowRoomList
 
 
 checkClearRoom : Int -> List Monster -> Bool

@@ -230,7 +230,7 @@ animate  model =
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
         newTreasure = updateTreasure model.map.treasure newClearList
         map = model.map
-        newMap = {map | monsters = newMonsters}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList

@@ -187,7 +187,7 @@ displayTreasure treasure =
 
                 treasureColor = treasureType.color
             in
-                if treasureTemp.canShow  then 
+                if not treasureTemp.canShow  then 
                 Svg.rect
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y
