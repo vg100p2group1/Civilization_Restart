@@ -64,6 +64,7 @@ type alias Map =
     , treasure : List Treasure
     , doors : List Rectangle
     , gate : Rectangle
+    , roomCleared : List Int
     }
 
 
@@ -73,7 +74,7 @@ roomConfig : Room
 roomConfig = Room (0,0) False False [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) []
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
