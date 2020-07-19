@@ -4,3 +4,5 @@ elm-stuff
 index.html
 # rm .idea
 .idea
+# rm build folder
+build
