@@ -13,13 +13,13 @@ import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSyste
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
-import Map.MonsterGenerator exposing (updateMonster)
+import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
+import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-
         MoveLeft on ->
             let 
                 pTemp = model.myself 
@@ -108,7 +108,10 @@ update msg model =
             else
                 (model, Cmd.none)
         Tick time ->
-            (animate model, Cmd.none)
+            if model.paused then
+                (model, Cmd.none)
+            else
+                (animate model, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
@@ -224,10 +227,12 @@ animate  model =
                 0
             else
                 weapon.counter - 1
-        newBullet_ = Debug.log "newBullets" newShoot ++ model.bullet
+        newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
+        newClearList = updateRoomList model.map.monsters model.map.roomCount []
+        newTreasure = updateTreasure model.map.treasure newClearList
         map = model.map
-        newMap = {map | monsters = newMonsters}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -240,6 +245,7 @@ animate  model =
         {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
+
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
@@ -510,7 +516,7 @@ updateSkill msg model =
                 newSub = List.map (\sub -> choose sub (0,0)) subList
                 newSys = {sys|active = not active, subsys = newSub}
                 newMe = {me|skillSys = newSys}
-                newModel = {model|myself = newMe}
+                newModel = {model|myself = newMe, paused = not model.paused}
             in
                 (newModel, Cmd.none)
         SubSystemChange change ->
