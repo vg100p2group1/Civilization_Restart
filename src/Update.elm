@@ -226,6 +226,7 @@ animate  model =
                 weapon.counter - 1
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
+        -- newClearList = updateList model.map 
         map = model.map
         newMap = {map | monsters = newMonsters}
         newViewbox = mapToViewBox newMe newMap

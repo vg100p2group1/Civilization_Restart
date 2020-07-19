@@ -17,7 +17,7 @@ mapWithGate rooms number drawnrooms seed0 =
         mapTemp = showMap rooms number drawnrooms
         (gateTemp, _) = gateGenerator rooms seed0
     in
-        {mapTemp| gate=gateTemp}
+        {mapTemp| gate=gateTemp,roomCount=number}
 
 
 showMap : List Room -> Int -> Map -> Map
