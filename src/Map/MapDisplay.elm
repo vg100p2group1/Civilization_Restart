@@ -1,7 +1,7 @@
 
 module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,Monster,roomConfig,mapConfig)
+import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig)
 import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
@@ -33,19 +33,21 @@ showMap rooms number drawnrooms=
         roomNow = getRoomNow 
         newRooms = List.drop 1 rooms
 
-        monstersNew = drawMonsters roomNow 
+        monstersNew = drawMonsters roomNow number
+        treasureNew = drawTreasure roomNow number
         obstaclesNew= drawObstacle roomNow 
         roadsNew=drawRoads roomNow
+
         wallsNew=drawWalls roomNow
         doorsNew=drawDoors roomNow
     in
         if number == 0 then 
             drawnrooms
         else 
-            showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew}
+            showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew,treasure=drawnrooms.treasure++treasureNew}
 
-drawMonsters : Room -> List Monster
-drawMonsters room =
+drawMonsters : Room -> Int -> List Monster
+drawMonsters room number=
     let
         (x,y) = room.position
         newX = toFloat (2500*x)
@@ -63,7 +65,23 @@ drawMonsters room =
             in
                 newModel
     in
-        List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position}) monsterList
+        List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position,roomNum=number}) monsterList
+
+drawTreasure : Room -> Int -> List Treasure
+drawTreasure room number=
+    let
+        (x,y) = room.position
+        newX = Debug.log "build" toFloat (2500*x)
+        newY = toFloat (2500*y)
+        treasureList = room.treasure
+        movingRectangle model =
+            let
+                newModel = {model|x=model.x+newX,y=model.y+newY}
+            in
+                recUpdate newModel
+
+    in
+        List.map (\value->{value| position = movingRectangle value.position,roomNum=number}) treasureList
 
 drawObstacle : Room -> List Rectangle
 drawObstacle room =

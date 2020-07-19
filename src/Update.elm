@@ -100,7 +100,7 @@ update msg model =
 
                     mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                     meTemp = model.myself
-                    meNew = {defaultMe|weapons=meTemp.weapons}
+                    meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
                     -- it should be updated when dialogues are saved in every room
                     newDialogues = updateDialogues model
                 in
@@ -224,7 +224,7 @@ animate  model =
                 0
             else
                 weapon.counter - 1
-        newBullet_ = Debug.log "newBullets" newShoot ++ model.bullet
+        newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         map = model.map
         newMap = {map | monsters = newMonsters}

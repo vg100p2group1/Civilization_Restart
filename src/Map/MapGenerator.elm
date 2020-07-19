@@ -3,6 +3,7 @@ import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator)
 import Map.MonsterGenerator exposing (monsterGenerator)
+import Map.TreasureGenerator exposing (treasureGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
 -- import Browser
@@ -74,11 +75,12 @@ firstRoomGenerator number seed0=
         (room0Direction,seed1) = Random.step (Random.int 0 1) seed0
         (obstacleTemp,seed2) = obstacleGenerator seed1
         (monsterTemp,seed3) = monsterGenerator seed2 obstacleTemp
+        (treasureTemp,seed4) = treasureGenerator seed3 obstacleTemp
     in
         if room0Direction == 0 then
-            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number - 1,seed3)
+            ({roomConfig|position=(1,0),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp},number - 1,seed4)
         else 
-            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp},number - 1,seed3)
+            ({roomConfig|position=(0,1),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp},number - 1,seed4)
 
 otherRoomGenerator : List Room -> List Room -> Int -> Random.Seed -> (List Room, Random.Seed)
 otherRoomGenerator roomList rooms number seed0 = 
@@ -114,8 +116,9 @@ otherRoomGenerator roomList rooms number seed0 =
 
         (obstacleTemp,seed3) = obstacleGenerator seed2
         (monsterTemp,seed4) = monsterGenerator seed3 obstacleTemp
+        (treasureTemp,seed5) = treasureGenerator seed4 obstacleTemp
 
-        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp,monsters=monsterTemp}
+        roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp}
     in 
         if number == 0 then 
             ((rooms ++ (leavesUpdate [] roomList (List.length roomList) seed3)),seed4)
@@ -128,6 +131,7 @@ leavesUpdate  roomUpdated roomList num seed0=
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
         (obstacleTemp, seed1) = obstacleGenerator seed0
         (monsterTemp, seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
+        (treasureTemp, seed3) = treasureGenerator seed2 obstacleTemp
         roomTemp = List.head roomList
         roomListNew = List.drop 1 roomList
         getRoom = 
@@ -137,15 +141,15 @@ leavesUpdate  roomUpdated roomList num seed0=
                 Nothing ->
                     roomConfig
         roomNewTemp = getRoom
-        roomNew = {roomNewTemp| obstacles = obstacleTemp,monsters=monsterTemp} 
+        roomNew = {roomNewTemp| obstacles = obstacleTemp,monsters=monsterTemp,treasure=treasureTemp} 
     in 
         if num==0 then
             roomUpdated
         else
             if checkOverlap roomNew roomListNew then 
-                leavesUpdate (roomUpdated) roomListNew (num - 1) seed2
+                leavesUpdate (roomUpdated) roomListNew (num - 1) seed3
             else 
-                leavesUpdate (roomUpdated++[roomNew]) roomListNew (num - 1) seed2
+                leavesUpdate (roomUpdated++[roomNew]) roomListNew (num - 1) seed3
         
 checkOverlap : Room -> List Room -> Bool
 checkOverlap room roomList =

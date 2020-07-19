@@ -52,8 +52,8 @@ checkMonsterCollison monster obstacles monsterList=
 monsterBuilding : List Monster -> Int -> List Obstacle -> Random.Seed -> (List Monster,Random.Seed)
 monsterBuilding monsterList number obstacles seed0 =
     let
-        (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
-        (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
+        (xTemp,seed1) = Random.step (Random.int 300 1500) seed0
+        (yTemp,seed2) = Random.step (Random.int 300 1500) seed1
         (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
         (monsterSpeed, seed4) = Random.step (Random.float 2 6) seed3
         getMonsterType = 
@@ -70,7 +70,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0
 
     in 
         if number==0 then

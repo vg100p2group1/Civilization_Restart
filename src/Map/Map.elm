@@ -1,11 +1,23 @@
 
-module Map.Map exposing (Treasure,Obstacle,Room,Map,Monster,MonsterType,treasureConfig,roomConfig,mapConfig)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
 import Config exposing (viewBoxMax)
 import Random exposing (Seed)
 
 type alias Treasure =
-    { position : (Int,Int)
+    { position : Rectangle
+    , treasureType : TreasureType
+    , seed : Seed
+    , canshow : Bool
+    , roomNum : Int
+    
+    }
+
+type alias TreasureType =
+    {   level : Int
+    ,   size : Float
+    ,   color : String     
+    
     }
 
 type alias Obstacle =
@@ -28,6 +40,7 @@ type alias Monster =
     , active : Bool
     , timeBeforeAttack : Int
     , speed : Float
+    , roomNum : Int
     }
 
 
@@ -37,9 +50,10 @@ type alias Room =
     , boss : Bool
     , obstacles : List Obstacle
     , monsters : List Monster
-    , treasure : Treasure
+    , treasure : List Treasure
     , road : List (Int,Int) -- 邻接表
     , rank : Int -- rank 越低，怪难度越高？
+    , roomNum : Int
     }
 
 type alias Map =
@@ -47,19 +61,19 @@ type alias Map =
     , roads : List Rectangle
     , obstacles : List Rectangle
     , monsters : List Monster
+    , treasure : List Treasure
     , doors : List Rectangle
     , gate : Rectangle
     }
 
 
-treasureConfig : Treasure
-treasureConfig = Treasure (0,0) 
+
 
 roomConfig : Room
-roomConfig = Room (0,0) False False [] [] treasureConfig [] 0
+roomConfig = Room (0,0) False False [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
