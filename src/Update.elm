@@ -13,7 +13,8 @@ import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSyste
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
-import Map.MonsterGenerator exposing (updateMonster)
+import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
+import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -226,7 +227,8 @@ animate  model =
                 weapon.counter - 1
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
-        -- newClearList = updateList model.map 
+        newClearList = updateRoomList model.map.monsters model.map.roomCount []
+        newTreasure = updateTreasure model.map.treasure newClearList
         map = model.map
         newMap = {map | monsters = newMonsters}
         newViewbox = mapToViewBox newMe newMap
@@ -241,6 +243,7 @@ animate  model =
         {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
+
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))

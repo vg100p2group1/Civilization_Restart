@@ -107,7 +107,7 @@ showMap model =
        obstacles = displayRec model.obstacles
        monsters = displayMonster model.monsters
 
-       treasure = displayTreasure model.treasure model.roomCount
+       treasure = displayTreasure model.treasure
 
        gate = displayDoors [model.gate]
     --    d = Debug.log "gateshow" model.gate
@@ -175,8 +175,8 @@ displayMonster monsters =
     in
         List.map createBricksFormat monsters
 
-displayTreasure : List Treasure ->Int -> List (Svg.Svg Msg)
-displayTreasure treasure number=
+displayTreasure : List Treasure  -> List (Svg.Svg Msg)
+displayTreasure treasure =
     let
         -- d=Debug.log "wall" obstacle
         createBricksFormat treasureTemp =
@@ -187,7 +187,7 @@ displayTreasure treasure number=
 
                 treasureColor = treasureType.color
             in
-                if treasureTemp.roomNum == number  then 
+                if treasureTemp.canShow  then 
                 Svg.rect
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y

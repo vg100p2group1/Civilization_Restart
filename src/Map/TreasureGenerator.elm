@@ -1,4 +1,4 @@
-module Map.TreasureGenerator exposing (treasureGenerator)
+module Map.TreasureGenerator exposing (treasureGenerator,updateTreasure)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Treasure,TreasureType,Obstacle)
 import Random
@@ -72,3 +72,12 @@ treasureBuilding treasureList number obstacles seed0 =
                 treasureBuilding (treasureNew :: treasureList) (number - 1) obstacles seed3
             else 
                 treasureBuilding  treasureList number obstacles seed3
+
+updateTreasure : List Treasure -> List Int ->List Map.Map.Treasure
+updateTreasure treasureList roomClearList=
+    List.map (updateSingleTreasure roomClearList) treasureList
+
+updateSingleTreasure :  List Int -> Treasure ->  Map.Map.Treasure
+updateSingleTreasure roomClearList treasure=
+
+    if List.member treasure.roomNum roomClearList then {treasure|canShow=True}else treasure

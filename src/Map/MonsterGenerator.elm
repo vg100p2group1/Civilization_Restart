@@ -1,5 +1,5 @@
 
-module Map.MonsterGenerator exposing (monsterGenerator,updateMonster)
+module Map.MonsterGenerator exposing (monsterGenerator,updateMonster,updateRoomList)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
@@ -107,3 +107,18 @@ updateMonster monsters bullets me =
                      |> List.map (\m -> updateMonster_ m bullets)
     in
         allMonsterAct finalMonsters me bullets
+
+updateRoomList : List Monster -> Int  -> List Int -> List Int 
+updateRoomList monsterList number nowRoomList= 
+    if number == 0 then nowRoomList 
+        else if checkClearRoom number monsterList then updateRoomList  monsterList (number - 1) (number :: nowRoomList )
+            else updateRoomList monsterList number nowRoomList
+
+
+checkClearRoom : Int -> List Monster -> Bool
+checkClearRoom roomNumber monsterList =
+    let
+        monsterInRoom = List.filter (\b -> b.roomNum == roomNumber) monsterList
+        
+    in
+        (List.length monsterInRoom) == 0

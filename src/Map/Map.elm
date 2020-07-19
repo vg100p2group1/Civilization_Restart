@@ -8,7 +8,7 @@ type alias Treasure =
     { position : Rectangle
     , treasureType : TreasureType
     , seed : Seed
-    , canshow : Bool
+    , canShow : Bool
     , roomNum : Int
     
     }
