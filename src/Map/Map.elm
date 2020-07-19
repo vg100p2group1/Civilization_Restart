@@ -8,7 +8,7 @@ type alias Treasure =
     { position : Rectangle
     , treasureType : TreasureType
     , seed : Seed
-    , canshow : Bool
+    , canShow : Bool
     , roomNum : Int
     
     }
@@ -64,6 +64,8 @@ type alias Map =
     , treasure : List Treasure
     , doors : List Rectangle
     , gate : Rectangle
+    , roomCleared : List Int
+    , roomCount : Int
     }
 
 
@@ -73,7 +75,7 @@ roomConfig : Room
 roomConfig = Room (0,0) False False [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
