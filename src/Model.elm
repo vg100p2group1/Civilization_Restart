@@ -50,9 +50,10 @@ type alias Model =
     , viewbox : Map
     , size : (Float, Float)
     , state : State
-    , currentDialogues: Dialogues
+    , currentDialogues : Dialogues
     , explosion : List ExplosionEffect
     , explosionViewbox : List ExplosionEffect
+    , paused : Bool
     }
 
 type State = Dialogue
