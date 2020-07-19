@@ -191,8 +191,8 @@ displayTreasure treasure =
                 Svg.rect
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat model.width
-                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.width <| String.fromFloat 0
+                    , Svg.Attributes.height <| String.fromFloat 0
                     , Svg.Attributes.fill "purple"
                 
                     ]
