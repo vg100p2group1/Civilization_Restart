@@ -6,6 +6,7 @@ import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
 import Skill exposing (SkillSystem, defaultSystem)
+import Attributes exposing (Attr,defaultAttr)
 
 type alias Me =
     { x : Float
@@ -19,11 +20,11 @@ type alias Me =
     , moveLeft : Bool
     , moveDown : Bool
     , mouseData : (Float,Float)
-    , fire : Bool -- 到时候用sum type
+    , fire : Bool 
   --   , name : String
   --   , score : Float
     , hitBox : Circle
-    , weapons : List Weapon     -- the first element is the one in uses
+    , weapons : List Weapon 
     , currentWeapon : Weapon
     , counter : Int
     , url : String
@@ -31,15 +32,38 @@ type alias Me =
     , weaponDirection : Direction
     -- , direction : Int 
     , skillSys : SkillSystem
+    , attr : Attr
     }
+
 type Direction
     = DirectionRight
     | DirectionLeft
 
 
 defaultMe : Me
-
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight defaultSystem
+defaultMe = 
+    { x = 500
+    , y = 500
+    , r = 50
+    , xSpeed = playerSpeed
+    , ySpeed = 0
+    , rotate = 0
+    , moveUp = False
+    , moveRight = False
+    , moveLeft = False
+    , moveDown = False
+    , mouseData = (500,500)
+    , fire = False
+    , hitBox = Circle 500 500 50
+    , weapons = weaponList
+    , currentWeapon = defaultWeapon
+    , counter = 0
+    , url = ""
+    , preDirection = DirectionRight
+    , weaponDirection = DirectionRight
+    , skillSys = defaultSystem
+    , attr = defaultAttr
+    }
 
 type alias Model =
     { myself : Me

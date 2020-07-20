@@ -8,3 +8,4 @@ all:
 clean:
 	rm index.html
 	rm build -r
+	rm elm-stuff -r
