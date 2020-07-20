@@ -5,7 +5,7 @@ import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..), SkillMsg(..))
-import Attributes exposing (Attr, AttrType, getCurrentAttr, getMaxAttr, getAttrName)
+import Attributes exposing (Attr, AttrType(..), getCurrentAttr, getMaxAttr, getAttrName)
 import Html exposing (Html, div, text, button, progress)
 import Html.Attributes exposing (style, disabled)
 import Html.Events exposing (onClick)
@@ -16,6 +16,8 @@ import Svg.Attributes
 import MiniMap exposing (getMiniMap)
 import Animation.ShowGun exposing (showGun)
 import Animation.Explosion exposing (showExplosion)
+import VirtualDom exposing (attributeNS)
+import Http exposing (Progress)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -377,10 +379,20 @@ showAttr attr =
     , style "padding" "0 140px"
     , style "position" "absolute"
     ]
-    [ text "Attack:"
-    , progress [max getMaxAttr] []
-    ]
+    (List.map (makeProgress attr) [Attack, Clip, Armor, Attack, Speed])
 
-makeProgress : AttrType -> Attr -> Html Msg
-makeProgress t attr =
-    div [] []
+makeProgress : Attr -> AttrType -> Html Msg
+makeProgress attr t =
+    let
+        maxAttr = getMaxAttr t attr
+        valueAttr = getCurrentAttr t attr
+    in
+    div 
+    [style "margin" "20px"]
+    [ text (getAttrName t ++ " : ")
+    , progress
+        [ Html.Attributes.max (String.fromInt maxAttr)
+        , Html.Attributes.value (String.fromInt valueAttr)
+        ]
+        []
+    ]
