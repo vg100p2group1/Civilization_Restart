@@ -55,6 +55,13 @@ view model =
                 , Html.Attributes.style "left" "200px"
                 ]
                 [showMiniMap model]
+            
+            , Html.div
+                [ style "left" "800px"
+                , style "top" "100px"
+                , style "position" "absolute"
+                ]
+                [showAttr model.myself.attr]
 
             , Html.div
                 [ 
@@ -374,9 +381,7 @@ showMiniMap model =
 showAttr : Attr -> Html Msg
 showAttr attr = 
     div
-    [ style "left" "480px"
-    , style "top" "155px"
-    , style "padding" "0 140px"
+    [ style "padding" "0 140px"
     , style "position" "absolute"
     ]
     (List.map (makeProgress attr) [Attack, Clip, Armor, Attack, Speed])
@@ -384,15 +389,17 @@ showAttr attr =
 makeProgress : Attr -> AttrType -> Html Msg
 makeProgress attr t =
     let
-        maxAttr = getMaxAttr t attr
-        valueAttr = getCurrentAttr t attr
+        maxAttr = String.fromInt <| getMaxAttr t attr
+        valueAttr = String.fromInt <| getCurrentAttr t attr
     in
     div 
     [style "margin" "20px"]
-    [ text (getAttrName t ++ " : ")
+    [ div
+        [style "width" "50px"]
+        [text (getAttrName t ++ " : ")]
     , progress
-        [ Html.Attributes.max (String.fromInt maxAttr)
-        , Html.Attributes.value (String.fromInt valueAttr)
+        [ Html.Attributes.max maxAttr
+        , Html.Attributes.value valueAttr
         ]
-        []
+        [text (valueAttr ++ "/" ++ maxAttr)]
     ]
