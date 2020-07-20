@@ -1,4 +1,4 @@
-module Attributes exposing (Attr, AttrInfo, AttrType(..), getMaxAttr, getCurrentAttr, setMaxAttr, setCurrentAttr)
+module Attributes exposing (Attr, AttrInfo, AttrType(..), getMaxAttr, getCurrentAttr, setMaxAttr, setCurrentAttr, defaultAttr)
 
 import Dict exposing (Dict, get,update)
 
@@ -6,6 +6,8 @@ type alias Attr =
     { max : AttrInfo
     , current : AttrInfo
     }
+
+defaultAttr = {max = Dict.empty, current = Dict.empty}
 
 -- it will only contain the attr that are adjusted
 -- NOTE: it is quire annoying that Dict only provide get function for comparable types,
