@@ -284,7 +284,7 @@ speedCase me map=
         (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
-        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++map.walls++map.roads) 
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"
         getCollideType collideList  = 
@@ -464,7 +464,7 @@ updateBullet me map bullets (collisionX,collisionY) =
                 {b|hitbox = newHitbox,x=newX, y=newY}
 
         allBullets = bullets
-                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.walls)))
+                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.walls))))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
