@@ -5,7 +5,8 @@ import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle)
 import Messages exposing (Msg(..), SkillMsg(..))
-import Html exposing (Html, div, text, button)
+import Attributes exposing (Attr, AttrType, getCurrentAttr, getMaxAttr, getAttrName)
+import Html exposing (Html, div, text, button, progress)
 import Html.Attributes exposing (style, disabled)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
@@ -368,3 +369,18 @@ showMiniMap model =
         Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
         (walls ++ roads  ++ gate ++ meTemp)
 
+showAttr : Attr -> Html Msg
+showAttr attr = 
+    div
+    [ style "left" "480px"
+    , style "top" "155px"
+    , style "padding" "0 140px"
+    , style "position" "absolute"
+    ]
+    [ text "Attack:"
+    , progress [max getMaxAttr] []
+    ]
+
+makeProgress : AttrType -> Attr -> Html Msg
+makeProgress t attr =
+    div [] []

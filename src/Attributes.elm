@@ -1,4 +1,4 @@
-module Attributes exposing (Attr, AttrInfo, AttrType(..), getMaxAttr, getCurrentAttr, setMaxAttr, setCurrentAttr, defaultAttr)
+module Attributes exposing (Attr, AttrInfo, AttrType(..), getAttrName, getMaxAttr, getCurrentAttr, setMaxAttr, setCurrentAttr, defaultAttr)
 
 import Dict exposing (Dict, get,update)
 
@@ -39,6 +39,15 @@ getDefault at =
         Armor -> 50
         Health -> 100
         Clip -> 80
+
+getAttrName : AttrType -> String
+getAttrName at = 
+    case at of
+        Attack -> "Attack"
+        Speed -> "Speed"
+        Armor -> "Armor"
+        Health -> "Health"
+        Clip -> "Bullet"
 
 getAttr : AttrType -> AttrInfo -> Int
 getAttr t pAttr =

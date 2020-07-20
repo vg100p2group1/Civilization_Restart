@@ -20,11 +20,11 @@ type alias Me =
     , moveLeft : Bool
     , moveDown : Bool
     , mouseData : (Float,Float)
-    , fire : Bool -- 到时候用sum type
+    , fire : Bool 
   --   , name : String
   --   , score : Float
     , hitBox : Circle
-    , weapons : List Weapon     -- the first element is the one in uses
+    , weapons : List Weapon 
     , currentWeapon : Weapon
     , counter : Int
     , url : String
