@@ -12,11 +12,18 @@ explosion effect =
         counternow = effect.counter
         
         -- d1=Debug.log "direction u r l d"    (me.moveUp&&me.moveRight&&me.moveLeft&&me.moveDown)
-        -- getUrl = 
+        getUrl =
+            case counternow of 
+                0 ->
+                  "./images/Explosion/Ex_01.png"
+                1 ->
+                  "./images/Explosion/Ex_02.png"  
+                _ ->
+                  "./images/Explosion/Ex_01.png"   
     in
         Svg.image [Svg.Attributes.x <| String.fromFloat (effect.x - effect.r), 
                    Svg.Attributes.y <| String.fromFloat (effect.y - effect.r), 
-                   Svg.Attributes.xlinkHref ("./images/Explosion/Ex_0"++ String.fromInt (counternow+1) ++".png"), 
+                   Svg.Attributes.xlinkHref getUrl, 
                    Svg.Attributes.preserveAspectRatio "none meet", 
                    Svg.Attributes.width <| String.fromFloat (effect.r*2), 
                    Svg.Attributes.height <| String.fromFloat (effect.r*2)

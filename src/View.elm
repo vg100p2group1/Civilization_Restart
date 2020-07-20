@@ -3,7 +3,7 @@ import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
 import Map.Map exposing (Map,Monster,Room,Treasure)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
-import Shape exposing (Rectangle)
+import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
 import Messages exposing (Msg(..), SkillMsg(..))
 import Html exposing (Html, div, text, button)
 import Html.Attributes exposing (style, disabled)
@@ -100,14 +100,17 @@ playerDemonstrate model =
 showMap : Map -> List (Svg.Svg Msg)
 showMap model =
     let
-       walls = displayRec model.walls
-       roads = displayRec model.roads
+       walls = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
+    --    d2=Debug.log "walls List" model.walls
+       d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
+       
+       roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
 
-       doors = displayDoors model.doors
-       obstacles = displayRec model.obstacles
-       monsters = displayMonster model.monsters
+       doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.doors
+       obstacles = displayRec  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
+       monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
-       treasure = displayTreasure model.treasure
+       treasure = displayTreasure  model.treasure
 
        gate = displayDoors [model.gate]
     --    d = Debug.log "gateshow" model.gate
