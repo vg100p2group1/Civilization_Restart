@@ -351,8 +351,18 @@ showMiniMap : Model -> Html.Html Msg
 showMiniMap model =
     let
        (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
+       
 
-       walls = displayRec <| List.map (\value -> value.position) miniMap.walls
+       wallPosUpdate value=
+            let 
+                rectangle = value.position
+            in 
+                if rectangle.width>rectangle.height then
+                    {rectangle|x=rectangle.x-200,width=rectangle.width+400}
+                else 
+                    rectangle 
+
+       walls = displayRec <| List.map wallPosUpdate miniMap.walls
        roads = displayRec miniMap.roads
        gate = displayDoors [miniMap.gate]
 
