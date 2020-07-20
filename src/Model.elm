@@ -31,6 +31,10 @@ type alias Me =
     , weaponDirection : Direction
     -- , direction : Int 
     , skillSys : SkillSystem
+    , health : Int
+    , clip : Int
+    , armor : Int
+    , attr : PlayerAttr
     }
 type Direction
     = DirectionRight

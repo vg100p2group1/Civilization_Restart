@@ -1,12 +1,17 @@
-module Attributes exposing (PlayerAttr, AttrType(..), getAttr, setAttr)
+module Attributes exposing (Attr, AttrInfo, AttrType(..), getMaxAttr, getCurrentAttr, setMaxAttr, setCurrentAttr)
 
 import Dict exposing (Dict, get,update)
+
+type alias Attr = 
+    { max : AttrInfo
+    , current : AttrInfo
+    }
 
 -- it will only contain the attr that are adjusted
 -- NOTE: it is quire annoying that Dict only provide get function for comparable types,
 -- so instead of using a Dict AttrType, we have to use Dict Int Int and use a function
 -- to convert AttrType into Int
-type alias PlayerAttr = Dict Int Int
+type alias AttrInfo = Dict Int Int
 
 type AttrType
     = Attack
@@ -33,7 +38,7 @@ getDefault at =
         Health -> 100
         Clip -> 80
 
-getAttr : AttrType -> PlayerAttr -> Int
+getAttr : AttrType -> AttrInfo -> Int
 getAttr t pAttr =
     let
         stored = get (attrTypeToInt t) pAttr
@@ -42,7 +47,7 @@ getAttr t pAttr =
         Nothing -> getDefault t
         Just val -> val
 
-setAttr : AttrType -> Int -> PlayerAttr -> PlayerAttr
+setAttr : AttrType -> Int -> AttrInfo -> AttrInfo
 setAttr at delta pAttr =
     let
         code = attrTypeToInt at
@@ -52,3 +57,19 @@ setAttr at delta pAttr =
                 Just n -> Just (n + delta)
     in
     update code change pAttr
+
+getMaxAttr : AttrType -> Attr -> Int
+getMaxAttr aType attr =
+    getAttr aType attr.max
+
+getCurrentAttr : AttrType -> Attr -> Int
+getCurrentAttr aType attr =
+    getAttr aType attr.current
+
+setMaxAttr : AttrType -> Int -> Attr -> Attr
+setMaxAttr aType val attr =
+    {attr|max = setAttr aType val attr.max}
+
+setCurrentAttr : AttrType -> Int -> Attr -> Attr
+setCurrentAttr aType val attr =
+    {attr|max = setAttr aType val attr.current}
