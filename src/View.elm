@@ -15,6 +15,7 @@ import Svg.Attributes
 import MiniMap exposing (getMiniMap)
 import Animation.ShowGun exposing (showGun)
 import Animation.Explosion exposing (showExplosion)
+import Animation.ShowBullet exposing (showBullets)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -89,7 +90,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [gun model.myself, me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
+              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model
@@ -102,7 +103,7 @@ showMap model =
     let
        walls = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
     --    d2=Debug.log "walls List" model.walls
-       d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
+    --    d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
        
        roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
 
@@ -219,32 +220,25 @@ me myself=
     Svg.image [Svg.Attributes.x "460", Svg.Attributes.y "460", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
                    Svg.Attributes.width "80", Svg.Attributes.height "80"][]
 
-gun : Me -> Svg.Svg Msg
-gun myself =
-    let       
-        pos = myself.mouseData
-        px = Tuple.first pos
-        py = Tuple.second pos
-        route=Svg.Attributes.d(" M 500 520" ++
-                               " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
-                              )
-        getcolor = 
-            if myself.fire then 
-                "red"
-            else
-                myself.currentWeapon.color
-    in
-        Svg.path [route , Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
+-- gun : Me -> Svg.Svg Msg
+-- gun myself =
+--     let       
+--         pos = myself.mouseData
+--         px = Tuple.first pos
+--         py = Tuple.second pos
+--         route=Svg.Attributes.d(" M 500 520" ++
+--                                " L " ++ String.fromFloat px ++ " " ++ String.fromFloat py
+--                               )
+--         getcolor = 
+--             if myself.fire then 
+--                 "red"
+--             else
+--                 myself.currentWeapon.color
+--     in
+--         Svg.path [route , Svg.Attributes.stroke getcolor, Svg.Attributes.strokeWidth "2"][]
 
 
-showBullets : List Bullet -> List ( Svg.Svg Msg) 
-showBullets bullets =
-    let 
-        createBulletFormat model =
-        --"#002c5a"
-          Svg.circle [Svg.Attributes.fill "gray", Svg.Attributes.cx <| String.fromFloat  model.x, Svg.Attributes.cy <| String.fromFloat  model.y, Svg.Attributes.r <| String.fromFloat model.r][]
-    in
-        List.map createBulletFormat bullets
+
 
 
 
