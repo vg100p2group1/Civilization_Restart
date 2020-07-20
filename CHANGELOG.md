@@ -1,5 +1,37 @@
 # Change Log
 
+### [0.2.0] - 2020-07-19
+
+#### Added:
+
+* Add treasures to the map and they will be activated when the monsters are eliminated.
+* Design the weapon system so that the player can change their guns by pressing **Q** or **1, 2, 3, 4**
+* Add the explosion effect when the bullets hit the obstacles.
+* Add the animation for the player when he moves or shoots.
+* Add the skill tree system by pressing **B**, so that players can upgrade their skills to get more interesting experience.
+* Refine the monsters' behaviors so that the level of difficulty is more proper.
+* The dialogues between player and bosses can be automatically presented when he moves to a new stage.
+
+#### Fixed:
+
+* Fix the bug that some of the monsters will collide with the wall.
+* Fix the bug that the player's gun will be automatically changed when he enters a new room.
+* Fix the bug that the shooting rate of the monsters are too fast and several bullets are shot at one time.
+* Fix the bug that there exist blank space between player and walls when he approaches them.
+* Fix the bug that the bullets will go through the walls.
+
+#### Deprecated:
+
+* The connection line between the mouse position and players' guns.
+
+* The simple dialogues will be replaced by more advanced ones to push the story.
+
+* The background will be replaced by scenes.
+
+* The gun and player pictures will be replaced by more delicate and different ones.
+
+  
+
 ### [0.1.0] - 2020-07-13
 
 #### Added:
@@ -29,5 +61,8 @@
 
 * The random tremble of the monsters will be replaced by more advanced and intelligent monsters behaviors towards players.
 
-  
+
+
+
+
 

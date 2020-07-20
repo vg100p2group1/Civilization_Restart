@@ -1,5 +1,5 @@
 
-module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,roomConfig,mapConfig)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
 import Config exposing (viewBoxMax)
 import Random exposing (Seed)
@@ -8,7 +8,7 @@ type alias Treasure =
     { position : Rectangle
     , treasureType : TreasureType
     , seed : Seed
-    , canshow : Bool
+    , canShow : Bool
     , roomNum : Int
     
     }
@@ -56,14 +56,29 @@ type alias Room =
     , roomNum : Int
     }
 
+type WallProperty
+    =UpWall
+    |DownWall
+    |RightWall
+    |LeftWall
+
+
+type alias Wall =
+    {   position : Rectangle
+      , property : WallProperty
+    }
+
+
 type alias Map =
-    { walls : List Rectangle
+    { walls : List Wall
     , roads : List Rectangle
     , obstacles : List Rectangle
     , monsters : List Monster
     , treasure : List Treasure
     , doors : List Rectangle
     , gate : Rectangle
+    , roomCleared : List Int
+    , roomCount : Int
     }
 
 
@@ -73,7 +88,7 @@ roomConfig : Room
 roomConfig = Room (0,0) False False [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit)
+mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)

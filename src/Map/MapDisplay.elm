@@ -1,7 +1,7 @@
 
 module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig)
+import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig,Wall,WallProperty(..))
 import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
@@ -17,7 +17,7 @@ mapWithGate rooms number drawnrooms seed0 =
         mapTemp = showMap rooms number drawnrooms
         (gateTemp, _) = gateGenerator rooms seed0
     in
-        {mapTemp| gate=gateTemp}
+        {mapTemp| gate=gateTemp,roomCount=number}
 
 
 showMap : List Room -> Int -> Map -> Map
@@ -71,7 +71,8 @@ drawTreasure : Room -> Int -> List Treasure
 drawTreasure room number=
     let
         (x,y) = room.position
-        newX = Debug.log "build" toFloat (2500*x)
+        -- newX = Debug.log "build" toFloat (2500*x)
+        newX = toFloat (2500*x)
         newY = toFloat (2500*y)
         treasureList = room.treasure
         movingRectangle model =
@@ -138,11 +139,11 @@ drawRoads room =
                 (2,1) ->
                     [Rectangle (newX + 1800) (newY + 800) 900 100 recInit,Rectangle (newX + 1800) (newY + 1100) 900 100 recInit]
                 (1,2) ->
-                    [Rectangle (newX + 800) (newY + 2000) 100 500 recInit,Rectangle (newX + 1100) (newY + 2000) 100 500 recInit]
+                    [Rectangle (newX + 800) (newY + 1800) 100 900 recInit,Rectangle (newX + 1100) (newY + 1800) 100 900 recInit]
                 (0,1) ->
                     [Rectangle (newX - 700) (newY + 800) 900 100 recInit,Rectangle (newX - 700) (newY + 1100) 900 100 recInit]
                 (1,0) ->
-                    [Rectangle (newX + 800) (newY - 500) 100 500 recInit,Rectangle (newX + 1100) (newY - 500) 100 500 recInit]
+                    [Rectangle (newX + 800) (newY - 700) 100 900 recInit,Rectangle (newX + 1100) (newY - 700) 100 900 recInit]
                 _ ->
                     [Rectangle 0 0 0 0 recInit]
             
@@ -153,7 +154,7 @@ drawRoads room =
         List.map recUpdate <| List.concat <| List.map recPosition roadList2
     
 
-drawWalls : Room -> List Rectangle
+drawWalls : Room -> List Wall
 drawWalls room=
     let
         (x,y) = room.position
@@ -171,28 +172,28 @@ drawWalls room=
         -- d3 = Debug.log "update" roadList2 
         newRec1 = 
             if List.member (0,1) roadList2 then
-                [Rectangle newX newY 200 800 recInit,Rectangle newX (newY+1200) 200 800 recInit]
+                [Wall (Rectangle newX (newY+150) 200 650 recInit) LeftWall, Wall (Rectangle newX (newY+1200) 200 650 recInit) LeftWall]
                 -- []
             else
-                [Rectangle newX newY 200 2000 recInit]
+                [Wall (Rectangle newX (newY+150) 200 1700 recInit) LeftWall]
         newRec2 = 
             if List.member (1,0) roadList2 then 
-                [Rectangle newX newY 900 200 recInit,Rectangle (newX+1100) newY 900 200 recInit]
+                [Wall (Rectangle (newX+200) newY 600 200 recInit) UpWall, Wall (Rectangle (newX+1200) newY 600 200 recInit) UpWall]
                 -- []
             else  
-                [Rectangle newX newY 2000 200 recInit]
+                [Wall (Rectangle (newX+200) newY 1600 200 recInit) UpWall]
         newRec3 = 
             if List.member (2,1) roadList2 then
-                [Rectangle (newX+1800) newY 200 800 recInit,Rectangle (newX+1800) (newY+1100) 200 800 recInit]
+                [Wall (Rectangle (newX+1800) (newY+150) 200 650 recInit) RightWall, Wall (Rectangle (newX+1800) (newY+1200) 200 650 recInit) RightWall]
                 -- []
             else 
-                [Rectangle (newX+1800) newY 200 2000 recInit]
+                [Wall (Rectangle (newX+1800) (newY+150) 200 1700 recInit) RightWall]
         newRec4 = 
             if List.member (1,2) roadList2 then
-                [Rectangle newX (newY+1800) 900 200 recInit,Rectangle (newX+1100) (newY+1800) 900 200 recInit]
+                [Wall (Rectangle (newX+200) (newY+1800) 600 200 recInit) DownWall, Wall (Rectangle (newX+1200) (newY+1800) 600 200 recInit) DownWall]
                 -- []
             else 
-                [Rectangle newX (newY+1800) 2000 200 recInit]
+                [Wall (Rectangle (newX+200) (newY+1800) 1600 200 recInit) DownWall]
         
     in
-        List.map recUpdate (List.concat [newRec1,newRec2,newRec3,newRec4])
+        List.map (\value->{value| position=recUpdate value.position}) (List.concat [newRec1,newRec2,newRec3,newRec4])

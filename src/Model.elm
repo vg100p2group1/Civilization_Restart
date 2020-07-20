@@ -123,6 +123,8 @@ mapToViewBox me map =
             {value|x=-me.x + viewBoxMax/2 + value.x, y= -me.y + viewBoxMax/2 + value.y}
         circleUpdate value =
             {value|cx=-me.x + viewBoxMax/2 + value.cx, cy= -me.y + viewBoxMax/2 + value.cy}
+        wallListUpdate model =
+            List.map (\value-> {value|position=recUpdate value.position}) model
         -- monsterList = map.monsters
         monsterUpdate monster= 
             {monster| position = circleUpdate monster.position}
@@ -134,4 +136,4 @@ mapToViewBox me map =
         -- monsterListUpdate model =
         --     List.map (\value -> {value| position = circleUpdate value.position}) model
     in
-        {map| walls= recListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}
+        {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}
