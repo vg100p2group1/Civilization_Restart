@@ -16,6 +16,7 @@ import MiniMap exposing (getMiniMap)
 import Animation.ShowGun exposing (showGun)
 import Animation.Explosion exposing (showExplosion)
 import Animation.ShowBullet exposing (showBullets)
+import Environment.ShowWalls exposing (showWalls)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -101,7 +102,7 @@ playerDemonstrate model =
 showMap : Map -> List (Svg.Svg Msg)
 showMap model =
     let
-       walls = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
+       walls = showWalls <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value.position))) model.walls
     --    d2=Debug.log "walls List" model.walls
     --    d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
        
@@ -351,7 +352,7 @@ showMiniMap model =
     let
        (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
 
-       walls = displayRec miniMap.walls
+       walls = displayRec <| List.map (\value -> value.position) miniMap.walls
        roads = displayRec miniMap.roads
        gate = displayDoors [miniMap.gate]
 
