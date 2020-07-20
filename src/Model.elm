@@ -5,6 +5,7 @@ import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
+import Skill exposing (SkillSystem, defaultSystem)
 
 type alias Me =
     { x : Float
@@ -28,6 +29,8 @@ type alias Me =
     , url : String
     , preDirection : Direction
     , weaponDirection : Direction
+    -- , direction : Int 
+    , skillSys : SkillSystem
     }
 type Direction
     = DirectionRight
@@ -36,7 +39,7 @@ type Direction
 
 defaultMe : Me
 
-defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight
+defaultMe = Me 500 500 50 playerSpeed 0 0 False False False False (500,500) False (Circle 500 500 50) weaponList defaultWeapon 0 "" DirectionRight DirectionRight defaultSystem
 
 type alias Model =
     { myself : Me
@@ -47,9 +50,10 @@ type alias Model =
     , viewbox : Map
     , size : (Float, Float)
     , state : State
-    , currentDialogues: Dialogues
+    , currentDialogues : Dialogues
     , explosion : List ExplosionEffect
     , explosionViewbox : List ExplosionEffect
+    , paused : Bool
     }
 
 type State = Dialogue
@@ -99,7 +103,11 @@ mapToViewBox me map =
         monsterUpdate monster= 
             {monster| position = circleUpdate monster.position}
         monstersUpdated = List.map monsterUpdate map.monsters
+        treasureUpdate monster= 
+            {monster| position = recUpdate monster.position}
+        treasureUpdated = List.map treasureUpdate map.treasure
+
         -- monsterListUpdate model =
         --     List.map (\value -> {value| position = circleUpdate value.position}) model
     in
-        {map| walls= recListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,gate=recUpdate map.gate}
+        {map| walls= recListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}

@@ -1,24 +1,25 @@
 
 module Update exposing (update)
 
-import Messages exposing (Msg(..))
+import Messages exposing (Msg(..), SkillMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
+import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator)
 import Map.MapDisplay exposing (showMap, mapWithGate)
-import Map.MonsterGenerator exposing (updateMonster)
+import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
+import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-
         MoveLeft on ->
             let 
                 pTemp = model.myself 
@@ -99,7 +100,7 @@ update msg model =
 
                     mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                     meTemp = model.myself
-                    meNew = {defaultMe|weapons=meTemp.weapons}
+                    meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
                     -- it should be updated when dialogues are saved in every room
                     newDialogues = updateDialogues model
                 in
@@ -107,7 +108,10 @@ update msg model =
             else
                 (model, Cmd.none)
         Tick time ->
-            (animate model, Cmd.none)
+            if model.paused then
+                (model, Cmd.none)
+            else
+                (animate model, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
@@ -136,7 +140,9 @@ update msg model =
               }
             , Cmd.none
             )
-
+        
+        SkillChange skillMsg ->
+            updateSkill skillMsg model
 
         Noop ->
             let 
@@ -221,10 +227,12 @@ animate  model =
                 0
             else
                 weapon.counter - 1
-        newBullet_ = Debug.log "newBullets" newShoot ++ model.bullet
+        newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
+        newClearList = updateRoomList model.map.monsters model.map.roomCount []
+        newTreasure = updateTreasure model.map.treasure newClearList
         map = model.map
-        newMap = {map | monsters = newMonsters}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -237,6 +245,7 @@ animate  model =
         {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
+
 
 
 speedCase : Me -> Map-> (Me,(Bool,Bool))
@@ -379,6 +388,7 @@ startUpdateSen model =
     else
         { model | sentenceState = Nothing}
 -}
+
 updateSentence : Float -> Model -> Model
 updateSentence elapsed model =
     case model.state of
@@ -491,3 +501,56 @@ updateState model =
 updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
+
+updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
+updateSkill msg model =
+    let
+        me = model.myself
+        sys = me.skillSys
+    in
+    case msg of
+        TriggerSkillWindow ->
+            let 
+                active = sys.active
+                subList = sys.subsys
+                newSub = List.map (\sub -> choose sub (0,0)) subList
+                newSys = {sys|active = not active, subsys = newSub}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe, paused = not model.paused}
+            in
+                (newModel, Cmd.none)
+        SubSystemChange change ->
+            let 
+                delta = if change then 1 else -1
+                newSys = switchSubSystem sys delta
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        ChooseSkill id level->
+            let 
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                newSub = choose sub (id, level)
+                newSubList = List.take sys.current subList ++ [newSub] ++ (List.drop (sys.current+1) subList)
+                newSys = {sys|subsys = newSubList}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)
+        UnlockSkill ->
+            let
+                sub = getCurrentSubSystem sys
+                subList = sys.subsys
+                (newSub,cost) = unlockChosen sub
+                (finalSub, points) = 
+                    if cost > sys.points then     -- only apply if player can afford it
+                        ({sub|text ="it requires more points than you have"}, sys.points)
+                    else
+                        (newSub, sys.points - cost)
+                newSubList = List.take sys.current subList ++ [finalSub] ++ List.drop (sys.current+1) subList
+                newSys = {sys|subsys = newSubList, points = points}
+                newMe = {me|skillSys = newSys}
+                newModel = {model|myself = newMe}
+            in
+                (newModel, Cmd.none)

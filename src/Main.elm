@@ -5,7 +5,7 @@ import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp, onResiz
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode
 import Json.Encode exposing (Value)
-import Messages exposing (Msg(..))
+import Messages exposing (Msg(..),SkillMsg(..))
 import Task
 import View exposing (view)
 import Update
@@ -72,6 +72,11 @@ key on keycode =
             if on then
                 ChangeWeapon_
             else Noop
+        66 ->
+            if on then
+                SkillChange TriggerSkillWindow
+            else
+                Noop
         _ ->
             Noop
 
@@ -88,6 +93,7 @@ init =
     , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
     , explosion = []
     , explosionViewbox = []
+    , paused = False
     }
 
 
