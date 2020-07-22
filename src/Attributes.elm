@@ -7,10 +7,11 @@ type alias Attr =
     , current : AttrInfo
     }
 
+defaultAttr : Attr
 defaultAttr = {max = Dict.empty, current = Dict.empty}
 
 -- it will only contain the attr that are adjusted
--- NOTE: it is quire annoying that Dict only provide get function for comparable types,
+-- NOTE: it is quite annoying that Dict only provide get function for comparable types,
 -- so instead of using a Dict AttrType, we have to use Dict Int Int and use a function
 -- to convert AttrType into Int
 type alias AttrInfo = Dict Int Int
@@ -21,6 +22,7 @@ type AttrType
     | Armor
     | Health
     | Clip      -- It acctually means total bullets but since the word Bullet is already used as a type, I chooce Clip instead
+    | ShootSpeed
 
 attrTypeToInt : AttrType -> Int
 attrTypeToInt at = 
@@ -30,6 +32,7 @@ attrTypeToInt at =
         Armor -> 2
         Health -> 3
         Clip -> 4
+        ShootSpeed -> 5
 
 getDefault : AttrType -> Int
 getDefault at =
@@ -39,6 +42,7 @@ getDefault at =
         Armor -> 50
         Health -> 100
         Clip -> 80
+        ShootSpeed -> 40
 
 getAttrName : AttrType -> String
 getAttrName at = 
@@ -48,6 +52,7 @@ getAttrName at =
         Armor -> "Armor"
         Health -> "Health"
         Clip -> "Bullet"
+        ShootSpeed -> "Shooting Speed"
 
 getAttr : AttrType -> AttrInfo -> Int
 getAttr t pAttr =
