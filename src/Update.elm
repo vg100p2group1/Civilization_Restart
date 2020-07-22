@@ -221,7 +221,7 @@ animate  model =
                                 fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
                              else
                                 ([], model.myself.currentWeapon)
-
+        -- This is for the cooling time of weapons
         weaponCounter =
             if weapon.counter == 0 then
                 0
