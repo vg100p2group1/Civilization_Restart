@@ -9,7 +9,7 @@ import Messages exposing (Msg(..),SkillMsg(..))
 import Task
 import View exposing (view)
 import Update
-import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox)
+import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..))
 import Map.MapDisplay exposing (mapInit)
 import Map.MapGenerator exposing (roomInit)
 -- import Html.Styled exposing (..)
@@ -31,7 +31,10 @@ main =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ onAnimationFrameDelta Tick
+        [ if model.gameState == Playing then
+              onAnimationFrameDelta Tick
+          else
+              Sub.none
         , onKeyUp (Decode.map (key False) keyCode)
         , onKeyDown (Decode.map (key True) keyCode)
         , onResize Resize
@@ -77,6 +80,12 @@ key on keycode =
                 SkillChange TriggerSkillWindow
             else
                 Noop
+        32 ->
+            if on then
+                ChangeGameState
+            else
+                Noop
+
         _ ->
             Noop
 
@@ -94,6 +103,9 @@ init =
     , explosion = []
     , explosionViewbox = []
     , paused = False
+    , gameState = Playing
     }
+
+
 
 

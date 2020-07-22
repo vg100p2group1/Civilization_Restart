@@ -22,6 +22,10 @@ type Msg
     | NextSentence
     | ChangeWeapon Int
     | ChangeWeapon_
+    | Start
+    | Pause
+    | Resume
+    | ChangeGameState
 
 type SkillMsg
     = TriggerSkillWindow

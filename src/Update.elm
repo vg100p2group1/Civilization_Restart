@@ -2,7 +2,7 @@
 module Update exposing (update)
 
 import Messages exposing (Msg(..), SkillMsg(..))
-import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox)
+import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
@@ -11,8 +11,8 @@ import Debug
 import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
-import Map.MapGenerator exposing (roomGenerator)
-import Map.MapDisplay exposing (showMap, mapWithGate)
+import Map.MapGenerator exposing (roomGenerator,roomInit)
+import Map.MapDisplay exposing (showMap, mapWithGate,mapInit)
 import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
@@ -20,6 +20,38 @@ import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Start ->
+            let
+                init =
+                    { myself = defaultMe
+                    , bullet = []
+                    , bulletViewbox = []
+                    , map = mapInit
+                    , rooms = roomInit
+                    , viewbox = mapToViewBox defaultMe mapInit
+                    , size = (0, 0)
+                    , state = Others
+                    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+                    , explosion = []
+                    , explosionViewbox = []
+                    , paused = False
+                    , gameState = Playing
+                    }
+            in
+                (init, Cmd.none)
+        Pause ->
+            ( {model|gameState=Paused}, Cmd.none)
+        Resume ->
+            ( {model|gameState=Playing}, Cmd.none)
+        ChangeGameState ->
+            let
+                newModel =
+                    case model.gameState of
+                        Playing -> {model|gameState=Paused}
+                        Paused -> {model|gameState=Playing}
+                        Stopped -> {model|gameState=Playing}
+            in
+                (newModel, Cmd.none)
         MoveLeft on ->
             let 
                 pTemp = model.myself 
@@ -93,18 +125,21 @@ update msg model =
             in
                 ({model|myself = me},Cmd.none) 
         NextFloor ->
-            if model.state == NextStage then
-                let
-                    roomNew =
-                        roomGenerator 1 (Tuple.second model.rooms)
+            if model.gameState == Playing then
+                if model.state == NextStage then
+                    let
+                        roomNew =
+                            roomGenerator 1 (Tuple.second model.rooms)
 
-                    mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
-                    meTemp = model.myself
-                    meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
-                    -- it should be updated when dialogues are saved in every room
-                    newDialogues = updateDialogues model
-                in
-                    ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues},Cmd.none)
+                        mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                        meTemp = model.myself
+                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
+                        -- it should be updated when dialogues are saved in every room
+                        newDialogues = updateDialogues model
+                    in
+                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused},Cmd.none)
+                else
+                    (model, Cmd.none)
             else
                 (model, Cmd.none)
         Tick time ->
@@ -118,13 +153,19 @@ update msg model =
 
         -- the dialogue should be displayed when the player enters a new room actually
         ShowDialogue ->
-            ({ model | state = Dialogue}, Cmd.none)
+            ({ model | state = Dialogue, gameState = Paused}, Cmd.none)
 
         ChangeWeapon number ->
-            (changeWeapon (number - 1) model, Cmd.none)
+            if model.gameState == Playing then
+                (changeWeapon (number - 1) model, Cmd.none)
+            else
+                (model, Cmd.none)
 
         ChangeWeapon_ ->
-            (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
+            if model.gameState == Playing then
+                (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
+            else
+                (model, Cmd.none)
 
         Resize width height ->
             ( { model | size = ( toFloat width, toFloat height ) }
@@ -401,13 +442,13 @@ updateSentence elapsed model =
                             False
                         Nothing ->
                             True
-                (state, newDialogues) =
+                (state, newDialogues, gameState) =
                     if end then
-                        (Others, model.currentDialogues)
+                        (Others, model.currentDialogues, Playing)
                     else
-                        (Dialogue, List.drop 1 model.currentDialogues)
+                        (Dialogue, List.drop 1 model.currentDialogues, Paused)
             in
-                {model | state = state, currentDialogues = newDialogues}
+                {model | state = state, currentDialogues = newDialogues, gameState = gameState}
         _ ->
             model
 
@@ -509,14 +550,18 @@ updateSkill msg model =
         sys = me.skillSys
     in
     case msg of
-        TriggerSkillWindow ->
+        TriggerSkillWindow->
             let 
                 active = sys.active
                 subList = sys.subsys
                 newSub = List.map (\sub -> choose sub (0,0)) subList
                 newSys = {sys|active = not active, subsys = newSub}
                 newMe = {me|skillSys = newSys}
-                newModel = {model|myself = newMe, paused = not model.paused}
+                newModel =
+                    if model.paused then
+                        {model|myself = newMe, paused = not model.paused, gameState = Playing}
+                    else
+                        {model|myself = newMe, paused = not model.paused, gameState = Paused}
             in
                 (newModel, Cmd.none)
         SubSystemChange change ->
