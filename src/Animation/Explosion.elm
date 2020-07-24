@@ -17,14 +17,14 @@ explosion effect =
                 0 ->
                   "./images/Explosion/Ex_01.png"
                 1 ->
-                  "./images/Explosion/Ex_01.png"  
+                  "./images/Explosion/Ex_02.png"  
                 2 ->
                   "./images/Explosion/Ex_02.png"   
                 3 ->
                   "./images/Explosion/Ex_02.png" 
                 _ ->
                   ""
-        d1 = Debug.log "counter,url" (counternow,getUrl)
+        -- d1 = Debug.log "counter,url" (counternow,getUrl)
     in
         Svg.image [Svg.Attributes.x <| String.fromFloat (effect.x - effect.r), 
                    Svg.Attributes.y <| String.fromFloat (effect.y - effect.r), 

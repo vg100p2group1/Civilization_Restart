@@ -104,6 +104,7 @@ init =
     , explosionViewbox = []
     , paused = False
     , gameState = Playing
+    , level = 1
     }
 
 

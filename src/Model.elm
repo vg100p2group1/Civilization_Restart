@@ -80,6 +80,7 @@ type alias Model =
     , explosionViewbox : List ExplosionEffect
     , paused : Bool
     , gameState : GameState
+    , level : Int 
     }
 
 type State = Dialogue

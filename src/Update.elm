@@ -36,6 +36,7 @@ update msg model =
                     , explosionViewbox = []
                     , paused = False
                     , gameState = Playing
+                    , level = 1
                     }
             in
                 (init, Cmd.none)
@@ -129,7 +130,7 @@ update msg model =
                 if model.state == NextStage then
                     let
                         roomNew =
-                            roomGenerator 1 (Tuple.second model.rooms)
+                            roomGenerator (model.level+1) (Tuple.second model.rooms) 
 
                         mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                         meTemp = model.myself
@@ -137,7 +138,7 @@ update msg model =
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
-                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused},Cmd.none)
+                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,level=model.level+1},Cmd.none)
                 else
                     (model, Cmd.none)
             else
