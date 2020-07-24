@@ -5,7 +5,8 @@ import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
 import Messages exposing (Msg(..), SkillMsg(..))
-import Html exposing (Html, div, text, button)
+import Attributes exposing (Attr, AttrType(..), getCurrentAttr, getMaxAttr, getAttrName)
+import Html exposing (Html, div, text, button, progress)
 import Html.Attributes exposing (style, disabled)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
@@ -54,6 +55,13 @@ view model =
                 , Html.Attributes.style "left" "200px"
                 ]
                 [showMiniMap model]
+            
+            , Html.div
+                [ style "left" "800px"
+                , style "top" "100px"
+                , style "position" "absolute"
+                ]
+                [showAttr model.myself.attr]
 
             , Html.div
                 [ 
@@ -357,9 +365,9 @@ showMiniMap model =
             let 
                 rectangle = value.position
             in 
-                if rectangle.width>rectangle.height then
-                    {rectangle|x=rectangle.x-200,width=rectangle.width+400}
-                else 
+                -- if rectangle.width>rectangle.height && rectangle.width>1000  then
+                --     {rectangle|x=rectangle.x-200,width=rectangle.width+400}
+                -- else     
                     rectangle 
 
        walls = displayRec <| List.map wallPosUpdate miniMap.walls
@@ -376,3 +384,28 @@ showMiniMap model =
         Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
         (walls ++ roads  ++ gate ++ meTemp)
 
+showAttr : Attr -> Html Msg
+showAttr attr = 
+    div
+    [ style "padding" "0 140px"
+    , style "position" "absolute"
+    ]
+    (List.map (makeProgress attr) [Attack, Clip, Armor, Attack, Speed])
+
+makeProgress : Attr -> AttrType -> Html Msg
+makeProgress attr t =
+    let
+        maxAttr = String.fromInt <| getMaxAttr t attr
+        valueAttr = String.fromInt <| getCurrentAttr t attr
+    in
+    div 
+    [style "margin" "20px"]
+    [ div
+        [style "width" "50px"]
+        [text (getAttrName t ++ " : ")]
+    , progress
+        [ Html.Attributes.max maxAttr
+        , Html.Attributes.value valueAttr
+        ]
+        [text (valueAttr ++ "/" ++ maxAttr)]
+    ]
