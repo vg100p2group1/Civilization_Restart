@@ -1,6 +1,6 @@
 module Map.TreasureGenerator exposing (treasureGenerator,updateTreasure)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
-import Map.Map exposing (Treasure,TreasureType,Obstacle)
+import Map.Map exposing (Treasure,TreasureType,Obstacle,TreasureMaterial)
 import Random
 import Weapon exposing(Bullet,ShooterType(..))
 import Model exposing (Me)
@@ -19,13 +19,13 @@ treasureTypeList =
         [m1,m2,m3]
 
 
-treasureGenerator : Random.Seed -> List Obstacle -> (List Treasure,Random.Seed)
-treasureGenerator seed0 obstacle =
+treasureGenerator : Random.Seed -> List Obstacle-> Int -> (List Treasure,Random.Seed)
+treasureGenerator seed0 obstacle storey=
     let
         (number,seed1) = Random.step (Random.int 3 5) seed0
         -- obstacle = room.obstacles
         
-        (tresureList,seed2) = treasureBuilding [] number obstacle seed1
+        (tresureList,seed2) = treasureBuilding [] number obstacle seed1 storey
     in
         (tresureList,seed2)
 
@@ -42,8 +42,8 @@ checkTreasureCollison treasure obstacles treasureList=
 
 
 
-treasureBuilding : List Treasure -> Int -> List Obstacle -> Random.Seed -> (List Treasure,Random.Seed)
-treasureBuilding treasureList number obstacles seed0 =
+treasureBuilding : List Treasure -> Int -> List Obstacle -> Random.Seed -> Int -> (List Treasure,Random.Seed)
+treasureBuilding treasureList number obstacles seed0 storey=
     let
         (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
@@ -61,17 +61,18 @@ treasureBuilding treasureList number obstacles seed0 =
 
         treasurePos = Rectangle (toFloat xTemp) (toFloat yTemp) treasureTypeTemp.size treasureTypeTemp.size recInit  
 
+        (treasureMaterial, seed4) = generateMaterial seed3 storey
 
-        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed2 False 0
+        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed4 False 0 treasureMaterial False
 
     in 
         if number==0 then
             (treasureList,seed3)
         else
             if checkTreasureCollison treasureNew obstacles treasureList then
-                treasureBuilding (treasureNew :: treasureList) (number - 1) obstacles seed3
+                treasureBuilding (treasureNew :: treasureList) (number - 1) obstacles seed3 storey
             else 
-                treasureBuilding  treasureList number obstacles seed3
+                treasureBuilding  treasureList number obstacles seed3 storey
 
 updateTreasure : List Treasure -> List Int ->List Map.Map.Treasure
 updateTreasure treasureList roomClearList=
@@ -79,5 +80,17 @@ updateTreasure treasureList roomClearList=
 
 updateSingleTreasure :  List Int -> Treasure ->  Map.Map.Treasure
 updateSingleTreasure roomClearList treasure=
-
     if List.member treasure.roomNum roomClearList then {treasure|canShow=True}else treasure
+
+
+generateMaterial : Random.Seed-> Int -> (TreasureMaterial,Random.Seed)
+generateMaterial seed0 storey=
+    let
+        maxNum = (storey//5)*2+1
+        minNum = storey//5
+        (s,seed1)=Random.step (Random.int minNum maxNum) seed0
+        (c,seed2)=Random.step (Random.int minNum maxNum) seed1
+        (w,seed3)=Random.step (Random.int minNum maxNum) seed2
+        (u,seed4)=Random.step (Random.int minNum maxNum) seed3 
+    in
+        (TreasureMaterial s c w u, seed4)
