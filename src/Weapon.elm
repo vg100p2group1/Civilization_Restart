@@ -27,6 +27,8 @@ type Arsenal
     | Gatling
     | Mortar
     | Shotgun
+    | Smallbullet
+    | Bigbullet
 
 type alias Weapon = 
     { bulletGenerator : WeaponInfo -> Bullet

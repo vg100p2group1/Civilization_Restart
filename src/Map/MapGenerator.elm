@@ -1,7 +1,7 @@
 module Map.MapGenerator exposing (roomGenerator,roomInit)
 import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
-import Map.ObstacleGenerator exposing (obstacleGenerator)
+import Map.ObstacleGenerator exposing (obstacleGenerator,bossRoomObstacleGenerator)
 import Map.MonsterGenerator exposing (monsterGenerator)
 import Map.TreasureGenerator exposing (treasureGenerator)
 -- import Html
@@ -129,7 +129,7 @@ leavesUpdate : List Room -> List Room -> Int -> Random.Seed -> List Room
 leavesUpdate  roomUpdated roomList num seed0=
     let
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
-        (obstacleTemp, seed1) = obstacleGenerator seed0
+        (obstacleTemp, seed1) = bossRoomObstacleGenerator seed0
         (monsterTemp, seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
         (treasureTemp, seed3) = treasureGenerator seed2 obstacleTemp
         roomTemp = List.head roomList

@@ -2,6 +2,7 @@
 module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
 import Config exposing (viewBoxMax)
+import Weapon exposing (Arsenal)
 import Random exposing (Seed)
 
 type alias Treasure =
@@ -36,6 +37,37 @@ type alias Monster =
     , region : Rectangle
     , monsterType : MonsterType
     , direction : Int
+    , seed : Seed
+    , active : Bool
+    , timeBeforeAttack : Int
+    , speed : Float
+    , roomNum : Int
+    }
+
+
+type alias Shootingtype =
+    {   bulletNum : Int
+    ,   attack : Int
+    ,   direction : Int
+    ,   bulletType : Arsenal
+    ,   bulletsToBeShot : Int
+    ,   bulletsShooted : Int
+    ,   bulletInterval : Int
+    ,   timeBeforeShooting : Int
+        
+    }
+
+type alias BossType =
+    {   level : Int
+    ,   size : Rectangle 
+    ,   color : String 
+    ,   shootingtype : List Shootingtype    
+    
+    }
+type alias Boss =
+    { position : Shape.Circle
+    , bossnum : Int
+    , bosstype : BossType
     , seed : Seed
     , active : Bool
     , timeBeforeAttack : Int
@@ -79,6 +111,7 @@ type alias Map =
     , gate : Rectangle
     , roomCleared : List Int
     , roomCount : Int
+    , boss : List Boss
     }
 
 
@@ -88,7 +121,7 @@ roomConfig : Room
 roomConfig = Room (0,0) False False [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0
+mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0 []
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
