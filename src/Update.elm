@@ -17,6 +17,7 @@ import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
+import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..))
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -234,12 +235,11 @@ animate  model =
         map = model.map
         newMap = {map | monsters = newMonsters,treasure=newTreasure}
         newViewbox = mapToViewBox newMe newMap
-        (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
+        (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
+        meHit = hit hurtPlayer newMe
         newBulletListViewbox = bulletToViewBox newMe newBulletList
-
         newExplosion = updateExplosion model.explosion filteredBulletList
         newExplosionViewbox = explosionToViewbox newMe newExplosion
-
         newState = updateState model
     in
         {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
@@ -443,7 +443,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
 
 
 
-updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet)
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet, List Bullet)
 updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
@@ -464,19 +464,26 @@ updateBullet me map bullets (collisionX,collisionY) =
                 {b|hitbox = newHitbox,x=newX, y=newY}
 
         allBullets = bullets
+                    -- hit wall
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.walls))))
+                    -- hit obstacles
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
+                    -- hit doors
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
+                    -- on the roads
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
-                    |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
-        finalBullets = List.map updateXY allBullets
+                    -- hit monsters and are shoot by player
+                    |> List.filter (\b -> not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
+        (flyingBullets, hitPlayer) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) allBullets
+        aaa = Debug.log "fb" flyingBullets
+        finalBullets = List.map updateXY flyingBullets
 
-        filteredBullets= List.filter (\value -> value.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
         
         -- d1=Debug.log "f" filteredBullets  
 
     in
-        (finalBullets,filteredBullets)
+        (finalBullets,filteredBullets,hitPlayer)
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
@@ -501,6 +508,18 @@ updateState model =
 updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
+
+hit : List Bullet -> Me -> Me
+hit bullet me =
+    let
+        total_hurt = bullet
+                    |> List.map .force
+                    |> List.sum
+                    |> Basics.round
+        attr = me.attr
+        newAttr = setCurrentAttr Health -(min total_hurt (getCurrentAttr Health attr)) attr
+    in
+        {me | attr = newAttr}
 
 updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
 updateSkill msg model =
