@@ -1,6 +1,4 @@
-
 module Update exposing (update)
-
 import Messages exposing (Msg(..), SkillMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
@@ -17,6 +15,8 @@ import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
+import Synthesis.UpdateSynthesis exposing (updateSynthesis)
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -36,7 +36,7 @@ update msg model =
                     , explosionViewbox = []
                     , paused = False
                     , gameState = Playing
-                    , level = 1
+                    , storey = 1
                     }
             in
                 (init, Cmd.none)
@@ -130,7 +130,7 @@ update msg model =
                 if model.state == NextStage then
                     let
                         roomNew =
-                            roomGenerator (model.level+1) (Tuple.second model.rooms) 
+                            roomGenerator (model.storey+1) (Tuple.second model.rooms) 
 
                         mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                         meTemp = model.myself
@@ -138,7 +138,7 @@ update msg model =
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
-                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,level=model.level+1},Cmd.none)
+                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
                 else
                     (model, Cmd.none)
             else
@@ -185,6 +185,9 @@ update msg model =
         
         SkillChange skillMsg ->
             updateSkill skillMsg model
+        
+        SynthesisSystem systhesisMsg ->
+            updateSynthesis systhesisMsg model
 
         Noop ->
             let 
