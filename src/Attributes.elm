@@ -21,6 +21,7 @@ type AttrType
     | Armor
     | Health
     | Clip      -- It acctually means total bullets but since the word Bullet is already used as a type, I chooce Clip instead
+    | BulletSpeed
 
 attrTypeToInt : AttrType -> Int
 attrTypeToInt at = 
@@ -30,6 +31,7 @@ attrTypeToInt at =
         Armor -> 2
         Health -> 3
         Clip -> 4
+        BulletSpeed -> 5
 
 getDefault : AttrType -> Int
 getDefault at =
@@ -39,6 +41,7 @@ getDefault at =
         Armor -> 50
         Health -> 100
         Clip -> 80
+        BulletSpeed -> 10
 
 getAttrName : AttrType -> String
 getAttrName at = 
@@ -48,6 +51,7 @@ getAttrName at =
         Armor -> "Armor"
         Health -> "Health"
         Clip -> "Bullet"
+        BulletSpeed -> "BulletSpeed"
 
 getAttr : AttrType -> AttrInfo -> Int
 getAttr t pAttr =
@@ -83,4 +87,4 @@ setMaxAttr aType val attr =
 
 setCurrentAttr : AttrType -> Int -> Attr -> Attr
 setCurrentAttr aType val attr =
-    {attr|max = setAttr aType val attr.current}
+    {attr|current = setAttr aType val attr.current}

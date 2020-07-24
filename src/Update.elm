@@ -236,13 +236,13 @@ animate  model =
         newMap = {map | monsters = newMonsters,treasure=newTreasure}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
-        meHit = hit hurtPlayer newMe
         newBulletListViewbox = bulletToViewBox newMe newBulletList
         newExplosion = updateExplosion model.explosion filteredBulletList
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
+        meHit = hit hurtPlayer newMe
     in
-        {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
+        {model| myself = {meHit|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 
@@ -475,7 +475,6 @@ updateBullet me map bullets (collisionX,collisionY) =
                     -- hit monsters and are shoot by player
                     |> List.filter (\b -> not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
         (flyingBullets, hitPlayer) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) allBullets
-        aaa = Debug.log "fb" flyingBullets
         finalBullets = List.map updateXY flyingBullets
 
         filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
@@ -511,6 +510,9 @@ updateDialogues model =
 
 hit : List Bullet -> Me -> Me
 hit bullet me =
+    if List.isEmpty bullet then
+        me
+    else
     let
         total_hurt = bullet
                     |> List.map .force
