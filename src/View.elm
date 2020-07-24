@@ -21,7 +21,7 @@ import Environment.ShowWalls exposing (showWalls)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
-
+import Synthesis.ShowSynthesis exposing (showSynthesis)
 
 view : Model -> Html.Html Msg
 view model =
@@ -103,6 +103,7 @@ playerDemonstrate model =
             ]
             , showDialogue model 0
             , showSkill model
+            , showSynthesis model
         ]
 
 

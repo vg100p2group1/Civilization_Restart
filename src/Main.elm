@@ -5,7 +5,7 @@ import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp, onResiz
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode
 import Json.Encode exposing (Value)
-import Messages exposing (Msg(..),SkillMsg(..))
+import Messages exposing (Msg(..),SkillMsg(..),SynthesisMsg(..))
 import Task
 import View exposing (view)
 import Update
@@ -80,6 +80,12 @@ key on keycode =
                 SkillChange TriggerSkillWindow
             else
                 Noop
+        82 ->
+            if on then
+                SynthesisSystem TriggerSynthesisWindow
+            else
+                Noop
+
         32 ->
             if on then
                 ChangeGameState
@@ -104,7 +110,7 @@ init =
     , explosionViewbox = []
     , paused = False
     , gameState = Playing
-    , level = 1
+    , storey = 1
     }
 
 

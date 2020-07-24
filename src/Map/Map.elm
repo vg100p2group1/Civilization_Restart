@@ -1,27 +1,16 @@
 
-module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),TreasureMaterial,roomConfig,mapConfig)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig)
 import Shape exposing (Rectangle,recInit)
-import Config exposing (viewBoxMax)
 import Random exposing (Seed)
-
+import Synthesis.Material exposing (Material)
 type alias Treasure =
     { position : Rectangle
     , treasureType : TreasureType
     , seed : Seed
     , canShow : Bool
     , roomNum : Int
-    , material : TreasureMaterial
-    , pick : Bool
+    , material : Material
     }
-
-type alias TreasureMaterial =
-    { steel : Int   
-    , copper : Int 
-    , wolfram : Int 
-    , uranium  : Int 
-    }
-
-
 
 type alias TreasureType =
     {   level : Int

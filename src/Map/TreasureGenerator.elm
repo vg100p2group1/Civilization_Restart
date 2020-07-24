@@ -1,10 +1,10 @@
 module Map.TreasureGenerator exposing (treasureGenerator,updateTreasure)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
-import Map.Map exposing (Treasure,TreasureType,Obstacle,TreasureMaterial)
+import Map.Map exposing (Treasure,TreasureType,Obstacle)
 import Random
 import Weapon exposing(Bullet,ShooterType(..))
 import Model exposing (Me)
-
+import Synthesis.Material exposing (Material)
 
 treasureTypeNum : Int 
 treasureTypeNum = 3
@@ -63,7 +63,7 @@ treasureBuilding treasureList number obstacles seed0 storey=
 
         (treasureMaterial, seed4) = generateMaterial seed3 storey
 
-        treasureNew = Map.Map.Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed4 False 0 treasureMaterial False
+        treasureNew = Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed4 False 0 treasureMaterial
 
     in 
         if number==0 then
@@ -83,7 +83,7 @@ updateSingleTreasure roomClearList treasure=
     if List.member treasure.roomNum roomClearList then {treasure|canShow=True}else treasure
 
 
-generateMaterial : Random.Seed-> Int -> (TreasureMaterial,Random.Seed)
+generateMaterial : Random.Seed-> Int -> (Material,Random.Seed)
 generateMaterial seed0 storey=
     let
         maxNum = (storey//5)*2+1
@@ -93,4 +93,4 @@ generateMaterial seed0 storey=
         (w,seed3)=Random.step (Random.int minNum maxNum) seed2
         (u,seed4)=Random.step (Random.int minNum maxNum) seed3 
     in
-        (TreasureMaterial s c w u, seed4)
+        (Material s c w u, seed4)
