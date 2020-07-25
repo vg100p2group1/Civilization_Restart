@@ -1,7 +1,7 @@
 
 module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..))
 import Random
-import Map.Map exposing(Room,Map)
+import Map.Map exposing(Room,Map,Treasure)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
@@ -9,7 +9,6 @@ import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
 import Synthesis.Package exposing (Package,packageInit)
 import Synthesis.SynthesisSystem exposing (SynthesisSubSystem,defaultSynthesisSubSystem)
-
 type alias Me =
     { x : Float
     , y : Float
@@ -91,6 +90,7 @@ type alias Model =
 type State = Dialogue
            | NextStage
            | ChangeSkill
+           | PickTreasure Treasure
            | Others
 
 type GameState = Paused

@@ -10,11 +10,12 @@ updateSynthesis msg model =
         weapon = me.weapons
         package = me.package
         sys = me.synthesis
+        -- d1 = Debug.log "package" package
     in
         case msg of               
             TriggerSynthesisWindow ->
                 let
-                    sysNew = {sys| active = not sys.active}
+                    sysNew = {sys| active = not sys.active,tip=""}
                     newMe = {me|synthesis = sysNew}
                     newModel =
                         if model.paused then

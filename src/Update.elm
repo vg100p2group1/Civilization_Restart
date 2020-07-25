@@ -2,7 +2,7 @@ module Update exposing (update)
 import Messages exposing (Msg(..), SkillMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
-import Map.Map exposing (Map,mapConfig)
+import Map.Map exposing (Map,mapConfig,Treasure,treasureInit)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
@@ -16,7 +16,7 @@ import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
-
+import Synthesis.Package exposing (packageUpdate)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -125,7 +125,7 @@ update msg model =
                 me= {pTemp|fire=False,currentWeapon={weapon|hasFired=False}}
             in
                 ({model|myself = me},Cmd.none) 
-        NextFloor ->
+        NextFloor ->  -- FMsg
             if model.gameState == Playing then
                 if model.state == NextStage then
                     let
@@ -139,8 +139,20 @@ update msg model =
                         newDialogues = updateDialogues model
                     in
                         ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
-                else
-                    (model, Cmd.none)
+                else 
+                    case model.state of
+                        PickTreasure t ->
+                            let
+                                meTemp = model.myself
+                                package = meTemp.package
+                                newPackage = packageUpdate package t
+                                newTreasureList = List.filter (\value->value/=t) model.map.treasure
+                                mapTemp = model.map
+                                mapNew = {mapTemp|treasure=newTreasureList}
+                            in
+                                ({model|myself={meTemp|package=newPackage},map=mapNew},Cmd.none)
+                        _ ->
+                            (model, Cmd.none)
             else
                 (model, Cmd.none)
         Tick time ->
@@ -533,15 +545,41 @@ updateState : Model -> State
 updateState model =
     let
         collideGate = circleRecTest model.myself.hitBox model.map.gate.edge
+        collideTreasureList = getCollideTreasure model.map.treasure model.myself
+        getTreasure = 
+            let 
+                temp = List.head collideTreasureList
+            in
+                case temp of
+                    Just a ->
+                        a
+                    Nothing ->
+                        treasureInit 
+        -- collideTreasure =/
         newState =
             if collideGate then
                 NextStage
+            else if  not (List.isEmpty collideTreasureList) then
+                PickTreasure getTreasure
             else if model.state == Dialogue then
-                Dialogue
+                Dialogue 
             else
                 Others
     in
         newState
+
+
+getCollideTreasure : List Treasure-> Me -> List Treasure
+getCollideTreasure treasureList me= 
+    let
+        -- d1 =Debug.log "treasure" (List.map (\value -> value.material) treasureList)
+        treasureRec = List.map (\value -> value.position ) treasureList
+        treasure =List.filter (\value -> (circleRecTest me.hitBox value.position.edge) && (value.canShow == True )) treasureList 
+
+        -- d1 =Debug.log "treasure" (List.map (\value -> value.material) treasure)
+    in
+        treasure
+
 
 updateDialogues : Model -> Dialogues
 updateDialogues model =

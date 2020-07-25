@@ -16,6 +16,7 @@ packageUpdate : Package -> Treasure -> Package
 packageUpdate package treasure =
     let
         material=treasure.material
+        -- d = Debug.log "d" material
         newPackage = Package (package.steel+material.steel) (package.copper+material.copper) (package.wolfram+material.wolfram) (package.wolfram+material.wolfram) 
     in
         newPackage

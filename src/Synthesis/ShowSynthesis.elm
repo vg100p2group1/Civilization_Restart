@@ -7,7 +7,7 @@ import Html.Events exposing (onClick)
 import Weapon exposing (Arsenal(..),defaultWeapon)
 
 import Messages exposing (SynthesisMsg(..),Msg(..))
-
+import Synthesis.WeaponUpgrade exposing (getWeaponMaterial)
 
 
 showSynthesis : Model -> Html Msg
@@ -34,6 +34,9 @@ showSynthesis model =
                     "./images/Gun/Gun_3_L.png"
                 Shotgun ->
                     "./images/Gun/Gun_4_L.png"
+        
+        package = model.myself.package
+        materialNeeded = getWeaponMaterial weaponNow
 
     in
         if sys.active then
@@ -49,25 +52,17 @@ showSynthesis model =
                 , style "background-size" "100% 100%"
                 ]
                 [   
-                    button [onClick <| SynthesisSystem <| NextWeapon False, style "margin" "20px 0 0 100px",style "float" "left"] [text "<"]
-                    , div [][img [src getUrl][]]
-                    , button [onClick <| SynthesisSystem <| NextWeapon True,style "margin" "20px 0 0 20px"] [text ">"]
-                --     , div [style "margin" "20px 0 0 180px"] [text points]
-                --     , div
-                --         [style "margin" "40px 0 0 120px"]
-                --         (List.map (skillToButton curr.chosen) skills)
-                --     , div
-                --         [ style "margin" "190px 0 0 0"
-                --         , style "padding" "5px 10px 5px 10px"
-                --         , style "height" "60px"
-                --         , style "background" "#FFF"]
-                --         [text txt]
-                --     , button
-                --         [ onClick <| SkillChange <| UnlockSkill
-                --         , style "margin" "20px 0 0 180px"
-                --         , disabled (not chosenCanUnlock)
-                --         ]
-                --         [text "Unlock"]
+                    button [onClick <| SynthesisSystem <| NextWeapon False, style "float" "left"] [text "<"]
+                    , div [ ][img [style "width" "50px",style "height" "50px",src getUrl][]]
+                    , button [onClick <| SynthesisSystem <| NextWeapon True] [text ">"]
+                    , div [] [text ("Level: "++String.fromInt weaponNow.level)]
+                    , div [][text ("steel: " ++ String.fromInt materialNeeded.steel ++ "/" ++String.fromInt package.steel)]
+                    , div [][text ("copper: " ++ String.fromInt materialNeeded.copper ++ "/" ++String.fromInt package.copper)]
+                    , div [][text ("Wolfram: " ++ String.fromInt materialNeeded.wolfram ++ "/" ++String.fromInt package.wolfram)]
+                    , div [][text ("steel: " ++ String.fromInt materialNeeded.wolfram ++ "/" ++String.fromInt package.wolfram)]
+
+                    , button [onClick <| SynthesisSystem <| Synthesis] [text "Synthesis/Upgrade"]
+                    , div [][text("tip: "++sys.tip)]
                 ]
         else
             div [] []
