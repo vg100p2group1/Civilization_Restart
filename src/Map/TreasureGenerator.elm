@@ -88,7 +88,12 @@ generateMaterial seed0 storey=
     let
         maxNum = (storey//5)*2+1
         minNum = storey//5
+
+        -- d1 = Debug.log "seed" seed0 
+
         (s,seed1)=Random.step (Random.int minNum maxNum) seed0
+        -- d2 = Debug.log "s" s
+
         (c,seed2)=Random.step (Random.int minNum maxNum) seed1
         (w,seed3)=Random.step (Random.int minNum maxNum) seed2
         (u,seed4)=Random.step (Random.int minNum maxNum) seed3 
