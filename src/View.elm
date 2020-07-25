@@ -22,7 +22,7 @@ import Config exposing (bulletSpeed)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
-
+import Synthesis.ShowSynthesis exposing (showSynthesis)
 
 view : Model -> Html.Html Msg
 view model =
@@ -104,6 +104,7 @@ playerDemonstrate model =
             ]
             , showDialogue model 0
             , showSkill model
+            , showSynthesis model
         ]
 
 
@@ -366,9 +367,9 @@ showMiniMap model =
             let 
                 rectangle = value.position
             in 
-                if rectangle.width>rectangle.height then
-                    {rectangle|x=rectangle.x-200,width=rectangle.width+400}
-                else 
+                -- if rectangle.width>rectangle.height && rectangle.width>1000  then
+                --     {rectangle|x=rectangle.x-200,width=rectangle.width+400}
+                -- else     
                     rectangle 
 
        walls = displayRec <| List.map wallPosUpdate miniMap.walls

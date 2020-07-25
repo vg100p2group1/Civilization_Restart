@@ -1,14 +1,14 @@
 
 module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..))
 import Random
-import Map.Map exposing(Room,Map)
+import Map.Map exposing(Room,Map,Treasure)
 import Shape exposing (Circle)
 import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
 import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
-
-
+import Synthesis.Package exposing (Package,packageInit)
+import Synthesis.SynthesisSystem exposing (SynthesisSubSystem,defaultSynthesisSubSystem)
 type alias Me =
     { x : Float
     , y : Float
@@ -34,6 +34,8 @@ type alias Me =
     -- , direction : Int 
     , skillSys : SkillSystem
     , attr : Attr
+    , synthesis : SynthesisSubSystem
+    , package : Package
     }
 
 type Direction
@@ -64,6 +66,8 @@ defaultMe =
     , weaponDirection = DirectionRight
     , skillSys = defaultSystem
     , attr = defaultAttr
+    , synthesis = defaultSynthesisSubSystem
+    , package = packageInit 
     }
 
 type alias Model =
@@ -80,11 +84,13 @@ type alias Model =
     , explosionViewbox : List ExplosionEffect
     , paused : Bool
     , gameState : GameState
+    , storey : Int 
     }
 
 type State = Dialogue
            | NextStage
            | ChangeSkill
+           | PickTreasure Treasure
            | Others
 
 type GameState = Paused
@@ -144,4 +150,3 @@ mapToViewBox me map =
         --     List.map (\value -> {value| position = circleUpdate value.position}) model
     in
         {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}
-
