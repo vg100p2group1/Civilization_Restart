@@ -227,7 +227,7 @@ skill231 =
     , level = 3
     , unlocked = False
     , desciption = "Skill 1 level 3 in subsystem 2"
-    }   
+    }
 
 subSys0 : SkillSubSystem
 subSys0 = 
