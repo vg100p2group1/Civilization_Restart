@@ -237,7 +237,7 @@ mouseDataUpdate model mousedata =
 
 
 fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> (List Bullet, Weapon)
-fireBullet_ weapon (mouseX,mouseY) (meX, meY) =
+fireBullet_ weapon (mouseX,mouseY) (meX, meY)=
     let
         bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
         (newShoot, fireFlag, counter) =
@@ -271,10 +271,12 @@ animate  model =
         newMe = {newMe_|attr=newAttr}
         -- This is for the cooling time of weapons
         weaponCounter =
-            if weapon.counter == 0 then
+            if weapon.counter <= 0 then
                 0
             else
                 weapon.counter - 1
+        newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * w.period}) newMe.weapons
+        newPeriod = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * newMe.currentWeapon.period
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
@@ -289,7 +291,7 @@ animate  model =
         newState = updateState model
         meHit = hit hurtPlayer newMe
     in
-        {model| myself = {meHit|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}},
+        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 

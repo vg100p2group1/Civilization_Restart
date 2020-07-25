@@ -5,7 +5,7 @@ import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
 import Weapon exposing(Bullet,ShooterType(..))
 import Model exposing (Me)
-import Attributes exposing (getCurrentAttr,AttrType(..))
+import Attributes exposing (getCurrentAttr,AttrType(..),defaultAttr)
 import Monster.Monster exposing (allMonsterAct)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
@@ -88,7 +88,8 @@ updateMonster_ monster bullets me =
                   |> List.filter (\b -> b.from == Player)
                   |> List.filter (\b -> circleCollisonTest b.hitbox monster.position)
         monsterType_ = monster.monsterType
-        newMonsterType = {monsterType_ | hp = monsterType_.hp - toFloat((getCurrentAttr Attack me.attr)) * List.sum (List.map (\b -> b.force) hitBullets)}
+        attackFactor = (getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat)
+        newMonsterType = {monsterType_ | hp = monsterType_.hp - attackFactor * List.sum (List.map (\b -> b.force) hitBullets)}
         {- debug test
         newMonsterType =
                 if List.isEmpty hitBullets then
