@@ -22,6 +22,7 @@ showWalls walls =
                 case oneWall.property of 
                     UpWall ->
                         rowWall numRow model.x (model.y+150) []
+
                     DownWall ->
                         rowWall numRow model.x model.y []
                     LeftWall ->
@@ -36,7 +37,7 @@ showWalls walls =
 
 columnWall : Float -> Float -> Float -> List (Svg.Svg Msg) ->  List (Svg.Svg Msg)
 columnWall number x y wallList=
-    if number <=0 then
+    if number ==0 then
         wallList
     else 
        columnWall (number-1) x (y+50) (wallList++[showOneColumnBrick x y])
@@ -54,14 +55,14 @@ showOneColumnBrick x y =
         , Svg.Attributes.preserveAspectRatio "none meet"
         , Svg.Attributes.width <| String.fromFloat 50
         , Svg.Attributes.height <| String.fromFloat 50
-        , Svg.Attributes.fill "black"
+        -- , Svg.Attributes.fill "black"
         ]
     []
 
 
 rowWall : Float -> Float -> Float -> List (Svg.Svg Msg) ->  List (Svg.Svg Msg)
 rowWall number x y wallList=
-    if number <=0 then
+    if number ==0 then
         wallList
     else 
        rowWall (number-1) (x+100) y (wallList++[showOneRowBrick x y])
@@ -72,10 +73,10 @@ showOneRowBrick x y =
     Svg.image 
         [ Svg.Attributes.x <| String.fromFloat x
         , Svg.Attributes.y <| String.fromFloat y
-        , Svg.Attributes.xlinkHref "./images/Environment/Wall1.png"
+        , Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
         , Svg.Attributes.preserveAspectRatio "none meet"
         , Svg.Attributes.width <| String.fromFloat 100
         , Svg.Attributes.height <| String.fromFloat 50
-        , Svg.Attributes.fill "black"
+        -- , Svg.Attributes.fill "black"
         ]
     []

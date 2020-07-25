@@ -1,5 +1,5 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox)
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..))
 import Random
 import Map.Map exposing(Room,Map)
 import Shape exposing (Circle)
@@ -7,6 +7,7 @@ import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
 import Config exposing (playerSpeed,viewBoxMax)
 import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
+
 
 type alias Me =
     { x : Float
@@ -78,11 +79,17 @@ type alias Model =
     , explosion : List ExplosionEffect
     , explosionViewbox : List ExplosionEffect
     , paused : Bool
+    , gameState : GameState
     }
 
 type State = Dialogue
            | NextStage
+           | ChangeSkill
            | Others
+
+type GameState = Paused
+               | Playing
+               | Stopped
 
 type Side = Left
           | Right
@@ -137,3 +144,4 @@ mapToViewBox me map =
         --     List.map (\value -> {value| position = circleUpdate value.position}) model
     in
         {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = recListUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}
+
