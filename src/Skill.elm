@@ -181,52 +181,52 @@ skill131 =
     , desciption = "Skill 1 level 3 in subsystem 1"
     }
 
-skill210 : Skill
-skill210 = 
+skillShootingSkillI : Skill
+skillShootingSkillI = 
     { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill 0 level 1 in subsystem 2"
+    , desciption = "Skill: Shooting SKill I in subsystem Berserker"
     }
 
-skill211 : Skill
-skill211 = 
-    { id = 1
-    , level = 1
-    , unlocked = False
-    , desciption = "Skill 1 level 1 in subsystem 2"
-    }
-
-skill220 : Skill
-skill220 = 
+skillAmplifyDamageI : Skill
+skillAmplifyDamageI = 
     { id = 0
     , level = 2
     , unlocked = False
-    , desciption = "Skill 0 level 2 in subsystem 2"
+    , desciption = "Skill: Amplify Damage I in subsystem Berserker"
     }
 
-skill221 : Skill
-skill221 = 
-    { id = 1
-    , level = 2
-    , unlocked = False
-    , desciption = "Skill 1 level 2 in subsystem 2"
-    }
-
-skill230 : Skill
-skill230 = 
+skillShootingSkillII : Skill
+skillShootingSkillII = 
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill 0 level 3 in subsystem 2"
+    , desciption = "Skill: Shooting SKill II in subsystem Berserker"
     }
 
-skill231 : Skill
-skill231 = 
+skillAmplifyDamageII : Skill
+skillAmplifyDamageII = 
     { id = 1
     , level = 3
     , unlocked = False
-    , desciption = "Skill 1 level 3 in subsystem 2"
+    , desciption = "Skill: Amplify Damage in subsystem Berserker"
+    }
+
+skillBattleFervor : Skill
+skillBattleFervor = 
+    { id = 0
+    , level = 4
+    , unlocked = False
+    , desciption = "Skill: Battle Fervor in subsystem Berserker"
+    }
+
+skillDualWield : Skill
+skillDualWield = 
+    { id = 1
+    , level = 4
+    , unlocked = False
+    , desciption = "Skill: Dual Wield in subsystem Berserker"
     }
 
 subSys0 : SkillSubSystem
@@ -249,7 +249,12 @@ subSys1 =
 
 subSysBerserker : SkillSubSystem
 subSysBerserker = 
-    { skills = [skill210, skill211, skill220, skill221, skill230, skill231]
+    { skills = 
+        [ skillShootingSkillI
+        , skillAmplifyDamageI
+        , skillShootingSkillII, skillAmplifyDamageII
+        , skillBattleFervor, skillDualWield
+        ]
     , name = "Berserker"
     , chosen = (-1,-1)
     , text = ""
