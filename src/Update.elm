@@ -125,7 +125,7 @@ update msg model =
                 me= {pTemp|fire=False,currentWeapon={weapon|hasFired=False}}
             in
                 ({model|myself = me},Cmd.none) 
-        NextFloor ->  -- FMsg
+        FMsg ->  -- FMsg
             if model.gameState == Playing then
                 if model.state == NextStage then
                     let
@@ -134,7 +134,7 @@ update msg model =
 
                         mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                         meTemp = model.myself
-                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
+                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package}
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
