@@ -2,7 +2,7 @@ module Update exposing (update)
 import Messages exposing (Msg(..), SkillMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
-import Map.Map exposing (Map,mapConfig,Treasure,treasureInit)
+import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
@@ -17,18 +17,20 @@ import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Synthesis.Package exposing (packageUpdate)
+import Control.EnableDoor exposing (enableDoor)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Start ->
             let
+                (roomNew,mapNew) = mapInit
                 init =
                     { myself = defaultMe
                     , bullet = []
                     , bulletViewbox = []
-                    , map = mapInit
-                    , rooms = roomInit
-                    , viewbox = mapToViewBox defaultMe mapInit
+                    , map = mapNew
+                    , rooms = (roomNew, Tuple.second roomInit)
+                    , viewbox = mapToViewBox defaultMe mapNew
                     , size = (0, 0)
                     , state = Others
                     , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
@@ -132,13 +134,13 @@ update msg model =
                         roomNew =
                             roomGenerator (model.storey+1) (Tuple.second model.rooms) 
 
-                        mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                        (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                         meTemp = model.myself
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package}
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
-                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
+                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
                 else 
                     case model.state of
                         PickTreasure t ->
@@ -273,7 +275,7 @@ animate  model =
     -- (model,Cmd.none)
     let
         me = model.myself
-        (newMe,collision) = speedCase me model.map
+        
         (newShoot, weapon) = if model.myself.fire then
                                 fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
                              else
@@ -289,7 +291,12 @@ animate  model =
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
         newTreasure = updateTreasure model.map.treasure newClearList
         map = model.map
-        newMap = {map | monsters = newMonsters,treasure=newTreasure}
+
+        (newDoors,collideDoor) = enableDoor me (Tuple.first model.rooms) map.doors newClearList
+
+        (newMe,collision) = speedCase me model.map collideDoor
+
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -305,8 +312,8 @@ animate  model =
 
 
 
-speedCase : Me -> Map-> (Me,(Bool,Bool))
-speedCase me map= 
+speedCase : Me -> Map-> List Door -> (Me,(Bool,Bool))
+speedCase me map collideDoor= 
     let 
         getNewXSpeed =
             if me.moveLeft then 
@@ -341,7 +348,7 @@ speedCase me map=
         (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
-        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads) 
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads++(List.map (\t->t.position) collideDoor)) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"
         getCollideType collideList  = 
@@ -523,7 +530,7 @@ updateBullet me map bullets (collisionX,collisionY) =
         allBullets = bullets
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.walls))))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
-                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
+                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.doors))))
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
                     |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
         finalBullets = List.map updateXY allBullets

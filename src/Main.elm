@@ -97,21 +97,25 @@ key on keycode =
 
 init : Model
 init =
-    { myself = defaultMe
-    , bullet = []
-    , bulletViewbox = []
-    , map = mapInit
-    , rooms = roomInit
-    , viewbox = mapToViewBox defaultMe mapInit
-    , size = (0, 0)
-    , state = Others
-    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
-    , explosion = []
-    , explosionViewbox = []
-    , paused = False
-    , gameState = Playing
-    , storey = 1
-    }
+    let
+        (roomNew,mapNew) = mapInit
+    in
+    
+        { myself = defaultMe
+        , bullet = []
+        , bulletViewbox = []
+        , map = mapNew
+        , rooms = (roomNew,Tuple.second roomInit)
+        , viewbox = mapToViewBox defaultMe mapNew
+        , size = (0, 0)
+        , state = Others
+        , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+        , explosion = []
+        , explosionViewbox = []
+        , paused = False
+        , gameState = Playing
+        , storey = 1
+        }
 
 
 
