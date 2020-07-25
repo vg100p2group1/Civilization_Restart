@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
-import Map.Map exposing (Map,Monster,Room,Treasure)
+import Map.Map exposing (Map,Monster,Room,Treasure,Door)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
@@ -117,13 +117,13 @@ showMap model =
        
        roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
 
-       doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.doors
+       doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
        obstacles = displayRec  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
        monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
        treasure = displayTreasure  model.treasure
 
-       gate = displayDoors [model.gate]
+       gate = displayDoors [Door model.gate False] -- To
     --    d = Debug.log "gateshow" model.gate
     in
        walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure
@@ -148,22 +148,30 @@ displayRec obstacle =
         List.map createBricksFormat obstacle
 
 
-displayDoors : List Rectangle -> List (Svg.Svg Msg)
-displayDoors obstacle =
+displayDoors : List Door -> List (Svg.Svg Msg)
+displayDoors doors =
     let
         
         -- d=Debug.log "wall" obstacle
-        createBricksFormat model =
-           Svg.rect 
-                [ Svg.Attributes.x <| String.fromFloat model.x
-                , Svg.Attributes.y <| String.fromFloat model.y
-                , Svg.Attributes.width <| String.fromFloat model.width
-                , Svg.Attributes.height <| String.fromFloat model.height
-                , Svg.Attributes.fill "grey"
-                ]
-           []
+        createBricksFormat door =
+            let
+                color =
+                    if door.enable then
+                        "black"
+                    else
+                        "grey"
+                model = door.position
+            in 
+                Svg.rect 
+                        [ Svg.Attributes.x <| String.fromFloat model.x
+                        , Svg.Attributes.y <| String.fromFloat model.y
+                        , Svg.Attributes.width <| String.fromFloat model.width
+                        , Svg.Attributes.height <| String.fromFloat model.height
+                        , Svg.Attributes.fill color
+                        ]
+                []
     in
-        List.map createBricksFormat obstacle
+        List.map createBricksFormat doors
 
 
 displayMonster : List Monster -> List (Svg.Svg Msg)
@@ -373,7 +381,7 @@ showMiniMap model =
 
        walls = displayRec <| List.map wallPosUpdate miniMap.walls
        roads = displayRec miniMap.roads
-       gate = displayDoors [miniMap.gate]
+       gate = displayDoors [Door miniMap.gate False]
 
        myself = model.myself
        xTemp = myself.x - toFloat(dx*2500)

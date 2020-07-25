@@ -1,5 +1,5 @@
 
-module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit,Door)
 import Shape exposing (Rectangle,recInit)
 import Random exposing (Seed)
 import Synthesis.Material exposing (Material)
@@ -70,14 +70,18 @@ type alias Wall =
       , property : WallProperty
     }
 
-
+type alias Door =
+    {
+        position : Rectangle
+    ,   enable : Bool
+    }
 type alias Map =
     { walls : List Wall
     , roads : List Rectangle
     , obstacles : List Rectangle
     , monsters : List Monster
     , treasure : List Treasure
-    , doors : List Rectangle
+    , doors : List Door
     , gate : Rectangle
     , roomCleared : List Int
     , roomCount : Int
