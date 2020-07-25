@@ -5,7 +5,7 @@ import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
 import Weapon exposing(Bullet,ShooterType(..))
 import Model exposing (Me)
-
+import Attributes exposing (getCurrentAttr,AttrType(..))
 import Monster.Monster exposing (allMonsterAct)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
@@ -81,14 +81,14 @@ monsterBuilding monsterList number obstacles seed0 =
             else 
                 monsterBuilding  monsterList number obstacles seed4
 
-updateMonster_ : Monster -> List Bullet -> Monster
-updateMonster_ monster bullets =
+updateMonster_ : Monster -> List Bullet -> Me -> Monster
+updateMonster_ monster bullets me =
     let
         hitBullets = bullets
                   |> List.filter (\b -> b.from == Player)
                   |> List.filter (\b -> circleCollisonTest b.hitbox monster.position)
         monsterType_ = monster.monsterType
-        newMonsterType = {monsterType_ | hp = monsterType_.hp - List.sum (List.map (\b -> b.force) hitBullets)}
+        newMonsterType = {monsterType_ | hp = monsterType_.hp - toFloat((getCurrentAttr Attack me.attr)) * List.sum (List.map (\b -> b.force) hitBullets)}
         {- debug test
         newMonsterType =
                 if List.isEmpty hitBullets then
@@ -104,7 +104,7 @@ updateMonster monsters bullets me =
     let
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
-                     |> List.map (\m -> updateMonster_ m bullets)
+                     |> List.map (\m -> updateMonster_ m bullets me)
     in
         allMonsterAct finalMonsters me bullets
 
