@@ -53,7 +53,7 @@ key on keycode =
             MoveDown on
         70 ->
             if on then
-                NextFloor
+                FMsg
             else
                 Noop
         13 ->

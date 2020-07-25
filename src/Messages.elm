@@ -12,7 +12,7 @@ type Msg
     | MouseDown
     | MouseUp
     -- | Map
-    | NextFloor
+    | FMsg
     | Resize Int Int
     | GetViewport Viewport
     | SkillChange SkillMsg
