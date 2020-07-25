@@ -391,7 +391,7 @@ showAttr attr =
     [ style "padding" "0 140px"
     , style "position" "absolute"
     ]
-    (List.map (makeProgress attr) [Health, Clip, Armor, Attack, Speed, BulletSpeed])
+    (List.map (makeProgress attr) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
 
 makeProgress : Attr -> AttrType -> Html Msg
 makeProgress attr t =

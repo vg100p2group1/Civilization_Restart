@@ -513,15 +513,24 @@ hit bullet me =
     if List.isEmpty bullet then
         me
     else
-    let
-        total_hurt = bullet
+        let
+            totalHurt = bullet
                     |> List.map .force
                     |> List.sum
                     |> Basics.round
-        attr = me.attr
-        newAttr = setCurrentAttr Health -(min total_hurt (getCurrentAttr Health attr)) attr
-    in
-        {me | attr = newAttr}
+            attr = me.attr
+            health = getCurrentAttr Health attr
+            armor = getCurrentAttr Armor attr
+            newAttr = 
+                if totalHurt <= armor then     -- the armor is enough to protect the player
+                    setCurrentAttr Armor -totalHurt attr
+                else if armor > 0 then      -- the armor is broken due to these bullets
+                    setCurrentAttr Armor armor attr
+                    |> setCurrentAttr Health (totalHurt - armor)
+                else
+                    setCurrentAttr Health -(min totalHurt health) attr
+        in
+            {me | attr = newAttr}
 
 updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
 updateSkill msg model =
