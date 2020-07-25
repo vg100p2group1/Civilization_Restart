@@ -18,6 +18,7 @@ import Animation.ShowGun exposing (showGun)
 import Animation.Explosion exposing (showExplosion)
 import Animation.ShowBullet exposing (showBullets)
 import Environment.ShowWalls exposing (showWalls)
+import Config exposing (bulletSpeed)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -391,7 +392,7 @@ showAttr attr =
     [ style "padding" "0 140px"
     , style "position" "absolute"
     ]
-    (List.map (makeProgress attr) [Attack, Clip, Armor, Attack, Speed])
+    (List.map (makeProgress attr) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
 
 makeProgress : Attr -> AttrType -> Html Msg
 makeProgress attr t =

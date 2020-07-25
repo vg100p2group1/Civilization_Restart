@@ -17,6 +17,7 @@ import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Synthesis.Package exposing (packageUpdate)
+import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -252,7 +253,7 @@ mouseDataUpdate model mousedata =
 
 
 fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> (List Bullet, Weapon)
-fireBullet_ weapon (mouseX,mouseY) (meX, meY) =
+fireBullet_ weapon (mouseX,mouseY) (meX, meY)=
     let
         bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
         (newShoot, fireFlag, counter) =
@@ -273,17 +274,25 @@ animate  model =
     -- (model,Cmd.none)
     let
         me = model.myself
-        (newMe,collision) = speedCase me model.map
+        attr = me.attr
+        (newMe_,collision) = speedCase me model.map
         (newShoot, weapon) = if model.myself.fire then
-                                fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
+                                 if getCurrentAttr Clip attr > 0 then
+                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
+                                 else
+                                    ([], model.myself.currentWeapon)
                              else
                                 ([], model.myself.currentWeapon)
+        newAttr = setCurrentAttr Clip -(List.length newShoot) attr
+        newMe = {newMe_|attr=newAttr}
         -- This is for the cooling time of weapons
         weaponCounter =
-            if weapon.counter == 0 then
+            if weapon.counter <= 0 then
                 0
             else
                 weapon.counter - 1
+        newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * w.period}) newMe.weapons
+        newPeriod = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * newMe.currentWeapon.period
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
@@ -291,15 +300,14 @@ animate  model =
         map = model.map
         newMap = {map | monsters = newMonsters,treasure=newTreasure}
         newViewbox = mapToViewBox newMe newMap
-        (newBulletList, filteredBulletList) = updateBullet newMe model.map newBullet collision
+        (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
-
         newExplosion = updateExplosion model.explosion filteredBulletList
         newExplosionViewbox = explosionToViewbox newMe newExplosion
-
         newState = updateState model
+        meHit = hit hurtPlayer newMe
     in
-        {model| myself = {newMe|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}}, 
+        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 
@@ -308,6 +316,8 @@ animate  model =
 speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
+        speedFactor = (getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat)
+
         getNewXSpeed =
             if me.moveLeft then 
                 (True,-playerSpeed)
@@ -500,7 +510,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
 
 
 
-updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet)
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet, List Bullet)
 updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
@@ -521,19 +531,25 @@ updateBullet me map bullets (collisionX,collisionY) =
                 {b|hitbox = newHitbox,x=newX, y=newY}
 
         allBullets = bullets
+                    -- hit wall
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.walls))))
+                    -- hit obstacles
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
+                    -- hit doors
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
+                    -- on the roads
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
-                    |> List.filter (\b ->  not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
-        finalBullets = List.map updateXY allBullets
+                    -- hit monsters and are shoot by player
+                    |> List.filter (\b -> not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
+        (flyingBullets, hitPlayer) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) allBullets
+        finalBullets = List.map updateXY flyingBullets
 
-        filteredBullets= List.filter (\value -> value.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
         
         -- d1=Debug.log "f" filteredBullets  
 
     in
-        (finalBullets,filteredBullets)
+        (finalBullets,filteredBullets,hitPlayer)
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
@@ -584,6 +600,30 @@ getCollideTreasure treasureList me=
 updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
+
+hit : List Bullet -> Me -> Me
+hit bullet me =
+    if List.isEmpty bullet then
+        me
+    else
+        let
+            totalHurt = bullet
+                    |> List.map .force
+                    |> List.sum
+                    |> Basics.round
+            attr = me.attr
+            health = getCurrentAttr Health attr
+            armor = getCurrentAttr Armor attr
+            newAttr = 
+                if totalHurt <= armor then     -- the armor is enough to protect the player
+                    setCurrentAttr Armor -totalHurt attr
+                else if armor > 0 then      -- the armor is broken due to these bullets
+                    setCurrentAttr Armor armor attr
+                    |> setCurrentAttr Health (totalHurt - armor)
+                else
+                    setCurrentAttr Health -(min totalHurt health) attr
+        in
+            {me | attr = newAttr}
 
 updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
 updateSkill msg model =
