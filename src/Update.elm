@@ -259,7 +259,7 @@ animate  model =
     let
         me = model.myself
         attr = me.attr
-        (newMe,collision) = speedCase me model.map
+        (newMe_,collision) = speedCase me model.map
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
                                     fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
@@ -268,6 +268,7 @@ animate  model =
                              else
                                 ([], model.myself.currentWeapon)
         newAttr = setCurrentAttr Clip -(List.length newShoot) attr
+        newMe = {newMe_|attr=newAttr}
         -- This is for the cooling time of weapons
         weaponCounter =
             if weapon.counter == 0 then
@@ -288,7 +289,7 @@ animate  model =
         newState = updateState model
         meHit = hit hurtPlayer newMe
     in
-        {model| myself = {meHit|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter},attr=newAttr},
+        {model| myself = {meHit|counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox}
 
