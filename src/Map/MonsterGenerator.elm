@@ -18,9 +18,9 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 150 150 "Yellow"
-        m2=MonsterType 150 150 "Red"
-        m3=MonsterType 150 150 "Blue"
+        m1=MonsterType 150 10 "Yellow"
+        m2=MonsterType 150 10 "Red"
+        m3=MonsterType 150 10 "Blue"
     in 
         [m1,m2,m3]
 
