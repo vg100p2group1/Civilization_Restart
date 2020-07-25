@@ -17,7 +17,7 @@ import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
-import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..))
+import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -251,6 +251,8 @@ animate  model =
 speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
+        speedFactor = (getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat)
+
         getNewXSpeed =
             if me.moveLeft then 
                 (True,-playerSpeed)
