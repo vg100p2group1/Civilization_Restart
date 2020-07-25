@@ -43,10 +43,6 @@ getDefault at =
         Health -> 100
         Clip -> 80
         ShootSpeed -> 40
-<<<<<<< HEAD
-
-=======
->>>>>>> Skills
 
 getAttrName : AttrType -> String
 getAttrName at = 

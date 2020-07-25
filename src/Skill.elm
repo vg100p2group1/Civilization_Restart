@@ -247,10 +247,10 @@ subSys1 =
     , unlockLevel = 0
     }
 
-subSys2 : SkillSubSystem
-subSys2 = 
+subSysBerserker : SkillSubSystem
+subSysBerserker = 
     { skills = [skill210, skill211, skill220, skill221, skill230, skill231]
-    , name = "SubSystem 2"
+    , name = "Berserker"
     , chosen = (-1,-1)
     , text = ""
     , unlockLevel = 0
@@ -261,7 +261,7 @@ defaultSubSystem = subSys0
 
 defaultSystem : SkillSystem
 defaultSystem = 
-    { subsys = [subSys0, subSys1, subSys2]
+    { subsys = [subSys0, subSys1, subSysBerserker]
     , current = 0
     , points = 10
     , active = False
