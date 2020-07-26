@@ -1,6 +1,6 @@
 # Change Log
 
-### [0.3.0] - 2020-07-26
+### [0.5.0] - 2020-07-26
 
 #### Added:
 
@@ -33,7 +33,6 @@
 * The original small and simple guns.
 * Changing weapon by pressing **1, 2, 3, 4**
 * Delete one of the skill trees.
-
 
 
 ### [0.2.0] - 2020-07-19

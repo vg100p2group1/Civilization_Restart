@@ -7,3 +7,4 @@ index.html
 # rm build folder
 build
 .~CHANGELOG.md
+.gitignore
