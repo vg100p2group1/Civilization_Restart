@@ -1,27 +1,28 @@
 
-module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
+module Map.MapDisplay exposing (mapWithGate, mapInit, showMap,drawDoors)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig,Wall,WallProperty(..),Boss)
+import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig,Wall,WallProperty(..),Door,Boss)
 import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
 import Map.MapGenerator exposing (roomInit)
 import Random 
 
-mapInit : Map
-mapInit = mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)) mapConfig (Random.initialSeed 0)
+mapInit : (List Room,Map)
+mapInit = 
+    mapWithGate (Tuple.first roomInit) (List.length (Tuple.first roomInit)) mapConfig (Random.initialSeed 0)
 
-mapWithGate : List Room -> Int -> Map -> Random.Seed -> Map
+mapWithGate : List Room -> Int -> Map -> Random.Seed -> (List Room,Map)
 mapWithGate rooms number drawnrooms seed0 = 
     let
-        mapTemp = showMap rooms number drawnrooms
+        (mapTemp,roomNew) = showMap rooms number drawnrooms []
         (gateTemp, _) = gateGenerator rooms seed0
     in
-        {mapTemp| gate=gateTemp,roomCount=number}
+        (roomNew,{mapTemp| gate=gateTemp,roomCount=number})
 
 
-showMap : List Room -> Int -> Map -> Map
-showMap rooms number drawnrooms=
+showMap : List Room -> Int -> Map-> List Room-> (Map,List Room)
+showMap rooms number drawnrooms roomNew=
     let
         roomNowTemp = List.head rooms 
         getRoomNow = 
@@ -31,6 +32,9 @@ showMap rooms number drawnrooms=
                 Nothing ->
                     roomConfig
         roomNow = getRoomNow 
+
+        roomAppended = roomNew ++ [{roomNow|roomNum=number}]
+
         newRooms = List.drop 1 rooms
 
         monstersNew = drawMonsters roomNow number
@@ -42,9 +46,16 @@ showMap rooms number drawnrooms=
         doorsNew=drawDoors roomNow
     in
         if number == 0 then 
-            drawnrooms
+            (drawnrooms,roomAppended)
         else 
-            showMap newRooms (number - 1)  {drawnrooms|walls=drawnrooms.walls++wallsNew,roads=drawnrooms.roads++roadsNew,obstacles=drawnrooms.obstacles++obstaclesNew,monsters=drawnrooms.monsters++monstersNew,doors=drawnrooms.doors++doorsNew,treasure=drawnrooms.treasure++treasureNew}
+            showMap newRooms (number - 1)  
+                {   drawnrooms|walls=drawnrooms.walls++wallsNew,
+                    roads=drawnrooms.roads++roadsNew,
+                    obstacles=drawnrooms.obstacles++obstaclesNew,
+                    monsters=drawnrooms.monsters++monstersNew,
+                    doors=drawnrooms.doors++doorsNew,
+                    treasure=drawnrooms.treasure++treasureNew}
+                roomAppended
 
 drawMonsters : Room -> Int -> List Monster
 drawMonsters room number=
@@ -116,7 +127,7 @@ drawObstacle room =
         List.map movingRectangle <| List.map (\value -> value.position) obstacleList
 
 
-drawDoors : Room -> List Rectangle
+drawDoors : Room -> List Door
 drawDoors room =
     let
         (x,y) = room.position
@@ -139,8 +150,9 @@ drawDoors room =
         
         roadList1 = room.road
         roadList2 = List.map (\value -> ( Tuple.first value - x + 1, Tuple.second value - y + 1)) roadList1
+        -- d1 = Debug.log "roadList" (roadList1,roadList2)
     in
-        List.map recUpdate <| List.map recPosition roadList2
+        List.map (\value -> Door value False)<| List.map recUpdate <| List.map recPosition roadList2
 
 
 drawRoads : Room -> List Rectangle

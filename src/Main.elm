@@ -5,7 +5,7 @@ import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp, onResiz
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode
 import Json.Encode exposing (Value)
-import Messages exposing (Msg(..),SkillMsg(..))
+import Messages exposing (Msg(..),SkillMsg(..),SynthesisMsg(..))
 import Task
 import View exposing (view)
 import Update
@@ -53,7 +53,7 @@ key on keycode =
             MoveDown on
         70 ->
             if on then
-                NextFloor
+                FMsg
             else
                 Noop
         13 ->
@@ -80,6 +80,12 @@ key on keycode =
                 SkillChange TriggerSkillWindow
             else
                 Noop
+        82 ->
+            if on then
+                SynthesisSystem TriggerSynthesisWindow
+            else
+                Noop
+
         32 ->
             if on then
                 ChangeGameState
@@ -91,20 +97,25 @@ key on keycode =
 
 init : Model
 init =
-    { myself = defaultMe
-    , bullet = []
-    , bulletViewbox = []
-    , map = mapInit
-    , rooms = roomInit
-    , viewbox = mapToViewBox defaultMe mapInit
-    , size = (0, 0)
-    , state = Others
-    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
-    , explosion = []
-    , explosionViewbox = []
-    , paused = False
-    , gameState = Playing
-    }
+    let
+        (roomNew,mapNew) = mapInit
+    in
+    
+        { myself = defaultMe
+        , bullet = []
+        , bulletViewbox = []
+        , map = mapNew
+        , rooms = (roomNew,Tuple.second roomInit)
+        , viewbox = mapToViewBox defaultMe mapNew
+        , size = (0, 0)
+        , state = Others
+        , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
+        , explosion = []
+        , explosionViewbox = []
+        , paused = False
+        , gameState = Playing
+        , storey = 1
+        }
 
 
 

@@ -41,6 +41,7 @@ type alias Weapon =
     , image : String
     , counter : Int
     , hasFired : Bool
+    , level : Int 
     }
 
 bulletConfig : Bullet
@@ -60,6 +61,7 @@ defaultWeapon =
     , image = ""
     , counter = 1
     , hasFired = False
+    , level = 1
     }
 
 
@@ -75,11 +77,11 @@ generateBullet weapon =
                 Pistol ->
                     bulletConfig
                 Gatling ->
-                    {bulletConfig|force=30}
+                    {bulletConfig|force=30* toFloat weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100,r=15}
+                    {bulletConfig|force=100* toFloat weapon.level,r=15}
                 Shotgun ->
-                    {bulletConfig|force=45,r=10}
+                    {bulletConfig|force=45* toFloat weapon.level,r=10}
     in
         bullet
 
@@ -87,9 +89,9 @@ weaponList : List Weapon
 weaponList =
     let
         pistol = defaultWeapon
-        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 "" 1 False
-        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 "" 1 False
-        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 "" 1 False
+        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 "" 1 False 1
+        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 "" 1 False 1
+        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 "" 1 False 1
     in
 
         [pistol, gatling, mortar, shotgun]
