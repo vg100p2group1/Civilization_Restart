@@ -44,6 +44,7 @@ showMap rooms number drawnrooms roomNew=
 
         wallsNew=drawWalls roomNow
         doorsNew=drawDoors roomNow
+        bossNew=drawBoss roomNow number
     in
         if number == 0 then 
             (drawnrooms,roomAppended)
@@ -54,7 +55,9 @@ showMap rooms number drawnrooms roomNew=
                     obstacles=drawnrooms.obstacles++obstaclesNew,
                     monsters=drawnrooms.monsters++monstersNew,
                     doors=drawnrooms.doors++doorsNew,
-                    treasure=drawnrooms.treasure++treasureNew}
+                    treasure=drawnrooms.treasure++treasureNew,
+                    boss=drawnrooms.boss++bossNew
+                    }
                 roomAppended
 
 drawMonsters : Room -> Int -> List Monster

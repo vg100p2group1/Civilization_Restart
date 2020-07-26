@@ -52,10 +52,10 @@ type AttackMode
 type alias ShootingType =
     {   attackMode : AttackMode
     ,    bulletNum : Int
-    ,   direction : Int
-    ,   attack : Int
-    ,   speed : Int 
-    ,   r : Int
+    ,   direction : Float
+    ,   attack : Float
+    ,   speed : Float
+    ,   r : Float
     -- ,   bulletsToBeShot : Int
     -- ,   bulletsShooted : Int
     ,   bulletInterval : Int
@@ -63,7 +63,8 @@ type alias ShootingType =
     }
 
 type alias BossType =
-    {   level : Int
+    {    hp : Float
+    ,   level : Int
     ,   width : Float
     ,   height : Float
     ,   color : String 

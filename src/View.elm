@@ -127,7 +127,7 @@ showMap model =
        gate = displayDoors [Door model.gate False] -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure ++ boss
     --    walls++gate
 
 
@@ -207,9 +207,10 @@ displayBoss boss =
             let
                 model = bossTemp.position
                 bossType = bossTemp.bossType
+                opacity = String.fromFloat (bossType.hp / 500)
                 
 
-                bossColor = bossType.color
+                bossColor = if bossTemp.active then "black" else bossType.color
             in
                 
                 Svg.rect
@@ -218,11 +219,12 @@ displayBoss boss =
                     , Svg.Attributes.width <| String.fromFloat model.width
                     , Svg.Attributes.height <| String.fromFloat model.height
                     , Svg.Attributes.fill bossColor
+                    , Svg.Attributes.fillOpacity opacity
                 
                     ]
                 []
     in
-        List.map createBricksFormat boss
+         List.map createBricksFormat boss
 displayTreasure : List Treasure  -> List (Svg.Svg Msg)
 displayTreasure treasure =
     let
