@@ -1,4 +1,4 @@
-module Map.ObstacleGenerator exposing (obstacleGenerator)
+module Map.ObstacleGenerator exposing (obstacleGenerator,bossRoomObstacleGenerator)
 import Random
 -- import Css exposing (visited)
 import Map.Map exposing (Obstacle)
@@ -52,7 +52,7 @@ roomD =
         List.map (\value -> {value|position = recUpdate value.position}) roomTemp
 
 roomList : List (List Obstacle)
-roomList = [roomA,roomB,roomC,roomD]
+roomList = [roomA,roomD,roomB,roomC]
 
 
 
@@ -60,6 +60,23 @@ obstacleGenerator : Random.Seed -> (List Obstacle,Random.Seed)
 obstacleGenerator seed0 = 
     let
         (roomnum,seed1)=Random.step (Random.int 0 3) seed0
+        roomTemp = List.head <| List.drop roomnum roomList
+        -- d1=Debug.log "roomnum" roomnum
+        -- d2=Debug.log "rooms" (List.drop roomnum roomList)
+        getRoom =
+            case roomTemp of
+                Just a ->
+                    a
+                Nothing ->
+                    [obstacleConfig]
+    in
+        (getRoom,seed1)
+
+
+bossRoomObstacleGenerator : Random.Seed -> (List Obstacle,Random.Seed)
+bossRoomObstacleGenerator seed0 = 
+    let
+        (roomnum,seed1)=Random.step (Random.int 0 1) seed0
         roomTemp = List.head <| List.drop roomnum roomList
         -- d1=Debug.log "roomnum" roomnum
         -- d2=Debug.log "rooms" (List.drop roomnum roomList)

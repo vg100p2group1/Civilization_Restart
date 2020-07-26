@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
-import Map.Map exposing (Map,Monster,Room,Treasure,Door)
+import Map.Map exposing (Map,Monster,Room,Treasure,Door,Boss)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
@@ -124,11 +124,12 @@ showMap model =
        monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
        treasure = displayTreasure  model.treasure
+       boss = displayBoss  model.boss
 
        gate = displayDoors [Door model.gate False] -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure ++ boss
     --    walls++gate
 
 
@@ -199,6 +200,33 @@ displayMonster monsters =
     in
         List.map createBricksFormat monsters
 
+
+displayBoss : List Boss  -> List (Svg.Svg Msg)
+displayBoss boss =
+    let
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat bossTemp =
+            let
+                model = bossTemp.position
+                bossType = bossTemp.bossType
+                opacity = String.fromFloat (bossType.hp / 500)
+                
+
+                bossColor = if bossTemp.active then "black" else bossType.color
+            in
+                
+                Svg.rect
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill bossColor
+                    , Svg.Attributes.fillOpacity opacity
+                
+                    ]
+                []
+    in
+         List.map createBricksFormat boss
 displayTreasure : List Treasure  -> List (Svg.Svg Msg)
 displayTreasure treasure =
     let

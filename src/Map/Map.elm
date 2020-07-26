@@ -1,5 +1,5 @@
 
-module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit,Door)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit,Door,Boss,BossType,ShootingType,AttackMode(..),Aint)
 import Shape exposing (Rectangle,recInit)
 import Random exposing (Seed)
 import Synthesis.Material exposing (Material)
@@ -45,11 +45,48 @@ type alias Monster =
     , roomNum : Int
     }
 
+type AttackMode 
+    = Circled
+    | Targeted
+
+type alias ShootingType =
+    {   attackMode : AttackMode
+    ,    bulletNum : Int
+    ,   direction : Float
+    ,   attack : Float
+    ,   speed : Float
+    ,   r : Float
+    -- ,   bulletsToBeShot : Int
+    -- ,   bulletsShooted : Int
+    ,   bulletInterval : Int
+        
+    }
+
+type alias BossType =
+    {    hp : Float
+    ,   level : Int
+    ,   width : Float
+    ,   height : Float
+    ,   color : String 
+    ,   shootingType : List ShootingType    
+    
+    }
+type alias Boss =
+    { position : Rectangle
+    , bossnum : Int
+    , bossType : BossType
+    , seed : Seed
+    , active : Bool
+    , timeBeforeAttack : Int
+    , roomNum : Int
+    }
+
 
 type alias Room =
     { position : (Int,Int)
     , gate : Bool
-    , boss : Bool
+    , haveBoss : Bool
+    , boss : List Boss
     , obstacles : List Obstacle
     , monsters : List Monster
     , treasure : List Treasure
@@ -85,16 +122,20 @@ type alias Map =
     , gate : Rectangle
     , roomCleared : List Int
     , roomCount : Int
+    , boss : List Boss
     }
 
+type alias Aint =
+  { dieFace : Int
+  }
 
 
 
 roomConfig : Room
-roomConfig = Room (0,0) False False [] [] [] [] 0 0
+roomConfig = Room (0,0) False False [] [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0
+mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0 []
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)

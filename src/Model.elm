@@ -145,6 +145,10 @@ mapToViewBox me map =
         monstersUpdated = List.map monsterUpdate map.monsters
         treasureUpdate monster= 
             {monster| position = recUpdate monster.position}
+            
+        bossUpdate boss= 
+            {boss| position = recUpdate boss.position}
+        bossesUpdated =  List.map bossUpdate map.boss
         treasureUpdated = List.map treasureUpdate map.treasure
 
 
@@ -153,4 +157,4 @@ mapToViewBox me map =
         -- monsterListUpdate model =
         --     List.map (\value -> {value| position = circleUpdate value.position}) model
     in
-        {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = doorsUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}
+        {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = doorsUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate,boss=bossesUpdated}

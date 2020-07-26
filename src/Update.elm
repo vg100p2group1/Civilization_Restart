@@ -10,6 +10,7 @@ import UpdateSkill exposing (updateSkill)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator,roomInit)
+import Monster.Boss exposing (updateBoss)
 import Map.MapDisplay exposing (showMap, mapWithGate,mapInit)
 import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import  Map.TreasureGenerator exposing (updateTreasure)
@@ -194,6 +195,7 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+        
 
 changeWeapon : Int -> Model -> Model
 changeWeapon number model =
@@ -278,16 +280,18 @@ animate  model =
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
-        (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
+        (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
         newTreasure = updateTreasure model.map.treasure newClearList
+        (newBoss,newBullet) = updateBoss model.map.boss newBullet__ me
         map = model.map
+        
 
         (newDoors,collideDoor) = enableDoor me (Tuple.first model.rooms) map.doors newClearList
 
         (newMe,collision) = speedCase me model.map collideDoor
 
-        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -340,7 +344,9 @@ speedCase me map collideDoor=
         (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
-        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads++(List.map (\t->t.position) collideDoor)) 
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
+            -- ++(List.map (\t->t.position) collideDoor)
+            ) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"
         getCollideType collideList  = 
