@@ -6,3 +6,4 @@ index.html
 .idea
 # rm build folder
 build
+.~CHANGELOG.md

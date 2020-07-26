@@ -28,6 +28,8 @@ type Msg
     | ChangeGameState
     -- Weapon
     | SynthesisSystem SynthesisMsg
+    | DualWield
+
     
 type SkillMsg
     = TriggerSkillWindow

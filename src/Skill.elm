@@ -1,4 +1,5 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem, getSubSys, getSkill)
+
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem, getSubSys, getSkill,subSysBerserker,skillDualWield)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -184,8 +185,9 @@ skillDirectionalBlasting =
     , name = "Directional Blasting"
     }
 
+
 skillAbsoluteTerritoryField : Skill
-skillAbsoluteTerritoryField = 
+skillAbsoluteTerritoryField =
     { id = 0
     , level = 4
     , unlocked = False
@@ -211,6 +213,7 @@ skillShootingSkillI =
     , name = "Shooting SKill I"
     }
 
+
 skillAmplifyDamageI : Skill
 skillAmplifyDamageI = 
     { id = 0
@@ -221,13 +224,15 @@ skillAmplifyDamageI =
     }
 
 skillShootingSkillII : Skill
-skillShootingSkillII = 
+skillShootingSkillII =
     { id = 0
-    , level = 4
+    , level = 3
     , unlocked = False
-    , desciption = "Skill: Shooting SKill II in subsystem Berserker"
-    , name = "Shooting SKill II"
+    , desciption = "Skill: Amplify Damage I in subsystem Berserker"
+    , name = "Amplify Damage I"
     }
+
+
 
 skillAmplifyDamageII : Skill
 skillAmplifyDamageII = 
@@ -271,6 +276,7 @@ subSysPhantom =
     , unlockLevel = 0
     }
 
+
 subSysMechanic : SkillSubSystem
 subSysMechanic = 
     { id = 1
@@ -305,7 +311,7 @@ defaultSubSystem : SkillSubSystem
 defaultSubSystem = subSysPhantom
 
 defaultSystem : SkillSystem
-defaultSystem = 
+defaultSystem =
     { subsys = [subSysPhantom, subSysMechanic, subSysBerserker]
     , current = 0
     , points = 10

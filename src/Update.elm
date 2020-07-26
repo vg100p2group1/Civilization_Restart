@@ -13,7 +13,7 @@ import Map.MapGenerator exposing (roomGenerator,roomInit)
 import Monster.Boss exposing (updateBoss)
 import Map.MapDisplay exposing (showMap, mapWithGate,mapInit)
 import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
-import  Map.TreasureGenerator exposing (updateTreasure)
+import Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
@@ -21,11 +21,12 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
+import Skill exposing (subSysBerserker,skillDualWield)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Start ->
-                (init, Cmd.none)
+            (init, Cmd.none)
         Pause ->
             ( {model|gameState=Paused}, Cmd.none)
         Resume ->
@@ -187,6 +188,9 @@ update msg model =
         SynthesisSystem systhesisMsg ->
             updateSynthesis systhesisMsg model
 
+        DualWield ->
+            (updateDualWield model, Cmd.none)
+
         Noop ->
             let 
                 pTemp =  model.myself
@@ -238,10 +242,11 @@ mouseDataUpdate model mousedata =
         ((mx - xLeft)/r, (my - yTop)/r)
 
 
-fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> (List Bullet, Weapon)
-fireBullet_ weapon (mouseX,mouseY) (meX, meY)=
+
+fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> Bool -> (List Bullet, Weapon)
+fireBullet_ weapon (mouseX,mouseY) (meX, meY) dual=
     let
-        bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
+        bullet = fireBullet weapon (mouseX,mouseY) (meX, meY) dual
         (newShoot, fireFlag, counter) =
             if weapon.counter <= 0 then
                 if weapon.auto then
@@ -264,21 +269,19 @@ animate  model =
         isDead = 0 == getCurrentAttr Health attr
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
-                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
+                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) model.myself.dualWield
                                  else
                                     ([], model.myself.currentWeapon)
                              else
                                 ([], model.myself.currentWeapon)
         newAttr = setCurrentAttr Clip -(List.length newShoot) attr
-        newMeAttr = {me|attr=newAttr}
-        -- This is for the cooling time of weapons
         weaponCounter =
             if weapon.counter <= 0 then
                 0
             else
                 weapon.counter - 1
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
-        newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
+        newPeriod = Debug.log "newPeriod" ((getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod)
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
@@ -300,7 +303,7 @@ animate  model =
         newState = updateState model
         meHit = hit hurtPlayer newMe
     in
-        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
+        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod},attr=newAttr},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
 
@@ -473,8 +476,8 @@ updateSentence elapsed model =
         _ ->
             model
 
-fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> List Bullet
-fireBullet weapon (mouseX,mouseY) (meX, meY) =
+fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> Bool -> List Bullet
+fireBullet weapon (mouseX,mouseY) (meX, meY) dual =
     let
         posX = mouseX
         posY = mouseY
@@ -489,7 +492,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
         bullet = generateBullet weapon
         newCircle = Circle meX (meY+20) bullet.r
         newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp, speedY=yTemp}
-        bulletList =
+        bulletList_ =
             case weapon.extraInfo of
                 Shotgun ->
                     -- the shotgun will shoot three bullets at one time and has an angle of 30 degrees
@@ -500,6 +503,15 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
                     [newBullet, bullet1, bullet2]
                 _ ->
                     [newBullet]
+        bulletList =
+            if dual then
+                let
+                    b1 = bulletList_ |> List.map (\b -> {b|y=b.y-20/unitV*(posX - 520),x=b.x+20/unitV*(posY - 520),hitbox=Circle (b.x+20/unitV*(posY - 520)) (b.y-20/unitV*(posX - 520)) b.r})
+                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y+20/unitV*(posX - 520),x=b.x-20/unitV*(posY - 520),hitbox=Circle (b.x-20/unitV*(posY - 520)) (b.y+20/unitV*(posX-520)) b.r})
+                in
+                    List.append b1 b2
+            else
+                bulletList_
     in
         bulletList
 
@@ -531,6 +543,7 @@ updateBullet me map bullets (collisionX,collisionY) =
                     -- hit obstacles
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     -- hit doors
+
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.doors))))
                     -- on the roads
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
@@ -619,3 +632,26 @@ hit bullet me =
                     setCurrentAttr Health -(min totalHurt health) attr
         in
             {me | attr = newAttr}
+
+
+updateDualWield : Model -> Model
+updateDualWield model =
+    let
+        dual = model.myself.skillSys.subsys
+              |> List.filter (\sub -> sub.id == 2)
+              |> List.head
+              |> Maybe.withDefault subSysBerserker
+              |> .skills
+              |> List.filter (\s -> s.id == 1 && s.level == 4)
+              |> List.head
+              |> Maybe.withDefault skillDualWield
+              |> .unlocked
+        me = model.myself
+        newMe =
+            if dual then
+                {me|dualWield = not me.dualWield}
+            else
+                me
+    in
+        {model|myself=newMe}
+

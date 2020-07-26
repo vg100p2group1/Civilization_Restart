@@ -1,4 +1,5 @@
 
+
 module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit,Door,Boss,BossType,ShootingType,AttackMode(..),Aint)
 import Shape exposing (Rectangle,recInit)
 import Random exposing (Seed)
