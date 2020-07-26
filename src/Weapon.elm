@@ -38,6 +38,7 @@ type alias Weapon =
     , bulletNumber : Int
     , auto : Bool
     , period : Float
+    , maxPeriod : Float
     , image : String
     , counter : Float
     , hasFired : Bool
@@ -58,6 +59,7 @@ defaultWeapon =
     , bulletNumber = 0
     , auto = False
     , period = 50
+    , maxPeriod = 50
     , image = ""
     , counter = 1
     , hasFired = False
@@ -89,9 +91,9 @@ weaponList : List Weapon
 weaponList =
     let
         pistol = defaultWeapon
-        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 "" 1 False 1
-        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 "" 1 False 1
-        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 "" 1 False 1
+        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1
+        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1
+        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1
     in
 
         [pistol, gatling, mortar, shotgun]

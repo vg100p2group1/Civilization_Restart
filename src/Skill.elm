@@ -21,10 +21,11 @@ type alias Skill =
     , level : Int
     , unlocked : Bool
     , desciption : String
+    , name : String
     }
 
 emptySkill : Skill
-emptySkill = Skill -1 1000 False "Nothing"
+emptySkill = Skill -1 1000 False "Nothing" "Empty Skill"
 
 getCurrentSubSystem : SkillSystem -> SkillSubSystem
 getCurrentSubSystem sys = 
@@ -93,100 +94,112 @@ unlockChosen sys =
             (newSubsystem, cost)
 
 -- Define all the skills:
-skill010 : Skill
-skill010 = 
+skillSpeedUpI : Skill
+skillSpeedUpI = 
     { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill 0 level 1 in subsystem 0"
+    , desciption = "Skill: Speed Up! I in subsystem Phantom"
+    , name = "Speed Up! I"
     }
 
-skill011 : Skill
-skill011 = 
+skillMissI : Skill
+skillMissI = 
+    { id = 0
+    , level = 2
+    , unlocked = False
+    , desciption = "Skill: Miss I in subsystem Phantom"
+    , name = "Miss I"
+    }
+
+skillSpeedUpII : Skill
+skillSpeedUpII = 
+    { id = 0
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill: Speed Up! II in subsystem Phantom"
+    , name = "Speed Up! II"
+    }
+
+skillMissII : Skill
+skillMissII = 
     { id = 1
+    , level = 3
+    , unlocked = False
+    , desciption = "Skill: Miss II in subsystem Phantom"
+    , name = "Miss II"
+    }
+
+skillFlash : Skill
+skillFlash = 
+    { id = 0
+    , level = 4
+    , unlocked = False
+    , desciption = "Skill: Flash in subsystem Phantom"
+    , name = "Flash"
+    }
+
+skillInvisible : Skill
+skillInvisible = 
+    { id = 1
+    , level = 4
+    , unlocked = False
+    , desciption = "Skill: Invisible in subsystem Phantom"
+    , name = "Invisible"
+    }
+
+skillArmorUpgradeI : Skill
+skillArmorUpgradeI = 
+    { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill 1 level 1 in subsystem 0"
+    , desciption = "Skill: Armor Upgrade I in subsystem Mechanic"
+    , name = "Armor Upgrade I"
     }
 
-skill020 : Skill
-skill020 = 
+skillArmorUpgradeII : Skill
+skillArmorUpgradeII = 
     { id = 0
     , level = 2
     , unlocked = False
-    , desciption = "Skill 0 level 2 in subsystem 0"
+    , desciption = "Skill: Armor Upgrade II in subsystem Mechanic"
+    , name = "Armor Upgrade II"
     }
 
-skill021 : Skill
-skill021 = 
-    { id = 1
-    , level = 2
-    , unlocked = False
-    , desciption = "Skill 1 level 2 in subsystem 0"
-    }
-
-skill030 : Skill
-skill030 = 
+skillMoreBullets : Skill
+skillMoreBullets = 
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill 0 level 3 in subsystem 0"
+    , desciption = "Skill: More Bullets in subsystem Mechanic"
+    , name = "More Bullets"
     }
 
-skill031 : Skill
-skill031 = 
+skillDirectionalBlasting : Skill
+skillDirectionalBlasting = 
     { id = 1
     , level = 3
     , unlocked = False
-    , desciption = "Skill 1 level 3 in subsystem 0"
+    , desciption = "Skill: Directional Blasing in subsystem Mechanic"
+    , name = "Directional Blasting"
     }
 
-skill110 : Skill
-skill110 = 
+skillAbsoluteTerritoryField : Skill
+skillAbsoluteTerritoryField = 
     { id = 0
-    , level = 1
+    , level = 4
     , unlocked = False
-    , desciption = "Skill 0 level 1 in subsystem 1"
+    , desciption = "Skill: Absolute Territory Field in subsystem Mechanic"
+    , name = "Absolute Territory Field"
     }
 
-skill111 : Skill
-skill111 = 
+skillExplosionIsArt : Skill
+skillExplosionIsArt = 
     { id = 1
-    , level = 1
+    , level = 4
     , unlocked = False
-    , desciption = "Skill 1 level 1 in subsystem 1"
-    }
-
-skill120 : Skill
-skill120 = 
-    { id = 0
-    , level = 2
-    , unlocked = False
-    , desciption = "Skill 0 level 2 in subsystem 1"
-    }
-
-skill121 : Skill
-skill121 = 
-    { id = 1
-    , level = 2
-    , unlocked = False
-    , desciption = "Skill 1 level 2 in subsystem 1"
-    }
-
-skill130 : Skill
-skill130 = 
-    { id = 0
-    , level = 3
-    , unlocked = False
-    , desciption = "Skill 0 level 3 in subsystem 1"
-    }
-
-skill131 : Skill
-skill131 = 
-    { id = 1
-    , level = 3
-    , unlocked = False
-    , desciption = "Skill 1 level 3 in subsystem 1"
+    , desciption = "Skill: Explosion is Art in subsystem Mechanic"
+    , name = "Explosion is Art"
     }
 
 skillShootingSkillI : Skill
@@ -195,6 +208,7 @@ skillShootingSkillI =
     , level = 1
     , unlocked = False
     , desciption = "Skill: Shooting SKill I in subsystem Berserker"
+    , name = "Shooting SKill I"
     }
 
 skillAmplifyDamageI : Skill
@@ -203,22 +217,25 @@ skillAmplifyDamageI =
     , level = 2
     , unlocked = False
     , desciption = "Skill: Amplify Damage I in subsystem Berserker"
+    , name = "Amplify Damage I"
     }
 
 skillShootingSkillII : Skill
 skillShootingSkillII = 
     { id = 0
-    , level = 3
+    , level = 4
     , unlocked = False
     , desciption = "Skill: Shooting SKill II in subsystem Berserker"
+    , name = "Shooting SKill II"
     }
 
 skillAmplifyDamageII : Skill
 skillAmplifyDamageII = 
     { id = 1
-    , level = 3
+    , level = 4
     , unlocked = False
     , desciption = "Skill: Amplify Damage in subsystem Berserker"
+    , name = "Amplify Damage II"
     }
 
 skillBattleFervor : Skill
@@ -227,6 +244,7 @@ skillBattleFervor =
     , level = 4
     , unlocked = False
     , desciption = "Skill: Battle Fervor in subsystem Berserker"
+    , name = "Battle Fervor"
     }
 
 skillDualWield : Skill
@@ -235,23 +253,34 @@ skillDualWield =
     , level = 4
     , unlocked = False
     , desciption = "Skill: Dual Wield in subsystem Berserker"
+    , name = "Dual Wield"
     }
 
-subSys0 : SkillSubSystem
-subSys0 = 
+subSysPhantom : SkillSubSystem
+subSysPhantom = 
     { id = 0
-    , skills = [skill010, skill011, skill020, skill021, skill030, skill031]
-    , name = "SubSystem 0"
+    , skills = 
+        [ skillSpeedUpI
+        , skillMissI
+        , skillSpeedUpII, skillMissII
+        , skillFlash, skillInvisible
+        ]
+    , name = "Phantom"
     , chosen = (-1,-1)
     , text = ""
     , unlockLevel = 0
     }
 
-subSys1 : SkillSubSystem
-subSys1 = 
+subSysMechanic : SkillSubSystem
+subSysMechanic = 
     { id = 1
-    , skills = [skill110, skill111, skill120, skill121, skill130, skill131]
-    , name = "SubSystem 1"
+    , skills = 
+        [ skillArmorUpgradeI
+        , skillArmorUpgradeII
+        , skillMoreBullets, skillDirectionalBlasting
+        , skillAbsoluteTerritoryField, skillExplosionIsArt
+        ]
+    , name = "Mechanic"
     , chosen = (-1,-1)
     , text = ""
     , unlockLevel = 0
@@ -273,11 +302,11 @@ subSysBerserker =
     }
 
 defaultSubSystem : SkillSubSystem
-defaultSubSystem = subSys0
+defaultSubSystem = subSysPhantom
 
 defaultSystem : SkillSystem
 defaultSystem = 
-    { subsys = [subSys0, subSys1, subSysBerserker]
+    { subsys = [subSysPhantom, subSysMechanic, subSysBerserker]
     , current = 0
     , points = 10
     , active = False

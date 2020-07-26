@@ -18,28 +18,11 @@ import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Synthesis.Package exposing (packageUpdate)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
+import Init exposing (init)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Start ->
-            let
-                init =
-                    { myself = defaultMe
-                    , bullet = []
-                    , bulletViewbox = []
-                    , map = mapInit
-                    , rooms = roomInit
-                    , viewbox = mapToViewBox defaultMe mapInit
-                    , size = (0, 0)
-                    , state = Others
-                    , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
-                    , explosion = []
-                    , explosionViewbox = []
-                    , paused = False
-                    , gameState = Playing
-                    , storey = 1
-                    }
-            in
                 (init, Cmd.none)
         Pause ->
             ( {model|gameState=Paused}, Cmd.none)
@@ -275,6 +258,7 @@ animate  model =
     let
         me = model.myself
         attr = me.attr
+        isDead = 0 == getCurrentAttr Health attr
         (newMe_,collision) = speedCase me model.map
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
@@ -291,8 +275,8 @@ animate  model =
                 0
             else
                 weapon.counter - 1
-        newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * w.period}) newMe.weapons
-        newPeriod = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * newMe.currentWeapon.period
+        newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
+        newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
@@ -309,7 +293,7 @@ animate  model =
     in
         {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
-                explosion=newExplosion,explosionViewbox=newExplosionViewbox}
+                explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
 
 
 

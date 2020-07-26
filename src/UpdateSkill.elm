@@ -77,10 +77,36 @@ atUnlock sub attr =
                 1 ->    -- Speed Up I
                     setCurrentAttr Speed 20 attr
                     |> setMaxAttr Speed 20
+                2 ->    -- Miss I
+                    attr
+                3 ->
+                    if id == 0 then -- Speed Up II
+                        setCurrentAttr Speed 20 attr
+                        |> setMaxAttr Speed 20
+                    else
+                        attr
+                4 -> -- Skills in level 4 does not change attributes
+                    attr
                 _-> attr
 
         1 ->    -- Mechanic
-            attr
+            case level of
+                1 ->     -- Armor Upgrade I
+                    setCurrentAttr Armor 80 attr
+                    |> setMaxAttr Armor 80
+                2 ->     -- Armor Upgrade II
+                    setCurrentAttr Armor 80 attr
+                    |> setMaxAttr Armor 80
+                3 ->
+                    if id == 0 then -- More Bullets
+                        setCurrentAttr Clip 100 attr
+                        |> setMaxAttr Clip 100
+                    else    -- Direcitional Blasting
+                        attr
+                4-> -- Skills in level 4 does not change attributes
+                    attr
+                _->
+                    attr
         2 ->    -- Berserker
             case level of
                 1 ->    -- Shooting Skill I

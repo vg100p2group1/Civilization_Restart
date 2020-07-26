@@ -92,7 +92,7 @@ playerDemonstrate model =
             , Html.Attributes.style "float" "left"
             , Html.Attributes.style "border" "outset"
             ]
-            [ Svg.svg 
+            [Svg.svg 
                 [ Mouse.onMove(.clientPos>>MouseMove)
                 , Mouse.onDown(\event->MouseDown)
                 , Mouse.onUp(\event->MouseUp)
@@ -105,6 +105,7 @@ playerDemonstrate model =
             , showDialogue model 0
             , showSkill model
             , showSynthesis model
+            , showGameOver model
         ]
 
 
@@ -319,10 +320,10 @@ showSkill model =
             , button [onClick <| SkillChange <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
             , div [style "margin" "20px 0 0 180px"] [text points]
             , div
-                [style "margin" "40px 0 0 120px"]
+                [style "margin" "20px 0 0 120px"]
                 (List.map (skillToButton curr.chosen) skills)
             , div
-                [ style "margin" "190px 0 0 0"
+                [ style "margin" "230px 0 0 0"
                 , style "padding" "5px 10px 5px 10px"
                 , style "height" "60px"
                 , style "background" "#FFF"]
@@ -353,9 +354,28 @@ skillToButton (chosenId, chosenLevel) skill =
     , style "position" "absolute"
     , style "margin" (top ++ " 0 0 " ++ left)
     , style "background" color
+    , style "width" "70px"
+    , style "height" "35px"
     ] ++ border)
-    [text ("(" ++ String.fromInt id ++ "," ++ String.fromInt level ++ ")")]
+    [text skill.name]
 
+showGameOver : Model -> Html Msg
+showGameOver model =
+    if model.isGameOver then
+        div
+            [ style "background" "rgba(236, 240, 241, 0.89)"
+            , style "color" "#34495f"
+            , style "height" "400px"
+            , style "left" "280px"
+            , style "padding" "0 140px"
+            , style "position" "absolute"
+            , style "top" "155px"
+            , style "width" "400px"
+            ]
+            [ div [style "margin" "160px 0 0 135px", style "color" "red",style "font-size" "24px"] [text "Game Over"]
+            ]
+    else
+        div [] []
 
 showMiniMap : Model -> Html.Html Msg
 showMiniMap model =
