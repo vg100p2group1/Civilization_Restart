@@ -1,8 +1,9 @@
 module UpdateSkill exposing (updateSkill)
 
-import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
+import Skill exposing (SubSystem,switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
 import Model exposing (Model, GameState(..))
 import Messages exposing (Msg, SkillMsg(..))
+import Attributes exposing (Attributes, setCurrentAttr)
 
 updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
 updateSkill msg model =
@@ -38,7 +39,7 @@ updateSkill msg model =
                 sub = getCurrentSubSystem sys
                 subList = sys.subsys
                 newSub = choose sub (id, level)
-                newSubList = List.take sys.current subList ++ [newSub] ++ (List.drop (sys.current+1) subList)
+                newSubList = List.take sys.current subList ++ newSub :: List.drop (sys.current+1) subList
                 newSys = {sys|subsys = newSubList}
                 newMe = {me|skillSys = newSys}
                 newModel = {model|myself = newMe}
@@ -54,9 +55,14 @@ updateSkill msg model =
                         ({sub|text ="it requires more points than you have"}, sys.points)
                     else
                         (newSub, sys.points - cost)
-                newSubList = List.take sys.current subList ++ [finalSub] ++ List.drop (sys.current+1) subList
+                newSubList = List.take sys.current subList ++ finalSub :: List.drop (sys.current+1) subList
                 newSys = {sys|subsys = newSubList, points = points}
                 newMe = {me|skillSys = newSys}
                 newModel = {model|myself = newMe}
             in
                 (newModel, Cmd.none)
+
+atUnlock : SubSystem -> Attribute -> (SubSystem, Attribute)
+atUnlock sub attr =
+    -- find out what skill is unlocked
+    (sub, attr)

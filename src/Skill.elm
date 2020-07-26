@@ -8,7 +8,8 @@ type alias SkillSystem =
     }
 
 type alias SkillSubSystem = 
-    { skills : List Skill
+    { id : Int
+    , skills : List Skill
     , name : String
     , chosen : (Int, Int)  -- The (id, level) of chosen Skill
     , text : String
@@ -231,7 +232,8 @@ skillDualWield =
 
 subSys0 : SkillSubSystem
 subSys0 = 
-    { skills = [skill010, skill011, skill020, skill021, skill030, skill031]
+    { id = 0
+    , skills = [skill010, skill011, skill020, skill021, skill030, skill031]
     , name = "SubSystem 0"
     , chosen = (-1,-1)
     , text = ""
@@ -240,7 +242,8 @@ subSys0 =
 
 subSys1 : SkillSubSystem
 subSys1 = 
-    { skills = [skill110, skill111, skill120, skill121, skill130, skill131]
+    { id = 1
+    , skills = [skill110, skill111, skill120, skill121, skill130, skill131]
     , name = "SubSystem 1"
     , chosen = (-1,-1)
     , text = ""
@@ -249,7 +252,8 @@ subSys1 =
 
 subSysBerserker : SkillSubSystem
 subSysBerserker = 
-    { skills = 
+    { id = 2
+    , skills = 
         [ skillShootingSkillI
         , skillAmplifyDamageI
         , skillShootingSkillII, skillAmplifyDamageII
