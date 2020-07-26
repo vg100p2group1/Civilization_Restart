@@ -21,7 +21,8 @@ type alias Me =
     , moveLeft : Bool
     , moveDown : Bool
     , mouseData : (Float,Float)
-    , fire : Bool 
+    , fire : Bool
+    , dualWield : Bool
   --   , name : String
   --   , score : Float
     , hitBox : Circle
@@ -57,6 +58,7 @@ defaultMe =
     , moveDown = False
     , mouseData = (500,500)
     , fire = False
+    , dualWield = False
     , hitBox = Circle 500 500 50
     , weapons = weaponList
     , currentWeapon = defaultWeapon
