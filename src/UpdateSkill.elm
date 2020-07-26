@@ -77,6 +77,16 @@ atUnlock sub attr =
                 1 ->    -- Speed Up I
                     setCurrentAttr Speed 20 attr
                     |> setMaxAttr Speed 20
+                2 ->    -- Miss I
+                    attr
+                3 ->
+                    if id == 0 then -- Speed Up II
+                        setCurrentAttr Speed 20 attr
+                        |> setMaxAttr Speed 20
+                    else
+                        attr
+                4 -> -- Skills in level 4 does not change attributes
+                    attr
                 _-> attr
 
         1 ->    -- Mechanic
