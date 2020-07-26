@@ -300,8 +300,8 @@ showSkill model =
             points = String.fromInt sys.points
             txt = curr.text
             sysName = curr.name
-            currentCost = Tuple.second (unlockChosen curr)
-            chosenCanUnlock = currentCost > 0 && currentCost < sys.points 
+            currentCost = (Tuple.second (unlockChosen curr))
+            chosenCanUnlock = currentCost > 0 && currentCost <= sys.points 
         in
             div
             [ style "background" "rgba(236, 240, 241, 0.89)"

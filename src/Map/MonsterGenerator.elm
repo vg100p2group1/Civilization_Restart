@@ -95,15 +95,16 @@ updateMonster_ monster bullets me =
         battleFervorFactor = 
             if skill.unlocked then
             let
-                maxHealth = getMaxAttr Health me.attr
-                currentHealth = getCurrentAttr Health me.attr
+                maxHealth = Debug.log "max" (getMaxAttr Health me.attr)
+                currentHealth = Debug.log "Curr" (getCurrentAttr Health me.attr)
                 loseHealthRate = 1 - toFloat currentHealth / toFloat maxHealth
             in
                 1 + loseHealthRate / 2
             else
                 1
-        attackFactor = (getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat) * battleFervorFactor
-        newMonsterType = {monsterType_ | hp = monsterType_.hp - attackFactor * List.sum (List.map (\b -> b.force) hitBullets)}
+        attackFactor = ((getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat) * battleFervorFactor)
+        damage = attackFactor * List.sum (List.map (\b -> b.force) hitBullets)
+        newMonsterType = {monsterType_ | hp = monsterType_.hp - damage}
         {- debug test
         newMonsterType =
                 if List.isEmpty hitBullets then
