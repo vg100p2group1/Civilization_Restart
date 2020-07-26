@@ -131,7 +131,7 @@ leavesUpdate  roomUpdated roomList num seed0 storey=
     let
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
         (obstacleTemp, seed1) = bossRoomObstacleGenerator seed0
-        bossTemp = bossGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
+        bossTemp = bossGenerator seed1 obstacleTemp storey -- 到时候把boss 给剔除出去
         (treasureTemp, seed3) = treasureGenerator seed1 obstacleTemp storey
         roomTemp = List.head roomList
         roomListNew = List.drop 1 roomList

@@ -6,6 +6,7 @@ import Model exposing (..)
 import Config exposing (bulletSpeed)
 import Weapon exposing(Bullet,ShooterType(..))
 import Random exposing (..)
+import Time exposing (now,posixToMillis)
 
 
 
@@ -20,13 +21,13 @@ bossTypeList =
 
 
 
-bossGenerator : Random.Seed ->List Obstacle ->  List Boss
-bossGenerator seed0 obstacle =
+bossGenerator : Random.Seed ->List Obstacle -> Int ->  List Boss
+bossGenerator seed0 obstacle storey=
     let
         
         -- obstacle = room.obstacles
         
-        bossList= bossBuilding [] obstacle 0 seed0
+        bossList= bossBuilding [] obstacle (modBy 2 storey ) seed0
     in
         bossList
 
@@ -131,10 +132,10 @@ bossAct  me boss =
         distx = abs (me.x - boss.position.edge.cx)
         disty = abs (me.y - boss.position.edge.cy)
 
-        dist= distx+ disty
+        
 
         checkActive = 
-            dist <= 500
+            (distx <= 500) || (disty<=500)
 
         firstShootingType = List.head boss.bossType.shootingType
 
@@ -214,19 +215,32 @@ targetedShoot boss num shootingType bullitList seed me=
     let
         
 
-        distx = me.x - boss.position.edge.cx
-        disty = me.y - boss.position.edge.cx
+        distx =  me.x - boss.position.edge.cx
+        disty =  me.y - boss.position.edge.cy
 
         dist = sqrt ((distx)^2 + (disty)^2)
 
-        speedx= 
-            (distx / dist) 
-        speedy= 
+        numtodirx  = 
+            (cos (degrees directiondiff))
+        numtodiry  = 
+            (sin (degrees directiondiff))  
+
+        
+
+        (directiondiff,seed1) =  Random.step (Random.float -shootingType.direction shootingType.direction) seed
+
+        disriedSpeedx= 
+             (distx / dist)
+        disriedSpeedy= 
             (disty / dist)
+
+        speedx = disriedSpeedx * numtodirx - numtodiry * disriedSpeedy
+
+        speedy = disriedSpeedx * numtodiry + numtodirx * disriedSpeedy
         
         oneNewBullet : Bullet
         oneNewBullet = Bullet boss.position.edge.cx  boss.position.edge.cy shootingType.r (Circle boss.position.edge.cx boss.position.edge.cy 5) (10*(speedx )) (10*(speedy )) False Weapon.Monster shootingType.attack
 
     in
         if num==0 then bullitList
-            else targetedShoot boss (num - 1) shootingType (oneNewBullet :: bullitList ) seed me
+            else targetedShoot boss (num - 1) shootingType (oneNewBullet :: bullitList ) seed1 me
