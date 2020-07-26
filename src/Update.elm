@@ -257,7 +257,7 @@ fireBullet_ weapon (mouseX,mouseY) (meX, meY)=
     let
         bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
         (newShoot, fireFlag, counter) =
-            if weapon.counter == 0 then
+            if weapon.counter <= 0 then
                 if weapon.auto then
                     (bullet, False, weapon.period)
                 else if weapon.hasFired then
@@ -316,14 +316,14 @@ animate  model =
 speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
-        speedFactor = (getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat)
-
+        speedFactor = Debug.log "factor" ((getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat))
+        speed = speedFactor * playerSpeed
         getNewXSpeed =
             if me.moveLeft then 
-                (True,-playerSpeed)
+                (True,-speed)
             else
                 if me.moveRight then
-                  (True,playerSpeed)
+                  (True,speed)
                 else
                     (False,0)
         
@@ -331,10 +331,10 @@ speedCase me map=
         
         getNewYSpeed =  
             if me.moveUp then 
-                (True,-playerSpeed)
+                (True,-speed)
             else
                 if me.moveDown then
-                  (True,playerSpeed)
+                  (True,speed)
                 else
                     (False,0)
 
