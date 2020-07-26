@@ -17,12 +17,9 @@ import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Synthesis.Package exposing (packageUpdate)
-<<<<<<< HEAD
 import Control.EnableDoor exposing (enableDoor)
-=======
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
->>>>>>> Wu_Qifei
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -263,7 +260,6 @@ animate  model =
         me = model.myself
         attr = me.attr
         isDead = 0 == getCurrentAttr Health attr
-        (newMe_,collision) = speedCase me model.map
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
                                     fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
@@ -272,7 +268,7 @@ animate  model =
                              else
                                 ([], model.myself.currentWeapon)
         newAttr = setCurrentAttr Clip -(List.length newShoot) attr
-        newMe = {newMe_|attr=newAttr}
+        newMeAttr = {me|attr=newAttr}
         -- This is for the cooling time of weapons
         weaponCounter =
             if weapon.counter <= 0 then
@@ -529,7 +525,7 @@ updateBullet me map bullets (collisionX,collisionY) =
                     -- hit obstacles
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.obstacles)))
                     -- hit doors
-                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.doors)))
+                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge (List.map (\value->value.position) map.doors))))
                     -- on the roads
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
                     -- hit monsters and are shoot by player
