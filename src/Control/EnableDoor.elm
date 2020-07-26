@@ -42,7 +42,7 @@ inCorridor me =
         y = toFloat <| (floor (me.y/2500))*2500
         -- d1=Debug.log "delta" (me.x-x,me.y-y)
     in
-        (me.x-x>2000||me.y-y>2000||me.x-x<200||me.y-y<200)
+        (me.x-x>1800||me.y-y>1800||me.x-x<200||me.y-y<200)
 
 
 
