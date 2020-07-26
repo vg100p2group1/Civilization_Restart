@@ -288,7 +288,19 @@ animate  model =
                              else
                                 ([], model.myself.currentWeapon)
         newAttr = setCurrentAttr Clip -(List.length newShoot) attr
+        {- for testing
         number = Debug.log "number" (getCurrentAttr Clip newAttr)
+        h1 = List.head newShoot
+        h2 = List.head(List.drop 1 newShoot)
+        y1_ = case h1 of
+                Nothing -> 0
+                Just a -> a.y
+        y1 = Debug.log "y1" y1_
+        y2_ = case h2 of
+                Nothing -> 0
+                Just a -> a.y
+        y2 = Debug.log "y2" y2_
+        -}
         newMe = {newMe_|attr=newAttr}
         -- This is for the cooling time of weapons
         weaponCounter =
@@ -312,6 +324,16 @@ animate  model =
         newState = updateState model
         meHit = hit hurtPlayer newMe
         dual = Debug.log "dual" model.myself.dualWield
+        h1 = List.head newBullet_
+        h2 = List.head(List.drop 1 newBullet_)
+        y1_ = case h1 of
+                Nothing -> 0
+                Just a -> a.y
+        y1 = Debug.log "y1" y1_
+        y2_ = case h2 of
+                Nothing -> 0
+                Just a -> a.y
+        y2 = Debug.log "y2" y2_
     in
         {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
@@ -514,8 +536,8 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) dual =
         bulletList =
             if dual then
                 let
-                    b1 = bulletList_ |> List.map (\b -> {b|y=b.y + 100})
-                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y - 100})
+                    b1 = bulletList_ |> List.map (\b -> {b|y=b.y-20/unitV*(posX - 520),x=b.x+20/unitV*(posY - 520),hitbox=Circle (b.x+20/unitV*(posY - 520)) (b.y-20/unitV*(posX - 520)) b.r})
+                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y+20/unitV*(posX - 520),x=b.x-20/unitV*(posY - 520),hitbox=Circle (b.x-20/unitV*(posY - 520)) (b.y+20/unitV*(posX-520)) b.r})
                 in
                     List.append b1 b2
             else
