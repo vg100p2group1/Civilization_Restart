@@ -1,4 +1,4 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem)
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem, getSubSys, getSkill)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -41,18 +41,28 @@ switchSubSystem sys dire =
     in
         {sys|current = newCurr}
 
-getSkill : SkillSubSystem -> (Int, Int) -> Maybe Skill
+getSkill : SkillSubSystem -> (Int, Int) -> Skill
 getSkill sys (id, level) =
     let
         chosenList = List.filter (\sk -> sk.id == id && sk.level == level) sys.skills
     in
-        List.head chosenList
+        Maybe.withDefault emptySkill (List.head chosenList)
+
+getSubSys : SkillSystem -> Int -> SkillSubSystem
+getSubSys sys id =
+    let
+        sub = sys.subsys
+            |> List.filter (\s -> s.id == id)
+            |> List.head
+            |>Maybe.withDefault defaultSubSystem 
+    in
+        sub
+    
 
 choose : SkillSubSystem -> (Int, Int) -> SkillSubSystem
 choose sys (id, level) =
     let 
-        maybeSkill = getSkill sys (id, level)
-        skill = Maybe.withDefault emptySkill maybeSkill
+        skill = getSkill sys (id, level)
     in
         {sys|chosen = (skill.id, skill.level), text = skill.desciption}
 
@@ -68,22 +78,19 @@ unlockChosen : SkillSubSystem -> (SkillSubSystem, Int)
 unlockChosen sys = 
     let 
         (id, level) = sys.chosen
-        maybeSkill = getSkill sys (id, level)
+        skill = getSkill sys (id, level)
     in
-        case maybeSkill of 
-            Maybe.Nothing -> (sys, 0)
-            Just skill ->
-                if skill.unlocked || not (canUnlockLevel sys skill.level) then  -- the skill is already unlocked
-                    (sys, 0)
-                else  -- unlock the skill
-                let
-                    newSkill = {skill|unlocked = True}
-                    newSkills = newSkill :: List.filter (\sk -> not (sk.id == id && sk.level == level)) sys.skills
-                    newUnlocklevel = Basics.max sys.unlockLevel skill.level
-                    newSubsystem = {sys | skills = newSkills, unlockLevel = newUnlocklevel}
-                    cost = skill.level
-                in
-                    (newSubsystem, cost)
+        if skill.unlocked || not (canUnlockLevel sys skill.level) then  -- the skill is already unlocked or cannot unlock
+            (sys, 0)
+        else  -- unlock the skill
+        let
+            newSkill = {skill|unlocked = True}
+            newSkills = newSkill :: List.filter (\sk -> not (sk.id == id && sk.level == level)) sys.skills
+            newUnlocklevel = Basics.max sys.unlockLevel skill.level
+            newSubsystem = {sys | skills = newSkills, unlockLevel = newUnlocklevel}
+            cost = skill.level
+        in
+            (newSubsystem, cost)
 
 -- Define all the skills:
 skill010 : Skill
