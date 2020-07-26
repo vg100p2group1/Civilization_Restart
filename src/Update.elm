@@ -212,6 +212,7 @@ update msg model =
                 ( {model| myself= me}
                 , Cmd.none
                 )
+        
 
 changeWeapon : Int -> Model -> Model
 changeWeapon number model =
