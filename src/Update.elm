@@ -1,14 +1,12 @@
-
 module Update exposing (update)
-
-import Messages exposing (Msg(..), SkillMsg(..))
+import Messages exposing (Msg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
-import Map.Map exposing (Map,mapConfig)
+import Map.Map exposing (Map,mapConfig,Treasure,treasureInit)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
-import Skill exposing (switchSubSystem, choose, unlockChosen, getCurrentSubSystem)
+import UpdateSkill exposing (updateSkill)
 -- import Svg.Attributes exposing (viewBox)
 -- import Html.Attributes exposing (value)
 import Map.MapGenerator exposing (roomGenerator,roomInit)
@@ -17,6 +15,8 @@ import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import  Map.TreasureGenerator exposing (updateTreasure)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
+import Synthesis.UpdateSynthesis exposing (updateSynthesis)
+import Synthesis.Package exposing (packageUpdate)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -37,6 +37,7 @@ update msg model =
                     , explosionViewbox = []
                     , paused = False
                     , gameState = Playing
+                    , storey = 1
                     }
             in
                 (init, Cmd.none)
@@ -125,22 +126,34 @@ update msg model =
                 me= {pTemp|fire=False,currentWeapon={weapon|hasFired=False}}
             in
                 ({model|myself = me},Cmd.none) 
-        NextFloor ->
+        FMsg ->  -- FMsg
             if model.gameState == Playing then
                 if model.state == NextStage then
                     let
                         roomNew =
-                            roomGenerator 1 (Tuple.second model.rooms)
+                            roomGenerator (model.storey+1) (Tuple.second model.rooms) 
 
                         mapNew = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
                         meTemp = model.myself
-                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon}
+                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package}
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
-                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused},Cmd.none)
-                else
-                    (model, Cmd.none)
+                        ({model|myself=meNew,rooms=roomNew,map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
+                else 
+                    case model.state of
+                        PickTreasure t ->
+                            let
+                                meTemp = model.myself
+                                package = meTemp.package
+                                newPackage = packageUpdate package t
+                                newTreasureList = List.filter (\value->value/=t) model.map.treasure
+                                mapTemp = model.map
+                                mapNew = {mapTemp|treasure=newTreasureList}
+                            in
+                                ({model|myself={meTemp|package=newPackage},map=mapNew},Cmd.none)
+                        _ ->
+                            (model, Cmd.none)
             else
                 (model, Cmd.none)
         Tick time ->
@@ -185,6 +198,9 @@ update msg model =
         
         SkillChange skillMsg ->
             updateSkill skillMsg model
+        
+        SynthesisSystem systhesisMsg ->
+            updateSynthesis systhesisMsg model
 
         Noop ->
             let 
@@ -241,7 +257,7 @@ fireBullet_ weapon (mouseX,mouseY) (meX, meY)=
     let
         bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
         (newShoot, fireFlag, counter) =
-            if weapon.counter == 0 then
+            if weapon.counter <= 0 then
                 if weapon.auto then
                     (bullet, False, weapon.period)
                 else if weapon.hasFired then
@@ -301,13 +317,13 @@ speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
         speedFactor = (getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat)
-
+        speed = speedFactor * playerSpeed
         getNewXSpeed =
             if me.moveLeft then 
-                (True,-playerSpeed)
+                (True,-speed)
             else
                 if me.moveRight then
-                  (True,playerSpeed)
+                  (True,speed)
                 else
                     (False,0)
         
@@ -315,10 +331,10 @@ speedCase me map=
         
         getNewYSpeed =  
             if me.moveUp then 
-                (True,-playerSpeed)
+                (True,-speed)
             else
                 if me.moveDown then
-                  (True,playerSpeed)
+                  (True,speed)
                 else
                     (False,0)
 
@@ -545,15 +561,41 @@ updateState : Model -> State
 updateState model =
     let
         collideGate = circleRecTest model.myself.hitBox model.map.gate.edge
+        collideTreasureList = getCollideTreasure model.map.treasure model.myself
+        getTreasure = 
+            let 
+                temp = List.head collideTreasureList
+            in
+                case temp of
+                    Just a ->
+                        a
+                    Nothing ->
+                        treasureInit 
+        -- collideTreasure =/
         newState =
             if collideGate then
                 NextStage
+            else if  not (List.isEmpty collideTreasureList) then
+                PickTreasure getTreasure
             else if model.state == Dialogue then
-                Dialogue
+                Dialogue 
             else
                 Others
     in
         newState
+
+
+getCollideTreasure : List Treasure-> Me -> List Treasure
+getCollideTreasure treasureList me= 
+    let
+        -- d1 =Debug.log "treasure" (List.map (\value -> value.material) treasureList)
+        treasureRec = List.map (\value -> value.position ) treasureList
+        treasure =List.filter (\value -> (circleRecTest me.hitBox value.position.edge) && (value.canShow == True )) treasureList 
+
+        -- d1 =Debug.log "treasure" (List.map (\value -> value.material) treasure)
+    in
+        treasure
+
 
 updateDialogues : Model -> Dialogues
 updateDialogues model =
@@ -582,60 +624,3 @@ hit bullet me =
                     setCurrentAttr Health -(min totalHurt health) attr
         in
             {me | attr = newAttr}
-
-updateSkill : SkillMsg -> Model -> (Model, Cmd Msg)
-updateSkill msg model =
-    let
-        me = model.myself
-        sys = me.skillSys
-    in
-    case msg of
-        TriggerSkillWindow->
-            let 
-                active = sys.active
-                subList = sys.subsys
-                newSub = List.map (\sub -> choose sub (0,0)) subList
-                newSys = {sys|active = not active, subsys = newSub}
-                newMe = {me|skillSys = newSys}
-                newModel =
-                    if model.paused then
-                        {model|myself = newMe, paused = not model.paused, gameState = Playing}
-                    else
-                        {model|myself = newMe, paused = not model.paused, gameState = Paused}
-            in
-                (newModel, Cmd.none)
-        SubSystemChange change ->
-            let 
-                delta = if change then 1 else -1
-                newSys = switchSubSystem sys delta
-                newMe = {me|skillSys = newSys}
-                newModel = {model|myself = newMe}
-            in
-                (newModel, Cmd.none)
-        ChooseSkill id level->
-            let 
-                sub = getCurrentSubSystem sys
-                subList = sys.subsys
-                newSub = choose sub (id, level)
-                newSubList = List.take sys.current subList ++ [newSub] ++ (List.drop (sys.current+1) subList)
-                newSys = {sys|subsys = newSubList}
-                newMe = {me|skillSys = newSys}
-                newModel = {model|myself = newMe}
-            in
-                (newModel, Cmd.none)
-        UnlockSkill ->
-            let
-                sub = getCurrentSubSystem sys
-                subList = sys.subsys
-                (newSub,cost) = unlockChosen sub
-                (finalSub, points) = 
-                    if cost > sys.points then     -- only apply if player can afford it
-                        ({sub|text ="it requires more points than you have"}, sys.points)
-                    else
-                        (newSub, sys.points - cost)
-                newSubList = List.take sys.current subList ++ [finalSub] ++ List.drop (sys.current+1) subList
-                newSys = {sys|subsys = newSubList, points = points}
-                newMe = {me|skillSys = newSys}
-                newModel = {model|myself = newMe}
-            in
-                (newModel, Cmd.none)

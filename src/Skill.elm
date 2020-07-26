@@ -1,4 +1,4 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem)
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem, getSubSys, getSkill)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -8,7 +8,8 @@ type alias SkillSystem =
     }
 
 type alias SkillSubSystem = 
-    { skills : List Skill
+    { id : Int
+    , skills : List Skill
     , name : String
     , chosen : (Int, Int)  -- The (id, level) of chosen Skill
     , text : String
@@ -40,18 +41,28 @@ switchSubSystem sys dire =
     in
         {sys|current = newCurr}
 
-getSkill : SkillSubSystem -> (Int, Int) -> Maybe Skill
+getSkill : SkillSubSystem -> (Int, Int) -> Skill
 getSkill sys (id, level) =
     let
         chosenList = List.filter (\sk -> sk.id == id && sk.level == level) sys.skills
     in
-        List.head chosenList
+        Maybe.withDefault emptySkill (List.head chosenList)
+
+getSubSys : SkillSystem -> Int -> SkillSubSystem
+getSubSys sys id =
+    let
+        sub = sys.subsys
+            |> List.filter (\s -> s.id == id)
+            |> List.head
+            |>Maybe.withDefault defaultSubSystem 
+    in
+        sub
+    
 
 choose : SkillSubSystem -> (Int, Int) -> SkillSubSystem
 choose sys (id, level) =
     let 
-        maybeSkill = getSkill sys (id, level)
-        skill = Maybe.withDefault emptySkill maybeSkill
+        skill = getSkill sys (id, level)
     in
         {sys|chosen = (skill.id, skill.level), text = skill.desciption}
 
@@ -67,22 +78,19 @@ unlockChosen : SkillSubSystem -> (SkillSubSystem, Int)
 unlockChosen sys = 
     let 
         (id, level) = sys.chosen
-        maybeSkill = getSkill sys (id, level)
+        skill = getSkill sys (id, level)
     in
-        case maybeSkill of 
-            Maybe.Nothing -> (sys, 0)
-            Just skill ->
-                if skill.unlocked || not (canUnlockLevel sys skill.level) then  -- the skill is already unlocked
-                    (sys, 0)
-                else  -- unlock the skill
-                let
-                    newSkill = {skill|unlocked = True}
-                    newSkills = newSkill :: List.filter (\sk -> not (sk.id == id && sk.level == level)) sys.skills
-                    newUnlocklevel = Basics.max sys.unlockLevel skill.level
-                    newSubsystem = {sys | skills = newSkills, unlockLevel = newUnlocklevel}
-                    cost = skill.level
-                in
-                    (newSubsystem, cost)
+        if skill.unlocked || not (canUnlockLevel sys skill.level) then  -- the skill is already unlocked or cannot unlock
+            (sys, 0)
+        else  -- unlock the skill
+        let
+            newSkill = {skill|unlocked = True}
+            newSkills = newSkill :: List.filter (\sk -> not (sk.id == id && sk.level == level)) sys.skills
+            newUnlocklevel = Basics.max sys.unlockLevel skill.level
+            newSubsystem = {sys | skills = newSkills, unlockLevel = newUnlocklevel}
+            cost = skill.level
+        in
+            (newSubsystem, cost)
 
 -- Define all the skills:
 skill010 : Skill
@@ -181,57 +189,58 @@ skill131 =
     , desciption = "Skill 1 level 3 in subsystem 1"
     }
 
-skill210 : Skill
-skill210 = 
+skillShootingSkillI : Skill
+skillShootingSkillI = 
     { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill 0 level 1 in subsystem 2"
+    , desciption = "Skill: Shooting SKill I in subsystem Berserker"
     }
 
-skill211 : Skill
-skill211 = 
-    { id = 1
-    , level = 1
-    , unlocked = False
-    , desciption = "Skill 1 level 1 in subsystem 2"
-    }
-
-skill220 : Skill
-skill220 = 
+skillAmplifyDamageI : Skill
+skillAmplifyDamageI = 
     { id = 0
     , level = 2
     , unlocked = False
-    , desciption = "Skill 0 level 2 in subsystem 2"
+    , desciption = "Skill: Amplify Damage I in subsystem Berserker"
     }
 
-skill221 : Skill
-skill221 = 
-    { id = 1
-    , level = 2
-    , unlocked = False
-    , desciption = "Skill 1 level 2 in subsystem 2"
-    }
-
-skill230 : Skill
-skill230 = 
+skillShootingSkillII : Skill
+skillShootingSkillII = 
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill 0 level 3 in subsystem 2"
+    , desciption = "Skill: Shooting SKill II in subsystem Berserker"
     }
 
-skill231 : Skill
-skill231 = 
+skillAmplifyDamageII : Skill
+skillAmplifyDamageII = 
     { id = 1
     , level = 3
     , unlocked = False
-    , desciption = "Skill 1 level 3 in subsystem 2"
+    , desciption = "Skill: Amplify Damage in subsystem Berserker"
+    }
+
+skillBattleFervor : Skill
+skillBattleFervor = 
+    { id = 0
+    , level = 4
+    , unlocked = False
+    , desciption = "Skill: Battle Fervor in subsystem Berserker"
+    }
+
+skillDualWield : Skill
+skillDualWield = 
+    { id = 1
+    , level = 4
+    , unlocked = False
+    , desciption = "Skill: Dual Wield in subsystem Berserker"
     }
 
 subSys0 : SkillSubSystem
 subSys0 = 
-    { skills = [skill010, skill011, skill020, skill021, skill030, skill031]
+    { id = 0
+    , skills = [skill010, skill011, skill020, skill021, skill030, skill031]
     , name = "SubSystem 0"
     , chosen = (-1,-1)
     , text = ""
@@ -240,17 +249,24 @@ subSys0 =
 
 subSys1 : SkillSubSystem
 subSys1 = 
-    { skills = [skill110, skill111, skill120, skill121, skill130, skill131]
+    { id = 1
+    , skills = [skill110, skill111, skill120, skill121, skill130, skill131]
     , name = "SubSystem 1"
     , chosen = (-1,-1)
     , text = ""
     , unlockLevel = 0
     }
 
-subSys2 : SkillSubSystem
-subSys2 = 
-    { skills = [skill210, skill211, skill220, skill221, skill230, skill231]
-    , name = "SubSystem 2"
+subSysBerserker : SkillSubSystem
+subSysBerserker = 
+    { id = 2
+    , skills = 
+        [ skillShootingSkillI
+        , skillAmplifyDamageI
+        , skillShootingSkillII, skillAmplifyDamageII
+        , skillBattleFervor, skillDualWield
+        ]
+    , name = "Berserker"
     , chosen = (-1,-1)
     , text = ""
     , unlockLevel = 0
@@ -261,7 +277,7 @@ defaultSubSystem = subSys0
 
 defaultSystem : SkillSystem
 defaultSystem = 
-    { subsys = [subSys0, subSys1, subSys2]
+    { subsys = [subSys0, subSys1, subSysBerserker]
     , current = 0
     , points = 10
     , active = False
