@@ -1,5 +1,39 @@
 # Change Log
 
+### [0.5.0] - 2020-07-26
+
+#### Added:
+
+* Add attributes of clip, attack, hp, armor, and shootSpeed to the player.
+* The skills of Berserker upgrading can be applied to actual behaviors in the game.
+* Add the function of Pause and Resume for the game by pressing **Blank Space**.
+* Add the death window reminder for the player after his HP becomes 0.
+* Refine the shooting patterns of the monsters.
+* Add the active skill of dualWield in the game that player can shoot two bullets at one time by pressing **1**.
+* Add the door that can be closed or opened in the game.
+* Add package System and Synthesis System.
+* Different pictures for this game including guns and walls.
+
+#### Fixed:
+
+* Fix the bug that the shootSpeed of the weapons can not be correctly updated.
+* Fix the bug that the corner of the minimap will vanish.
+* Fix the bug that when player is upgrading the skill tree, the game still goes on instead of pausing.
+* Fix the bug there sometimes exist disorderly pictures.
+
+#### Deprecated:
+
+* The The simple dialogues will be replaced by more advanced ones to push the story.
+* The blank and ugly background will be replaced.
+* The treasure box pictures will be replaced by pictures instead of simple colorful rectangles.
+
+#### Removed: 
+
+* The connection line between the mouse position and players' guns.
+* The original small and simple guns.
+* Changing weapon by pressing **1, 2, 3, 4**
+* Delete one of the skill trees.
+
 ### [0.2.0] - 2020-07-19
 
 #### Added:
