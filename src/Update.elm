@@ -316,7 +316,7 @@ animate  model =
 speedCase : Me -> Map-> (Me,(Bool,Bool))
 speedCase me map= 
     let 
-        speedFactor = Debug.log "factor" ((getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat))
+        speedFactor = (getCurrentAttr Speed me.attr |> toFloat) / (getCurrentAttr Speed defaultAttr |> toFloat)
         speed = speedFactor * playerSpeed
         getNewXSpeed =
             if me.moveLeft then 

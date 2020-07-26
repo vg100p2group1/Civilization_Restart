@@ -55,7 +55,7 @@ updateSkill msg model =
                     if cost > sys.points then     -- only apply if player can afford it
                         ({sub|text ="it requires more points than you have"}, sys.points, attr)
                     else
-                        (newSub, sys.points - cost, attr)
+                        (newSub, sys.points - cost, atUnlock newSub attr)
                 newSubList = List.take sys.current subList ++ finalSub :: List.drop (sys.current+1) subList
                 newSys = {sys|subsys = newSubList, points = points}
                 newMe = {me|skillSys = newSys, attr = newAttr}
@@ -67,9 +67,9 @@ atUnlock : SkillSubSystem -> Attr -> Attr
 atUnlock sub attr =
     -- find out what skill is unlocked
     let
-        subId =  Debug.log "at unlock" sub.id
-        id = Debug.log "at unlock" (Tuple.first sub.chosen)
-        level = Debug.log "at unlock" (Tuple.second sub.chosen)
+        subId =  sub.id
+        id = Tuple.first sub.chosen
+        level = Tuple.second sub.chosen
     in
     case subId of
         0 ->    -- Phantom
@@ -82,10 +82,10 @@ atUnlock sub attr =
         1 ->    -- Mechanic
             attr
         2 ->    -- Berserker
-            Debug.log "emmm" (case level of
+            case level of
                 1 ->    -- Shooting Skill I
-                    Debug.log "attr" (setCurrentAttr ShootSpeed 30 attr
-                    |> setMaxAttr ShootSpeed 30)
+                    setCurrentAttr ShootSpeed 30 attr
+                    |> setMaxAttr ShootSpeed 30
                 2 ->    -- Amplify Damage I
                     setCurrentAttr Attack 200 attr
                     |> setMaxAttr Attack 200
@@ -99,5 +99,5 @@ atUnlock sub attr =
                 4 -> -- Skills in level 4 does not change attributes
                     attr
                 _ ->
-                    attr)
+                    attr
         _-> attr
