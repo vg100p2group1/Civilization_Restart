@@ -92,7 +92,7 @@ playerDemonstrate model =
             , Html.Attributes.style "float" "left"
             , Html.Attributes.style "border" "outset"
             ]
-            [ Svg.svg 
+            [Svg.svg 
                 [ Mouse.onMove(.clientPos>>MouseMove)
                 , Mouse.onDown(\event->MouseDown)
                 , Mouse.onUp(\event->MouseUp)
@@ -105,6 +105,7 @@ playerDemonstrate model =
             , showDialogue model 0
             , showSkill model
             , showSynthesis model
+            , showGameOver model
         ]
 
 
@@ -358,6 +359,23 @@ skillToButton (chosenId, chosenLevel) skill =
     ] ++ border)
     [text skill.name]
 
+showGameOver : Model -> Html Msg
+showGameOver model =
+    if model.isGameOver then
+        div
+            [ style "background" "rgba(236, 240, 241, 0.89)"
+            , style "color" "#34495f"
+            , style "height" "400px"
+            , style "left" "280px"
+            , style "padding" "0 140px"
+            , style "position" "absolute"
+            , style "top" "155px"
+            , style "width" "400px"
+            ]
+            [ div [style "margin" "160px 0 0 135px", style "color" "red",style "font-size" "24px"] [text "Game Over"]
+            ]
+    else
+        div [] []
 
 showMiniMap : Model -> Html.Html Msg
 showMiniMap model =
