@@ -85,6 +85,7 @@ type alias Model =
     , paused : Bool
     , gameState : GameState
     , storey : Int 
+    , isGameOver : Bool
     }
 
 type State = Dialogue

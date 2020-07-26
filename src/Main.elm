@@ -10,8 +10,7 @@ import Task
 import View exposing (view)
 import Update
 import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..))
-import Map.MapDisplay exposing (mapInit)
-import Map.MapGenerator exposing (roomInit)
+import Init exposing (init)
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -95,6 +94,7 @@ key on keycode =
         _ ->
             Noop
 
+<<<<<<< HEAD
 init : Model
 init =
     let
@@ -117,6 +117,8 @@ init =
         , storey = 1
         }
 
+=======
+>>>>>>> Wu_Qifei
 
 
 
