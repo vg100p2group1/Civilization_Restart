@@ -160,7 +160,7 @@ skillArmorUpgradeI =
 skillArmorUpgradeII : Skill
 skillArmorUpgradeII = 
     { id = 0
-    , level = 1
+    , level = 2
     , unlocked = False
     , desciption = "Skill: Armor Upgrade II in subsystem Mechanic"
     , name = "Armor Upgrade II"

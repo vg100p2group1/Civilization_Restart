@@ -319,10 +319,10 @@ showSkill model =
             , button [onClick <| SkillChange <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
             , div [style "margin" "20px 0 0 180px"] [text points]
             , div
-                [style "margin" "40px 0 0 120px"]
+                [style "margin" "20px 0 0 120px"]
                 (List.map (skillToButton curr.chosen) skills)
             , div
-                [ style "margin" "190px 0 0 0"
+                [ style "margin" "230px 0 0 0"
                 , style "padding" "5px 10px 5px 10px"
                 , style "height" "60px"
                 , style "background" "#FFF"]
@@ -353,8 +353,10 @@ skillToButton (chosenId, chosenLevel) skill =
     , style "position" "absolute"
     , style "margin" (top ++ " 0 0 " ++ left)
     , style "background" color
+    , style "width" "70px"
+    , style "height" "35px"
     ] ++ border)
-    [text ("(" ++ String.fromInt id ++ "," ++ String.fromInt level ++ ")")]
+    [text skill.name]
 
 
 showMiniMap : Model -> Html.Html Msg
