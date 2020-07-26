@@ -291,8 +291,8 @@ animate  model =
                 0
             else
                 weapon.counter - 1
-        newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * w.period}) newMe.weapons
-        newPeriod = (getCurrentAttr ShootSpeed newAttr |> toFloat) / (getCurrentAttr ShootSpeed defaultAttr |> toFloat) * newMe.currentWeapon.period
+        newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
+        newPeriod = Debug.log "newPeriod" ((getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod)
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount []
