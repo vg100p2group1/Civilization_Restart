@@ -1,7 +1,7 @@
 
 module Map.MapDisplay exposing (mapWithGate, mapInit, showMap)
 -- import MapGenerator exposing (..)
-import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig,Wall,WallProperty(..))
+import Map.Map exposing (Room,Map,Monster,Treasure,roomConfig,mapConfig,Wall,WallProperty(..),Boss)
 import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
@@ -67,6 +67,22 @@ drawMonsters room number=
     in
         List.map (\value->{value| region = movingRectangle value.region,position = movingCircle value.position,roomNum=number}) monsterList
 
+drawBoss : Room -> Int -> List Boss
+drawBoss room number=
+    let
+        (x,y) = room.position
+        newX = toFloat (2500*x)
+        newY = toFloat (2500*y)
+        monsterList = room.boss
+        movingRectangle model =
+            let
+                newModel = {model|x=model.x+newX,y=model.y+newY}
+            in
+                recUpdate newModel
+
+       
+    in
+        List.map (\value->{value| position = movingRectangle value.position,roomNum=number}) monsterList
 drawTreasure : Room -> Int -> List Treasure
 drawTreasure room number=
     let

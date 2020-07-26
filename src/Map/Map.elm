@@ -1,5 +1,5 @@
 
-module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,Boss,BossType,ShootingType,AttackMode(..))
 import Shape exposing (Rectangle,recInit)
 import Config exposing (viewBoxMax)
 import Weapon exposing (Arsenal)
@@ -44,34 +44,38 @@ type alias Monster =
     , roomNum : Int
     }
 
+type AttackMode 
+    = Circled
+    | Targeted
 
-type alias Shootingtype =
-    {   bulletNum : Int
-    ,   attack : Int
+type alias ShootingType =
+    {   attackMode : AttackMode
+    ,    bulletNum : Int
     ,   direction : Int
-    ,   bulletType : Arsenal
-    ,   bulletsToBeShot : Int
-    ,   bulletsShooted : Int
+    ,   attack : Int
+    ,   speed : Int 
+    ,   r : Int
+    -- ,   bulletsToBeShot : Int
+    -- ,   bulletsShooted : Int
     ,   bulletInterval : Int
-    ,   timeBeforeShooting : Int
         
     }
 
 type alias BossType =
     {   level : Int
-    ,   size : Rectangle 
+    ,   width : Float
+    ,   height : Float
     ,   color : String 
-    ,   shootingtype : List Shootingtype    
+    ,   shootingType : List ShootingType    
     
     }
 type alias Boss =
-    { position : Shape.Circle
+    { position : Rectangle
     , bossnum : Int
-    , bosstype : BossType
+    , bossType : BossType
     , seed : Seed
     , active : Bool
     , timeBeforeAttack : Int
-    , speed : Float
     , roomNum : Int
     }
 
@@ -79,7 +83,8 @@ type alias Boss =
 type alias Room =
     { position : (Int,Int)
     , gate : Bool
-    , boss : Bool
+    , haveBoss : Bool
+    , boss : List Boss
     , obstacles : List Obstacle
     , monsters : List Monster
     , treasure : List Treasure
@@ -118,7 +123,7 @@ type alias Map =
 
 
 roomConfig : Room
-roomConfig = Room (0,0) False False [] [] [] [] 0 0
+roomConfig = Room (0,0) False False [] [] [] [] [] 0 0
 
 mapConfig : Map
 mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0 []
