@@ -64,7 +64,10 @@ key on keycode =
         71 ->
             ShowDialogue
         49 ->
-            ChangeWeapon 1
+            if on then
+                DualWield
+            else
+                Noop
         50 ->
             ChangeWeapon 2
         51 ->
