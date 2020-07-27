@@ -37,7 +37,8 @@ type alias Me =
     , attr : Attr
     , synthesis : SynthesisSubSystem
     , package : Package 
-    , time :Int
+    , time : Int
+    , flash : Bool
     }
 
 type Direction
@@ -72,6 +73,7 @@ defaultMe =
     , synthesis = defaultSynthesisSubSystem
     , package = packageInit 
     , time = 0
+    , flash = False
     }
 
 type alias Model =

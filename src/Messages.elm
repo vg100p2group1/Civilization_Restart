@@ -30,6 +30,7 @@ type Msg
     -- Weapon
     | SynthesisSystem SynthesisMsg
     | DualWield
+    | Flash
     | Tictoc Time.Posix
 
     

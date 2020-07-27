@@ -21,7 +21,7 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield)
+import Skill exposing (subSysBerserker,skillDualWield,subSysPhantom,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -192,6 +192,9 @@ update msg model =
 
         DualWield ->
             (updateDualWield model, Cmd.none)
+
+        Flash ->
+            (updateFlash model, Cmd.none)
 
         Noop ->
             let 
@@ -649,6 +652,7 @@ hit bullet me =
 updateDualWield : Model -> Model
 updateDualWield model =
     let
+        {-
         dual = model.myself.skillSys.subsys
               |> List.filter (\sub -> sub.id == 2)
               |> List.head
@@ -658,6 +662,8 @@ updateDualWield model =
               |> List.head
               |> Maybe.withDefault skillDualWield
               |> .unlocked
+        -}
+        dual = skillState 2 1 4 model.myself.skillSys.subsys subSysBerserker skillDualWield
         me = model.myself
         newMe =
             if dual then
@@ -667,3 +673,12 @@ updateDualWield model =
     in
         {model|myself=newMe}
 
+
+updateFlash : Model -> Model
+updateFlash model =
+    let
+        flash = skillState 0 0 4 model.myself.skillSys.subsys subSysPhantom skillFlash
+        me = model.myself
+        newMe = {me|flash=True}
+    in
+        {model|myself=newMe}
