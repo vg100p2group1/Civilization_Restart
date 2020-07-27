@@ -16,9 +16,10 @@ bossTypeList =
     let
         m1=bossType1
         m2=bossType2
+        m3=bossType3
         
     in 
-        [m1,m2,m1,m2]
+        [m1,m3,m1,m2]
 
 
 
@@ -28,7 +29,7 @@ bossGenerator seed0 obstacle storey=
         
         -- obstacle = room.obstacles
         
-        bossList= bossBuilding [] obstacle (modBy 2 storey ) seed0
+        bossList= bossBuilding [] obstacle (modBy 3 storey ) seed0
     in
         bossList
 
@@ -64,7 +65,7 @@ bossBuilding bossList obstacles bossNum  seed0=
 bossType1 : BossType
 bossType1 = 
     let
-        stype1 = [shootingType1]
+        stype1 = [shootingType1 0]
     in
         BossType 500 1 200 200 "red" stype1 
 
@@ -75,9 +76,22 @@ bossType2 =
     in
         BossType 500 1 200 200 "blue" stype2 
 
-shootingType1 : ShootingType
-shootingType1 = 
-    ShootingType Circled 10 0 30 10 5 10    
+bossType3 : BossType
+bossType3 = 
+    let
+        addDirection num =
+            if num == 0 then [] else shootingType1 num :: addDirection (num - 1)
+        addDirection1 num =
+            if num == 9 then [] else shootingType1 num :: addDirection (num - 1)
+
+
+        stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection1 18
+    in
+        BossType 500 1 200 200 "blue" stype3   
+
+shootingType1 : Float -> ShootingType
+shootingType1 direction = 
+    ShootingType Circled 10 (2* direction) 30 10 10 10    
 
 shootingType2 : ShootingType
 shootingType2 = 
@@ -117,12 +131,12 @@ allBossAct:  List Boss -> Me  -> List Bullet -> (List Boss,List Bullet)
 allBossAct bossList me bulletList = 
     let 
         
-        newBossList = List.map  (bossAct me) bossList
+        newBossList_ = List.map  (bossAct me) bossList
 
-        newBulletList = bossShoot newBossList me bulletList
+        (newBossList,newBulletList) = bossShoot newBossList_ me bulletList
 
     in
-        (newBossList,newBulletList)
+        (newBossList,newBulletList ++ bulletList)
 
 
 bossAct :  Me -> Boss ->  Boss
@@ -145,7 +159,7 @@ bossAct  me boss =
                     Just a ->
                         a
                     Nothing ->
-                        shootingType1
+                        shootingType1 0
 
                 
 
@@ -165,13 +179,23 @@ bossAct  me boss =
     in 
          {boss|active=checkActive,timeBeforeAttack=checkCanShoot} 
 
-bossShoot : List Boss -> Me -> List Bullet -> List Bullet
+bossShoot : List Boss -> Me -> List Bullet -> (List Boss,List Bullet)
 bossShoot bossList me bulletList = 
+        let
+            newList = List.map (newBullet me) bossList
+
+            newTuple = List.unzip newList
+
+            newBullets = List.concat (Tuple.second newTuple)
+
+            newBoss = Tuple.first newTuple
+        in
+            (newBoss,newBullets)
  
 
-        bulletList ++ List.concat (List.map (newBullet me) bossList)
+        
 
-newBullet : Me ->  Boss ->List Bullet
+newBullet : Me ->  Boss ->(Boss,List Bullet)
 newBullet me boss = 
             let
                 
@@ -182,26 +206,37 @@ newBullet me boss =
                         Just a ->
                             a
                         Nothing ->
-                            shootingType1
+                            shootingType1 0
 
                 newSeed = initialSeed me.time
+
+                newShootingType = List.drop 1 boss.bossType.shootingType ++ [nowShootingType]
+
+                nowbossType = boss.bossType 
+
+                newBossType = {nowbossType| shootingType=newShootingType}
+
+                newBoss = {boss|bossType = newBossType}
+
+
+
                 
 
             in
                 if (boss.timeBeforeAttack==0) && (boss.active) then 
                     case nowShootingType.attackMode of
                         Circled ->
-                            circledShoot boss nowShootingType.bulletNum nowShootingType [] 
+                            (newBoss, circledShoot boss nowShootingType.bulletNum nowShootingType [] )
                         Targeted ->
-                            targetedShoot boss nowShootingType.bulletNum nowShootingType [] newSeed me
+                            (newBoss,targetedShoot boss nowShootingType.bulletNum nowShootingType [] newSeed me)
                     
                     
-                    else []
+                    else(boss,[]) 
 
 circledShoot : Boss -> Int -> ShootingType ->List Bullet -> List Bullet
 circledShoot boss num shootingType bullitList =
     let
-        angle = (360 / toFloat  shootingType.bulletNum) * (toFloat num)
+        angle = ((360 / toFloat  shootingType.bulletNum) + shootingType.direction)* (toFloat num)
 
         speedx= cos (degrees angle) * shootingType.speed
         speedy= sin (degrees angle)* shootingType.speed

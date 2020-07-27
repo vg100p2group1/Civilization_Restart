@@ -558,6 +558,9 @@ updateBullet me map bullets (collisionX,collisionY) =
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) (List.map .edge map.roads)))
                     -- hit monsters and are shoot by player
                     |> List.filter (\b -> not (List.any (circleCollisonTest b.hitbox) (List.map .position map.monsters))||(b.from == Monster))
+                    -- hit bosses and are shoot by player
+                    |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) ((List.map .edge (List.map (\value->value.position) map.boss))))||(b.from == Monster))
+
         (flyingBullets, hitPlayer) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) allBullets
         finalBullets = List.map updateXY flyingBullets
 
