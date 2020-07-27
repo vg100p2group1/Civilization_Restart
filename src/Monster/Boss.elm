@@ -7,6 +7,7 @@ import Config exposing (bulletSpeed)
 import Weapon exposing(Bullet,ShooterType(..))
 import Random exposing (..)
 import Time exposing (now,posixToMillis)
+import Messages exposing (Msg(..))
 
 
 
@@ -182,6 +183,8 @@ newBullet me boss =
                             a
                         Nothing ->
                             shootingType1
+
+                newSeed = initialSeed me.time
                 
 
             in
@@ -190,7 +193,7 @@ newBullet me boss =
                         Circled ->
                             circledShoot boss nowShootingType.bulletNum nowShootingType [] 
                         Targeted ->
-                            targetedShoot boss nowShootingType.bulletNum nowShootingType [] boss.seed me
+                            targetedShoot boss nowShootingType.bulletNum nowShootingType [] newSeed me
                     
                     
                     else []
@@ -227,7 +230,7 @@ targetedShoot boss num shootingType bullitList seed me=
 
         
 
-        (directiondiff,seed1) =  Random.step (Random.float -shootingType.direction shootingType.direction) seed
+        (directiondiff,seed1) =  Random.step (Random.float -shootingType.direction shootingType.direction) seed 
 
         disriedSpeedx= 
              (distx / dist)

@@ -21,6 +21,8 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
+import Time exposing (..)
+import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -116,9 +118,9 @@ update msg model =
                 if model.state == NextStage then
                     let
                         roomNew =
-                            roomGenerator (model.storey+1) (Tuple.second model.rooms) 
+                            roomGenerator (model.storey+1) (initialSeed model.myself.time) 
 
-                        (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (Tuple.second model.rooms)
+                        (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package}
                         -- it should be updated when dialogues are saved in every room
@@ -194,6 +196,17 @@ update msg model =
             in
                 ( {model| myself= me}
                 , Cmd.none
+                )
+        Tictoc newTime ->
+
+            let 
+                me = model.myself
+                newMe = {me |time = posixToMillis  newTime}
+
+            in 
+
+                ( { model | myself=newMe }
+                    , Cmd.none
                 )
         
 
@@ -345,7 +358,7 @@ speedCase me map collideDoor=
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
         collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
-            ++(List.map (\t->t.position) collideDoor)
+            -- ++(List.map (\t->t.position) collideDoor)
             ) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"

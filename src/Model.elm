@@ -35,7 +35,8 @@ type alias Me =
     , skillSys : SkillSystem
     , attr : Attr
     , synthesis : SynthesisSubSystem
-    , package : Package
+    , package : Package 
+    , time :Int
     }
 
 type Direction
@@ -68,6 +69,7 @@ defaultMe =
     , attr = defaultAttr
     , synthesis = defaultSynthesisSubSystem
     , package = packageInit 
+    , time = 0
     }
 
 type alias Model =
