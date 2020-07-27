@@ -5,8 +5,9 @@ import Map.Map exposing (Monster,MonsterType,Obstacle)
 import Random
 import Weapon exposing(Bullet,ShooterType(..))
 import Model exposing (Me)
-
+import Attributes exposing (getCurrentAttr,getMaxAttr,AttrType(..),defaultAttr)
 import Monster.Monster exposing (allMonsterAct)
+import Skill exposing (getSubSys, getSkill)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
 
@@ -18,9 +19,9 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 150 150 "Yellow"
-        m2=MonsterType 150 150 "Red"
-        m3=MonsterType 150 150 "Blue"
+        m1=MonsterType 150 10 "Yellow"
+        m2=MonsterType 150 10 "Red"
+        m3=MonsterType 150 10 "Blue"
     in 
         [m1,m2,m3]
 
@@ -81,14 +82,29 @@ monsterBuilding monsterList number obstacles seed0 =
             else 
                 monsterBuilding  monsterList number obstacles seed4
 
-updateMonster_ : Monster -> List Bullet -> Monster
-updateMonster_ monster bullets =
+updateMonster_ : Monster -> List Bullet -> Me -> Monster
+updateMonster_ monster bullets me =
     let
         hitBullets = bullets
                   |> List.filter (\b -> b.from == Player)
                   |> List.filter (\b -> circleCollisonTest b.hitbox monster.position)
         monsterType_ = monster.monsterType
-        newMonsterType = {monsterType_ | hp = monsterType_.hp - List.sum (List.map (\b -> b.force) hitBullets)}
+        -- Skill Battle Fervor can influence the attack
+        sub = getSubSys me.skillSys 2
+        skill = getSkill sub (0,4)
+        battleFervorFactor = 
+            if skill.unlocked then
+            let
+                maxHealth = getMaxAttr Health me.attr
+                currentHealth = getCurrentAttr Health me.attr
+                loseHealthRate = 1 - toFloat currentHealth / toFloat maxHealth
+            in
+                1 + loseHealthRate / 2
+            else
+                1
+        attackFactor = (getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat) * battleFervorFactor
+        damage = attackFactor * List.sum (List.map (\b -> b.force) hitBullets)
+        newMonsterType = {monsterType_ | hp = monsterType_.hp - damage}
         {- debug test
         newMonsterType =
                 if List.isEmpty hitBullets then
@@ -104,7 +120,7 @@ updateMonster monsters bullets me =
     let
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
-                     |> List.map (\m -> updateMonster_ m bullets)
+                     |> List.map (\m -> updateMonster_ m bullets me)
     in
         allMonsterAct finalMonsters me bullets
 

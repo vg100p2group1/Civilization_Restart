@@ -10,8 +10,8 @@ import Task
 import View exposing (view)
 import Update
 import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..))
-import Map.MapDisplay exposing (mapInit)
-import Map.MapGenerator exposing (roomInit)
+import Init exposing (init)
+import Time exposing (..)
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -38,6 +38,7 @@ subscriptions model =
         , onKeyUp (Decode.map (key False) keyCode)
         , onKeyDown (Decode.map (key True) keyCode)
         , onResize Resize
+        , Time.every 50 Tictoc
         ]
 
 key : Bool -> Int -> Msg
@@ -64,7 +65,10 @@ key on keycode =
         71 ->
             ShowDialogue
         49 ->
-            ChangeWeapon 1
+            if on then
+                DualWield
+            else
+                Noop
         50 ->
             ChangeWeapon 2
         51 ->
@@ -94,28 +98,6 @@ key on keycode =
 
         _ ->
             Noop
-
-init : Model
-init =
-    let
-        (roomNew,mapNew) = mapInit
-    in
-    
-        { myself = defaultMe
-        , bullet = []
-        , bulletViewbox = []
-        , map = mapNew
-        , rooms = (roomNew,Tuple.second roomInit)
-        , viewbox = mapToViewBox defaultMe mapNew
-        , size = (0, 0)
-        , state = Others
-        , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
-        , explosion = []
-        , explosionViewbox = []
-        , paused = False
-        , gameState = Playing
-        , storey = 1
-        }
 
 
 

@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
-import Map.Map exposing (Map,Monster,Room,Treasure,Door)
+import Map.Map exposing (Map,Monster,Room,Treasure,Door,Boss)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
@@ -18,6 +18,7 @@ import Animation.ShowGun exposing (showGun)
 import Animation.Explosion exposing (showExplosion)
 import Animation.ShowBullet exposing (showBullets)
 import Environment.ShowWalls exposing (showWalls)
+import Config exposing (bulletSpeed)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -51,17 +52,22 @@ view model =
 
             [ Html.div
 
-                [ Html.Attributes.style "top" "200px"
-                , Html.Attributes.style "left" "200px"
+                [ Html.Attributes.style "top" "0px"
+                , Html.Attributes.style "left" "0px"
+                , Html.Attributes.style "width" (String.fromFloat (500*r) ++ "px")
+                , Html.Attributes.style "height" (String.fromFloat (500*r) ++ "px")
+                -- , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
-                [showMiniMap model]
+                [showMiniMap model r] 
             
             , Html.div
-                [ style "left" "800px"
-                , style "top" "100px"
+                [ style "right" "0px"
+                , style "top" "0px"
                 , style "position" "absolute"
+                , Html.Attributes.style "transform-origin" "100% 0 0"
+                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
-                [showAttr model.myself.attr]
+                [showAttr model.myself.attr r]
 
             , Html.div
                 [ 
@@ -91,7 +97,7 @@ playerDemonstrate model =
             , Html.Attributes.style "float" "left"
             , Html.Attributes.style "border" "outset"
             ]
-            [ Svg.svg 
+            [Svg.svg 
                 [ Mouse.onMove(.clientPos>>MouseMove)
                 , Mouse.onDown(\event->MouseDown)
                 , Mouse.onUp(\event->MouseUp)
@@ -104,6 +110,7 @@ playerDemonstrate model =
             , showDialogue model 0
             , showSkill model
             , showSynthesis model
+            , showGameOver model
         ]
 
 
@@ -122,11 +129,12 @@ showMap model =
        monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
        treasure = displayTreasure  model.treasure
+       boss = displayBoss  model.boss
 
        gate = displayDoors [Door model.gate False] -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure ++ boss
     --    walls++gate
 
 
@@ -197,6 +205,33 @@ displayMonster monsters =
     in
         List.map createBricksFormat monsters
 
+
+displayBoss : List Boss  -> List (Svg.Svg Msg)
+displayBoss boss =
+    let
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat bossTemp =
+            let
+                model = bossTemp.position
+                bossType = bossTemp.bossType
+                opacity = String.fromFloat (bossType.hp / 500)
+                
+
+                bossColor =bossType.color
+            in
+                
+                Svg.rect
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill bossColor
+                    , Svg.Attributes.fillOpacity opacity
+                
+                    ]
+                []
+    in
+         List.map createBricksFormat boss
 displayTreasure : List Treasure  -> List (Svg.Svg Msg)
 displayTreasure treasure =
     let
@@ -307,8 +342,8 @@ showSkill model =
             points = String.fromInt sys.points
             txt = curr.text
             sysName = curr.name
-            currentCost = Tuple.second (unlockChosen curr)
-            chosenCanUnlock = currentCost > 0 && currentCost < sys.points 
+            currentCost = (Tuple.second (unlockChosen curr))
+            chosenCanUnlock = currentCost > 0 && currentCost <= sys.points 
         in
             div
             [ style "background" "rgba(236, 240, 241, 0.89)"
@@ -326,10 +361,10 @@ showSkill model =
             , button [onClick <| SkillChange <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
             , div [style "margin" "20px 0 0 180px"] [text points]
             , div
-                [style "margin" "40px 0 0 120px"]
+                [style "margin" "20px 0 0 120px"]
                 (List.map (skillToButton curr.chosen) skills)
             , div
-                [ style "margin" "190px 0 0 0"
+                [ style "margin" "230px 0 0 0"
                 , style "padding" "5px 10px 5px 10px"
                 , style "height" "60px"
                 , style "background" "#FFF"]
@@ -360,12 +395,31 @@ skillToButton (chosenId, chosenLevel) skill =
     , style "position" "absolute"
     , style "margin" (top ++ " 0 0 " ++ left)
     , style "background" color
+    , style "width" "70px"
+    , style "height" "35px"
     ] ++ border)
-    [text ("(" ++ String.fromInt id ++ "," ++ String.fromInt level ++ ")")]
+    [text skill.name]
 
+showGameOver : Model -> Html Msg
+showGameOver model =
+    if model.isGameOver then
+        div
+            [ style "background" "rgba(236, 240, 241, 0.89)"
+            , style "color" "#34495f"
+            , style "height" "400px"
+            , style "left" "280px"
+            , style "padding" "0 140px"
+            , style "position" "absolute"
+            , style "top" "155px"
+            , style "width" "400px"
+            ]
+            [ div [style "margin" "160px 0 0 135px", style "color" "red",style "font-size" "24px"] [text "Game Over"]
+            ]
+    else
+        div [] []
 
-showMiniMap : Model -> Html.Html Msg
-showMiniMap model =
+showMiniMap : Model -> Float -> Html.Html Msg
+showMiniMap model r=
     let
        (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
        
@@ -388,30 +442,33 @@ showMiniMap model =
        yTemp = myself.y - toFloat(dy*2500)
        rTemp = 200
 
+       widthConfig = 500*r
        meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
     in
-        Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
+        Svg.svg [Svg.Attributes.width <| (String.fromFloat widthConfig)++"px", Svg.Attributes.height  <| (String.fromFloat widthConfig)++"px", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
         (walls ++ roads  ++ gate ++ meTemp)
 
-showAttr : Attr -> Html Msg
-showAttr attr = 
+showAttr : Attr -> Float -> Html Msg
+showAttr attr r= 
     div
-    [ style "padding" "0 140px"
-    , style "position" "absolute"
+    [ 
+        -- style "padding" "0 140px"
+    -- , style "position" "absolute"
+        -- style "hight" "500px"
     ]
-    (List.map (makeProgress attr) [Attack, Clip, Armor, Attack, Speed])
+    (List.map (makeProgress attr r) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
 
-makeProgress : Attr -> AttrType -> Html Msg
-makeProgress attr t =
+makeProgress : Attr -> Float -> AttrType -> Html Msg
+makeProgress attr r t =
     let
-        maxAttr = String.fromInt <| getMaxAttr t attr
-        valueAttr = String.fromInt <| getCurrentAttr t attr
+        maxAttr = String.fromFloat <| (toFloat <| getMaxAttr t attr) * r
+        valueAttr = String.fromFloat <| (toFloat <| getCurrentAttr t attr) * r
     in
     div 
     [style "margin" "20px"]
     [ div
-        [style "width" "50px"]
-        [text (getAttrName t ++ " : ")]
+        [style "width" "50px", style "font-size" "10px"]
+        [text (getAttrName t ++ ":")]
     , progress
         [ Html.Attributes.max maxAttr
         , Html.Attributes.value valueAttr

@@ -21,7 +21,8 @@ type alias Me =
     , moveLeft : Bool
     , moveDown : Bool
     , mouseData : (Float,Float)
-    , fire : Bool 
+    , fire : Bool
+    , dualWield : Bool
   --   , name : String
   --   , score : Float
     , hitBox : Circle
@@ -35,7 +36,8 @@ type alias Me =
     , skillSys : SkillSystem
     , attr : Attr
     , synthesis : SynthesisSubSystem
-    , package : Package
+    , package : Package 
+    , time :Int
     }
 
 type Direction
@@ -57,6 +59,7 @@ defaultMe =
     , moveDown = False
     , mouseData = (500,500)
     , fire = False
+    , dualWield = False
     , hitBox = Circle 500 500 50
     , weapons = weaponList
     , currentWeapon = defaultWeapon
@@ -68,6 +71,7 @@ defaultMe =
     , attr = defaultAttr
     , synthesis = defaultSynthesisSubSystem
     , package = packageInit 
+    , time = 0
     }
 
 type alias Model =
@@ -84,7 +88,8 @@ type alias Model =
     , explosionViewbox : List ExplosionEffect
     , paused : Bool
     , gameState : GameState
-    , storey : Int 
+    , storey : Int
+    , isGameOver : Bool
     }
 
 type State = Dialogue
@@ -144,6 +149,10 @@ mapToViewBox me map =
         monstersUpdated = List.map monsterUpdate map.monsters
         treasureUpdate monster= 
             {monster| position = recUpdate monster.position}
+            
+        bossUpdate boss= 
+            {boss| position = recUpdate boss.position}
+        bossesUpdated =  List.map bossUpdate map.boss
         treasureUpdated = List.map treasureUpdate map.treasure
 
 
@@ -152,4 +161,4 @@ mapToViewBox me map =
         -- monsterListUpdate model =
         --     List.map (\value -> {value| position = circleUpdate value.position}) model
     in
-        {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = doorsUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate}
+        {map| walls= wallListUpdate map.walls,roads=recListUpdate map.roads, obstacles=recListUpdate map.obstacles, monsters=monstersUpdated,doors = doorsUpdate map.doors,treasure=treasureUpdated,gate=recUpdate map.gate,boss=bossesUpdated}
