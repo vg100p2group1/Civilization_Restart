@@ -52,17 +52,22 @@ view model =
 
             [ Html.div
 
-                [ Html.Attributes.style "top" "200px"
-                , Html.Attributes.style "left" "200px"
+                [ Html.Attributes.style "top" "0px"
+                , Html.Attributes.style "left" "0px"
+                , Html.Attributes.style "width" (String.fromFloat (500*r) ++ "px")
+                , Html.Attributes.style "height" (String.fromFloat (500*r) ++ "px")
+                -- , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
-                [showMiniMap model]
+                [showMiniMap model r] 
             
             , Html.div
-                [ style "left" "800px"
-                , style "top" "100px"
+                [ style "right" "0px"
+                , style "top" "0px"
                 , style "position" "absolute"
+                , Html.Attributes.style "transform-origin" "100% 0 0"
+                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
-                [showAttr model.myself.attr]
+                [showAttr model.myself.attr r]
 
             , Html.div
                 [ 
@@ -413,8 +418,8 @@ showGameOver model =
     else
         div [] []
 
-showMiniMap : Model -> Html.Html Msg
-showMiniMap model =
+showMiniMap : Model -> Float -> Html.Html Msg
+showMiniMap model r=
     let
        (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
        
@@ -437,30 +442,33 @@ showMiniMap model =
        yTemp = myself.y - toFloat(dy*2500)
        rTemp = 200
 
+       widthConfig = 500*r
        meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
     in
-        Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
+        Svg.svg [Svg.Attributes.width <| (String.fromFloat widthConfig)++"px", Svg.Attributes.height  <| (String.fromFloat widthConfig)++"px", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
         (walls ++ roads  ++ gate ++ meTemp)
 
-showAttr : Attr -> Html Msg
-showAttr attr = 
+showAttr : Attr -> Float -> Html Msg
+showAttr attr r= 
     div
-    [ style "padding" "0 140px"
-    , style "position" "absolute"
+    [ 
+        -- style "padding" "0 140px"
+    -- , style "position" "absolute"
+        -- style "hight" "500px"
     ]
-    (List.map (makeProgress attr) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
+    (List.map (makeProgress attr r) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
 
-makeProgress : Attr -> AttrType -> Html Msg
-makeProgress attr t =
+makeProgress : Attr -> Float -> AttrType -> Html Msg
+makeProgress attr r t =
     let
-        maxAttr = String.fromInt <| getMaxAttr t attr
-        valueAttr = String.fromInt <| getCurrentAttr t attr
+        maxAttr = String.fromFloat <| (toFloat <| getMaxAttr t attr) * r
+        valueAttr = String.fromFloat <| (toFloat <| getCurrentAttr t attr) * r
     in
     div 
     [style "margin" "20px"]
     [ div
-        [style "width" "50px"]
-        [text (getAttrName t ++ " : ")]
+        [style "width" "50px", style "font-size" "10px"]
+        [text (getAttrName t ++ ":")]
     , progress
         [ Html.Attributes.max maxAttr
         , Html.Attributes.value valueAttr
