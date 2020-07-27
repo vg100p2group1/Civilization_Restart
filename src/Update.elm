@@ -697,10 +697,10 @@ updateFlash model (mouseX,mouseY)  =
                 -- velocity decomposition
         cos = (posX - 500) / unitV
         sin = (posY - 500) / unitV
-        --minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (mouseX, mouseY) 0))
-        --distance = min minDis_ 30
-        newX = 30 * cos + me.x
-        newY = 30 * sin + me.y
+        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (mouseX, mouseY) 0))
+        distance = min minDis_ 200
+        newX = distance * cos + me.x
+        newY = distance * sin + me.y
     in
         {model|myself={me|x=newX,y=newY,hitBox=Circle newX newY 50}}
 
@@ -720,7 +720,7 @@ findMinPath model (mouseX,mouseY) distance=
         newXTemp = xTemp + me.x
         newYTemp = yTemp + me.y
         collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (model.map.obstacles++(List.map (\value->value.position) model.map.walls)++model.map.roads)
-        isCollide = List.length collideType == 0
+        isCollide = not (List.length collideType == 0)
     in
         case isCollide of
             True ->
