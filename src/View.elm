@@ -212,7 +212,7 @@ displayBoss boss =
                 opacity = String.fromFloat (bossType.hp / 500)
                 
 
-                bossColor = if bossTemp.active then "black" else bossType.color
+                bossColor =bossType.color
             in
                 
                 Svg.rect

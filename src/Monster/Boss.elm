@@ -65,7 +65,7 @@ bossBuilding bossList obstacles bossNum  seed0=
 bossType1 : BossType
 bossType1 = 
     let
-        stype1 = [shootingType1]
+        stype1 = [shootingType1 0]
     in
         BossType 500 1 200 200 "red" stype1 
 
@@ -79,13 +79,19 @@ bossType2 =
 bossType3 : BossType
 bossType3 = 
     let
-        stype2 = [shootingType2,shootingType1,shootingType1,shootingType1,shootingType1,shootingType1,shootingType1,shootingType1,shootingType1,shootingType1]
-    in
-        BossType 500 1 200 200 "blue" stype2   
+        addDirection num =
+            if num == 0 then [] else shootingType1 num :: addDirection (num - 1)
+        addDirection1 num =
+            if num == 9 then [] else shootingType1 num :: addDirection (num - 1)
 
-shootingType1 : ShootingType
-shootingType1 = 
-    ShootingType Circled 10 0 30 10 5 10    
+
+        stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection 18
+    in
+        BossType 500 1 200 200 "blue" stype3   
+
+shootingType1 : Float -> ShootingType
+shootingType1 direction = 
+    ShootingType Circled 10 (2* direction) 30 10 5 10    
 
 shootingType2 : ShootingType
 shootingType2 = 
@@ -153,7 +159,7 @@ bossAct  me boss =
                     Just a ->
                         a
                     Nothing ->
-                        shootingType1
+                        shootingType1 0
 
                 
 
@@ -200,7 +206,7 @@ newBullet me boss =
                         Just a ->
                             a
                         Nothing ->
-                            shootingType1
+                            shootingType1 0
 
                 newSeed = initialSeed me.time
 
@@ -230,7 +236,7 @@ newBullet me boss =
 circledShoot : Boss -> Int -> ShootingType ->List Bullet -> List Bullet
 circledShoot boss num shootingType bullitList =
     let
-        angle = (360 / toFloat  shootingType.bulletNum) * (toFloat num)
+        angle = ((360 / toFloat  shootingType.bulletNum) + shootingType.direction)* (toFloat num)
 
         speedx= cos (degrees angle) * shootingType.speed
         speedy= sin (degrees angle)* shootingType.speed
