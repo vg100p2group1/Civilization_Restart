@@ -194,7 +194,7 @@ update msg model =
             (updateDualWield model, Cmd.none)
 
         Flash ->
-            (updateFlash model, Cmd.none)
+            (updateFlashStatus model, Cmd.none)
 
         Noop ->
             let 
@@ -674,11 +674,60 @@ updateDualWield model =
         {model|myself=newMe}
 
 
-updateFlash : Model -> Model
-updateFlash model =
+updateFlashStatus : Model -> Model
+updateFlashStatus model =
     let
         flash = skillState 0 0 4 model.myself.skillSys.subsys subSysPhantom skillFlash
         me = model.myself
-        newMe = {me|flash=True}
+        newModel =
+            if flash then
+                updateFlash model me.mouseData
+            else
+                model
     in
-        {model|myself=newMe}
+        newModel
+
+updateFlash : Model -> (Float, Float) ->  Model
+updateFlash model (mouseX,mouseY)  =
+    let
+        me = model.myself
+        posX = mouseX
+        posY = mouseY
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+                -- velocity decomposition
+        cos = (posX - 500) / unitV
+        sin = (posY - 500) / unitV
+        --minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (mouseX, mouseY) 0))
+        --distance = min minDis_ 30
+        newX = 30 * cos + me.x
+        newY = 30 * sin + me.y
+    in
+        {model|myself={me|x=newX,y=newY,hitBox=Circle newX newY 50}}
+
+
+findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
+findMinPath model (mouseX,mouseY) distance=
+    let
+        me = model.myself
+        posX = mouseX
+        posY = mouseY
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+                -- decomposition
+        cos = (posX - 500) / unitV
+        sin = (posY - 520) / unitV
+        xTemp = 10 * cos
+        yTemp = 10 * sin
+        newXTemp = xTemp + me.x
+        newYTemp = yTemp + me.y
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (model.map.obstacles++(List.map (\value->value.position) model.map.walls)++model.map.roads)
+        isCollide = List.length collideType == 0
+    in
+        case isCollide of
+            True ->
+                (model, distance)
+            False ->
+                let
+                    newModel = {model|myself={me|x=newXTemp,y=newYTemp,hitBox=Circle newXTemp newYTemp 50}}
+                    newDistance = Tuple.second (findMinPath newModel (mouseX,mouseY) (distance+10))
+                in
+                    (newModel, newDistance)
