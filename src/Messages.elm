@@ -1,6 +1,7 @@
 module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..))
 import Css exposing (Resize)
 import Browser.Dom exposing (Viewport)
+import Time exposing (Posix)
 -- import Model exposing (MouseMoveData)
 type Msg
     = Tick Float
@@ -29,6 +30,7 @@ type Msg
     -- Weapon
     | SynthesisSystem SynthesisMsg
     | DualWield
+    | Tictoc Time.Posix
 
     
 type SkillMsg

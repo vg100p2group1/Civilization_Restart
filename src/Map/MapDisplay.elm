@@ -6,7 +6,7 @@ import Shape exposing (recInit,Rectangle,recUpdate)
 
 import Map.Gate exposing (gateGenerator)
 import Map.MapGenerator exposing (roomInit)
-import Random 
+import Random exposing (..)
 
 mapInit : (List Room,Map)
 mapInit = 

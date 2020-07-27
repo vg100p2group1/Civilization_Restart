@@ -7,7 +7,7 @@ import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..)
 init : Model
 init =
     let
-        (roomNew,mapNew) = mapInit
+        (roomNew,mapNew) = mapInit 
     in
     
         { myself = defaultMe
