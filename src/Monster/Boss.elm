@@ -85,13 +85,13 @@ bossType3 =
             if num == 9 then [] else shootingType1 num :: addDirection (num - 1)
 
 
-        stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection 18
+        stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection1 18
     in
         BossType 500 1 200 200 "blue" stype3   
 
 shootingType1 : Float -> ShootingType
 shootingType1 direction = 
-    ShootingType Circled 10 (2* direction) 30 10 5 10    
+    ShootingType Circled 10 (2* direction) 30 10 10 10    
 
 shootingType2 : ShootingType
 shootingType2 = 
