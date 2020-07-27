@@ -251,10 +251,10 @@ mouseDataUpdate model mousedata =
         ((mx - xLeft)/r, (my - yTop)/r)
 
 
-fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> (List Bullet, Weapon)
-fireBullet_ weapon (mouseX,mouseY) (meX, meY)=
+fireBullet_ : Weapon -> (Float, Float) -> (Float, Float) -> Me-> (List Bullet, Weapon)
+fireBullet_ weapon (mouseX,mouseY) (meX, meY) me=
     let
-        bullet = fireBullet weapon (mouseX,mouseY) (meX, meY)
+        bullet = fireBullet weapon (mouseX,mouseY) (meX, meY) me
         (newShoot, fireFlag, counter) =
             if weapon.counter <= 0 then
                 if weapon.auto then
@@ -277,7 +277,7 @@ animate  model =
         isDead = 0 == getCurrentAttr Health attr
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
-                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y)
+                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) me
                                  else
                                     ([], model.myself.currentWeapon)
                              else
@@ -486,8 +486,8 @@ updateSentence elapsed model =
         _ ->
             model
 
-fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> List Bullet
-fireBullet weapon (mouseX,mouseY) (meX, meY) =
+fireBullet : Weapon -> (Float, Float) -> (Float, Float) -> Me-> List Bullet
+fireBullet weapon (mouseX,mouseY) (meX, meY) me =
     let
         posX = mouseX
         posY = mouseY
@@ -501,7 +501,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) =
         yTemp = bulletSpeed / unitV * (posY - 520)
         bullet = generateBullet weapon
         newCircle = Circle meX (meY+20) bullet.r
-        newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp, speedY=yTemp}
+        newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp+me.xSpeed, speedY=yTemp+me.ySpeed}
         bulletList =
             case weapon.extraInfo of
                 Shotgun ->
@@ -525,14 +525,10 @@ updateBullet me map bullets (collisionX,collisionY) =
             let
                 -- d2=Debug.log "meX" me.xSpeed
                 newX = 
-                    if (b.from == Player) &&  not collisionX then 
-                        b.hitbox.cx + b.speedX + me.xSpeed
-                    else 
+                    
                         b.hitbox.cx + b.speedX
                 newY = 
-                    if (b.from == Player) &&  not collisionY then
-                        b.hitbox.cy + b.speedY + me.ySpeed
-                    else 
+                    
                         b.hitbox.cy + b.speedY
                 newHitbox = Circle newX newY b.hitbox.r
             in
