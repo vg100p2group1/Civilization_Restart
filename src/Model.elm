@@ -96,6 +96,8 @@ type State = Dialogue
            | NextStage
            | ChangeSkill
            | PickTreasure Treasure
+           | SynthesisSys
+           | SkillSys
            | Others
 
 type GameState = Paused
