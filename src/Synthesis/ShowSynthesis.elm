@@ -8,6 +8,7 @@ import Weapon exposing (Arsenal(..),defaultWeapon)
 
 import Messages exposing (SynthesisMsg(..),Msg(..))
 import Synthesis.WeaponUpgrade exposing (getWeaponMaterial)
+import Synthesis.Material exposing (bulletNeeded)
 
 
 showSynthesis : Model -> Html Msg
@@ -27,13 +28,13 @@ showSynthesis model =
         getUrl =
             case weaponNow.extraInfo of 
                 Pistol -> 
-                    "./images/Gun/UI1.jpg"
+                    "./images/Gun/UI1.png"
                 Gatling ->
-                    "./images/Gun/UI2.jpg"
+                    "./images/Gun/UI2.png"
                 Mortar ->
-                    "./images/Gun/UI3.jpg"
+                    "./images/Gun/UI3.png"
                 Shotgun ->
-                    "./images/Gun/UI4.jpg"
+                    "./images/Gun/UI4.png"
         
         getName =
             case weaponNow.extraInfo of 
@@ -64,32 +65,56 @@ showSynthesis model =
                 ]
                 [    div [style "position" "absolute",style "margin-left" "170px",style "margin-top" "5px", style "color" "red",style "font-size" "25px"] [text "Upgrade & Synthesis System"]
                     , div[][ button [style "margin-left" "40px",style "margin-top" "40px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon False] [text "<"]
-                    , div [style "position" "absolute",style "margin-left" "230px",style "margin-top" "-25px",style "font-size" "20px"] [text ("Weapon: "++getName)]
-                    , div [style "position" "absolute",style "margin-left" "430px",style "margin-top" "-25px",style "font-size" "20px"] [text ("Level: "++String.fromInt weaponNow.level)]
+                    , div [style "position" "absolute",style "margin-left" "230px",style "margin-top" "-25px",style "font-size" "15px"] [text ("Upgrade: "++getName)]
+                    , div [style "position" "absolute",style "margin-left" "430px",style "margin-top" "-25px",style "font-size" "15px"] [text ("Level: "++String.fromInt weaponNow.level)]
 
                     , div [style "width" "100px",style "height" "110px" ][img [style "margin-left" "40px",style "margin-top" "10px",style "width" "100px",style "height" "100px",src getUrl][]]
                     , button [style "margin-left" "40px",style "margin-top" "10px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon True] [text ">"]
                     
                     
-                    , div [style "margin-left" "200px",style "margin-top" "-30px",style "position" "absolute"][text("tip: "++sys.tip)]
+                    
                     , div[style "margin-top" "-120px" , style "padding-left" "170px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Iron.jpg"][]]
-                         ,div [style "width" "100px",style "height" "20px",style "margin-left" "5px",style "margin-top" "5px"][text ("steel:" ++ String.fromInt materialNeeded.steel ++ "/" ++String.fromInt package.steel)]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-left" "5px",style "margin-top" "5px"][text ("steel:"  ++String.fromInt package.steel ++ "/" ++ String.fromInt materialNeeded.steel)]]
 
                     , div[style "margin-top" "-80px" , style "padding-left" "270px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Copper.jpg"][]]
-                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("copper:" ++ String.fromInt materialNeeded.copper ++ "/" ++String.fromInt package.copper)]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("copper:" ++ String.fromInt package.copper ++ "/" ++ String.fromInt materialNeeded.copper )]]
                     
                     , div[style "margin-top" "-80px" , style "padding-left" "370px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Wolfram.png"][]]
-                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Wolfram:" ++ String.fromInt materialNeeded.wolfram ++ "/" ++String.fromInt package.wolfram)]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Wolfram:"  ++String.fromInt package.wolfram ++ "/" ++ String.fromInt materialNeeded.wolfram)]]
                     
                     , div[style "margin-top" "-80px" , style "padding-left" "470px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Uranium.png"][]]
-                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Uranium:" ++ String.fromInt materialNeeded.uranium ++ "/" ++String.fromInt package.uranium)]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Uranium:" ++String.fromInt package.uranium ++ "/" ++ String.fromInt materialNeeded.uranium)]]
                     , button [style "position" "absolute",style "margin-top" "-90px" , style "margin-left" "580px",style "width" "80px",style "height" "80px",onClick <| SynthesisSystem <| Synthesis] [text "Upgrade"]
                     ]
+                    --Bullet
+                    , div[style "margin-top" "50px"][ 
+                      div [style "position" "absolute",style "margin-left" "230px",style "margin-top" "-15px",style "font-size" "15px"] [text "Bullet Synthesis: 30 per group"]
+
+                    , div [style "width" "100px",style "height" "110px" ][img [style "margin-left" "40px",style "margin-top" "10px",style "width" "100px",style "height" "100px",src "./images/Gun/BulletUI.png"][]]
+                                        
+                    , div[style "margin-top" "-80px" , style "padding-left" "170px",style "width" "80px",style "height" "80px"]
+                        [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Iron.jpg"][]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-left" "5px",style "margin-top" "5px"][text ("steel:"  ++String.fromInt package.steel ++ "/" ++ String.fromInt bulletNeeded.steel)]]
+
+                    , div[style "margin-top" "-80px" , style "padding-left" "270px",style "width" "80px",style "height" "80px"]
+                        [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Copper.jpg"][]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("copper:" ++ String.fromInt package.copper ++ "/" ++ String.fromInt bulletNeeded.copper )]]
                     
+                    , div[style "margin-top" "-80px" , style "padding-left" "370px",style "width" "80px",style "height" "80px"]
+                        [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Wolfram.png"][]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Wolfram:"  ++String.fromInt package.wolfram ++ "/" ++ String.fromInt bulletNeeded.wolfram)]]
+                    
+                    , div[style "margin-top" "-80px" , style "padding-left" "470px",style "width" "80px",style "height" "80px"]
+                        [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Uranium.png"][]]
+                         ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Uranium:" ++String.fromInt package.uranium ++ "/" ++ String.fromInt bulletNeeded.uranium)]]
+
+                    , button [style "position" "absolute",style "margin-top" "-90px" , style "margin-left" "580px",style "width" "80px",style "height" "80px",onClick <| SynthesisSystem <| SynthesisBullet] [text "Synthesis"]
+                    ]
+                    , div [style "margin-left" "200px",style "margin-top" "5px",style "position" "absolute",style "font-size" "20px"][text("Tip: "++sys.tip)]
                 ]
         else
             div [] []

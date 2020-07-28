@@ -44,3 +44,4 @@ type SynthesisMsg
     = TriggerSynthesisWindow
     | NextWeapon Bool      
     | Synthesis        
+    | SynthesisBullet
