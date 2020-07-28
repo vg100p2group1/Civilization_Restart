@@ -68,8 +68,15 @@ skillToButton (chosenId, chosenLevel) skill =
         level = skill.level
         isChosen = id == chosenId && level == chosenLevel
         top = (String.fromInt ((level-1) * 50)) ++ "px"
-        left = (String.fromInt (id * 80)) ++ "px"
-        color = if skill.unlocked then "blue" else "gray"
+
+        leftAdd =
+            if level == 1 || level == 2 then 
+                40
+            else 
+                0
+
+        left = (String.fromInt (id * 80 + leftAdd)) ++ "px"
+        color = if skill.unlocked then "1" else "0.5"
         border = if isChosen then [style "border" "1px solid purple"] else []
     in
     Html.img
@@ -79,6 +86,7 @@ skillToButton (chosenId, chosenLevel) skill =
     , src <| "./images/Skill/"++skill.name++".png"
     , style "width" "50px"
     , style "height" "50px"
+    , style "opacity" color
     ] ++ border)
     []
 
