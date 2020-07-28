@@ -1,4 +1,6 @@
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem, getSubSys, getSkill)
+
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel
+                      ,getCurrentSubSystem, getSubSys, getSkill,skillState,subSysBerserker,skillDualWield,subSysPhantom,skillFlash)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -184,8 +186,9 @@ skillDirectionalBlasting =
     , name = "Directional Blasting"
     }
 
+
 skillAbsoluteTerritoryField : Skill
-skillAbsoluteTerritoryField = 
+skillAbsoluteTerritoryField =
     { id = 0
     , level = 4
     , unlocked = False
@@ -211,6 +214,7 @@ skillShootingSkillI =
     , name = "Shooting SKill I"
     }
 
+
 skillAmplifyDamageI : Skill
 skillAmplifyDamageI = 
     { id = 0
@@ -221,7 +225,7 @@ skillAmplifyDamageI =
     }
 
 skillShootingSkillII : Skill
-skillShootingSkillII = 
+skillShootingSkillII =
     { id = 0
     , level = 4
     , unlocked = False
@@ -229,10 +233,12 @@ skillShootingSkillII =
     , name = "Shooting SKill II"
     }
 
+
+
 skillAmplifyDamageII : Skill
 skillAmplifyDamageII = 
     { id = 1
-    , level = 4
+    , level = 3
     , unlocked = False
     , desciption = "Skill: Amplify Damage in subsystem Berserker"
     , name = "Amplify Damage II"
@@ -305,9 +311,24 @@ defaultSubSystem : SkillSubSystem
 defaultSubSystem = subSysPhantom
 
 defaultSystem : SkillSystem
-defaultSystem = 
+defaultSystem =
     { subsys = [subSysPhantom, subSysMechanic, subSysBerserker]
     , current = 0
     , points = 10
     , active = False
     }
+
+skillState : Int -> Int -> Int -> List SkillSubSystem -> SkillSubSystem -> Skill -> Bool
+skillState subId skillId skillLevel subsystems subSys skill =
+    let
+        bool = subsystems
+              |> List.filter (\sub -> sub.id == subId)
+              |> List.head
+              |> Maybe.withDefault subSys
+              |> .skills
+              |> List.filter (\s -> s.id == skillId && s.level == skillLevel)
+              |> List.head
+              |> Maybe.withDefault skill
+              |> .unlocked
+    in
+        bool

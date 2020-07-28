@@ -11,6 +11,7 @@ import View exposing (view)
 import Update
 import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..))
 import Init exposing (init)
+import Time exposing (..)
 -- import Html.Styled exposing (..)
 -- import Html.Styled.Attributes exposing (..)
 
@@ -37,6 +38,7 @@ subscriptions model =
         , onKeyUp (Decode.map (key False) keyCode)
         , onKeyDown (Decode.map (key True) keyCode)
         , onResize Resize
+        , Time.every 50 Tictoc
         ]
 
 key : Bool -> Int -> Msg
@@ -63,9 +65,15 @@ key on keycode =
         71 ->
             ShowDialogue
         49 ->
-            ChangeWeapon 1
+            if on then
+                DualWield
+            else
+                Noop
         50 ->
-            ChangeWeapon 2
+            if on then
+                Flash
+            else
+                Noop
         51 ->
             ChangeWeapon 3
         52 ->

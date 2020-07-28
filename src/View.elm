@@ -1,6 +1,6 @@
 module View exposing (view)
 import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
-import Map.Map exposing (Map,Monster,Room,Treasure)
+import Map.Map exposing (Map,Monster,Room,Treasure,Door,Boss)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
@@ -23,7 +23,7 @@ import Config exposing (bulletSpeed)
 -- view model =
 --     playerDemonstrate model
 import Synthesis.ShowSynthesis exposing (showSynthesis)
-
+import Display.DisplaySkill exposing (showSkill)
 view : Model -> Html.Html Msg
 view model =
     let
@@ -52,17 +52,22 @@ view model =
 
             [ Html.div
 
-                [ Html.Attributes.style "top" "200px"
-                , Html.Attributes.style "left" "200px"
+                [ Html.Attributes.style "top" "0px"
+                , Html.Attributes.style "left" "0px"
+                , Html.Attributes.style "width" (String.fromFloat (500*r) ++ "px")
+                , Html.Attributes.style "height" (String.fromFloat (500*r) ++ "px")
+                -- , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
-                [showMiniMap model]
+                [showMiniMap model r] 
             
             , Html.div
-                [ style "left" "800px"
-                , style "top" "100px"
+                [ style "right" "0px"
+                , style "top" "0px"
                 , style "position" "absolute"
+                , Html.Attributes.style "transform-origin" "100% 0 0"
+                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
-                [showAttr model.myself.attr]
+                [showAttr model.myself.attr r]
 
             , Html.div
                 [ 
@@ -119,16 +124,17 @@ showMap model =
        
        roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
 
-       doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.doors
+       doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
        obstacles = displayRec  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
        monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
        treasure = displayTreasure  model.treasure
+       boss = displayBoss  model.boss
 
-       gate = displayDoors [model.gate]
+       gate = displayDoors [Door model.gate False] -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure
+       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure ++ boss
     --    walls++gate
 
 
@@ -150,22 +156,30 @@ displayRec obstacle =
         List.map createBricksFormat obstacle
 
 
-displayDoors : List Rectangle -> List (Svg.Svg Msg)
-displayDoors obstacle =
+displayDoors : List Door -> List (Svg.Svg Msg)
+displayDoors doors =
     let
         
         -- d=Debug.log "wall" obstacle
-        createBricksFormat model =
-           Svg.rect 
-                [ Svg.Attributes.x <| String.fromFloat model.x
-                , Svg.Attributes.y <| String.fromFloat model.y
-                , Svg.Attributes.width <| String.fromFloat model.width
-                , Svg.Attributes.height <| String.fromFloat model.height
-                , Svg.Attributes.fill "grey"
-                ]
-           []
+        createBricksFormat door =
+            let
+                color =
+                    if door.enable then
+                        "black"
+                    else
+                        "grey"
+                model = door.position
+            in 
+                Svg.rect 
+                        [ Svg.Attributes.x <| String.fromFloat model.x
+                        , Svg.Attributes.y <| String.fromFloat model.y
+                        , Svg.Attributes.width <| String.fromFloat model.width
+                        , Svg.Attributes.height <| String.fromFloat model.height
+                        , Svg.Attributes.fill color
+                        ]
+                []
     in
-        List.map createBricksFormat obstacle
+        List.map createBricksFormat doors
 
 
 displayMonster : List Monster -> List (Svg.Svg Msg)
@@ -191,6 +205,33 @@ displayMonster monsters =
     in
         List.map createBricksFormat monsters
 
+
+displayBoss : List Boss  -> List (Svg.Svg Msg)
+displayBoss boss =
+    let
+        -- d=Debug.log "wall" obstacle
+        createBricksFormat bossTemp =
+            let
+                model = bossTemp.position
+                bossType = bossTemp.bossType
+                opacity = String.fromFloat (bossType.hp / 500)
+                
+
+                bossColor =bossType.color
+            in
+                
+                Svg.rect
+                    [ Svg.Attributes.x <| String.fromFloat model.x
+                    , Svg.Attributes.y <| String.fromFloat model.y
+                    , Svg.Attributes.width <| String.fromFloat model.width
+                    , Svg.Attributes.height <| String.fromFloat model.height
+                    , Svg.Attributes.fill bossColor
+                    , Svg.Attributes.fillOpacity opacity
+                
+                    ]
+                []
+    in
+         List.map createBricksFormat boss
 displayTreasure : List Treasure  -> List (Svg.Svg Msg)
 displayTreasure treasure =
     let
@@ -289,75 +330,9 @@ showDialogue model deltaTime =
         _ ->
             div [] []
 
-showSkill : Model -> Html Msg
-showSkill model =
-    let
-        sys = model.myself.skillSys
-    in
-    if sys.active then
-        let
-            curr = getCurrentSubSystem sys
-            skills = curr.skills
-            points = String.fromInt sys.points
-            txt = curr.text
-            sysName = curr.name
-            currentCost = (Tuple.second (unlockChosen curr))
-            chosenCanUnlock = currentCost > 0 && currentCost <= sys.points 
-        in
-            div
-            [ style "background" "rgba(236, 240, 241, 0.89)"
-            , style "color" "#34495f"
-            , style "height" "400px"
-            , style "left" "280px"
-            , style "padding" "0 140px"
-            , style "position" "absolute"
-            , style "top" "155px"
-            , style "width" "400px"
-            , style "background-size" "100% 100%"
-            ]
-            [ button [onClick <| SkillChange <| SubSystemChange False, style "margin" "20px 0 0 100px",style "float" "left"] [text "<"]
-            , div [style "margin" "20px 0 0 20px", style "color" "red", style "float" "left"] [text sysName]
-            , button [onClick <| SkillChange <| SubSystemChange True,style "margin" "20px 0 0 20px"] [text ">"]
-            , div [style "margin" "20px 0 0 180px"] [text points]
-            , div
-                [style "margin" "20px 0 0 120px"]
-                (List.map (skillToButton curr.chosen) skills)
-            , div
-                [ style "margin" "230px 0 0 0"
-                , style "padding" "5px 10px 5px 10px"
-                , style "height" "60px"
-                , style "background" "#FFF"]
-                [text txt]
-            , button
-                [ onClick <| SkillChange <| UnlockSkill
-                , style "margin" "20px 0 0 180px"
-                , disabled (not chosenCanUnlock)
-                ]
-                [text "Unlock"]
-            ]
-    else
-        div [] []
 
-skillToButton : (Int, Int) -> Skill -> Html Msg
-skillToButton (chosenId, chosenLevel) skill =
-    let
-        id = skill.id
-        level = skill.level
-        isChosen = id == chosenId && level == chosenLevel
-        top = (String.fromInt ((level-1) * 50)) ++ "px"
-        left = (String.fromInt (id * 80)) ++ "px"
-        color = if skill.unlocked then "blue" else "gray"
-        border = if isChosen then [style "border" "1px solid purple"] else []
-    in
-    button
-    ([ onClick <| SkillChange <| ChooseSkill skill.id skill.level
-    , style "position" "absolute"
-    , style "margin" (top ++ " 0 0 " ++ left)
-    , style "background" color
-    , style "width" "70px"
-    , style "height" "35px"
-    ] ++ border)
-    [text skill.name]
+
+
 
 showGameOver : Model -> Html Msg
 showGameOver model =
@@ -377,8 +352,8 @@ showGameOver model =
     else
         div [] []
 
-showMiniMap : Model -> Html.Html Msg
-showMiniMap model =
+showMiniMap : Model -> Float -> Html.Html Msg
+showMiniMap model r=
     let
        (miniMap,(dx,dy)) =getMiniMap model.map <| Tuple.first model.rooms
        
@@ -394,37 +369,40 @@ showMiniMap model =
 
        walls = displayRec <| List.map wallPosUpdate miniMap.walls
        roads = displayRec miniMap.roads
-       gate = displayDoors [miniMap.gate]
+       gate = displayDoors [Door miniMap.gate False]
 
        myself = model.myself
        xTemp = myself.x - toFloat(dx*2500)
        yTemp = myself.y - toFloat(dy*2500)
        rTemp = 200
 
+       widthConfig = 500*r
        meTemp= [Svg.circle [Svg.Attributes.fill "green", Svg.Attributes.cx <| String.fromFloat xTemp, Svg.Attributes.cy <| String.fromFloat yTemp, Svg.Attributes.r <| String.fromFloat rTemp][]]
     in
-        Svg.svg [Svg.Attributes.width "500", Svg.Attributes.height "500", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
+        Svg.svg [Svg.Attributes.width <| (String.fromFloat widthConfig)++"px", Svg.Attributes.height  <| (String.fromFloat widthConfig)++"px", Svg.Attributes.viewBox <| "-300 -300 15000 15000"]
         (walls ++ roads  ++ gate ++ meTemp)
 
-showAttr : Attr -> Html Msg
-showAttr attr = 
+showAttr : Attr -> Float -> Html Msg
+showAttr attr r= 
     div
-    [ style "padding" "0 140px"
-    , style "position" "absolute"
+    [ 
+        -- style "padding" "0 140px"
+    -- , style "position" "absolute"
+        -- style "hight" "500px"
     ]
-    (List.map (makeProgress attr) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
+    (List.map (makeProgress attr r) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
 
-makeProgress : Attr -> AttrType -> Html Msg
-makeProgress attr t =
+makeProgress : Attr -> Float -> AttrType -> Html Msg
+makeProgress attr r t =
     let
-        maxAttr = String.fromInt <| getMaxAttr t attr
-        valueAttr = String.fromInt <| getCurrentAttr t attr
+        maxAttr = String.fromFloat <| (toFloat <| getMaxAttr t attr) * r
+        valueAttr = String.fromFloat <| (toFloat <| getCurrentAttr t attr) * r
     in
     div 
     [style "margin" "20px"]
     [ div
-        [style "width" "50px"]
-        [text (getAttrName t ++ " : ")]
+        [style "width" "50px", style "font-size" "10px"]
+        [text (getAttrName t ++ ":")]
     , progress
         [ Html.Attributes.max maxAttr
         , Html.Attributes.value valueAttr

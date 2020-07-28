@@ -1,9 +1,10 @@
 module Map.MapGenerator exposing (roomGenerator,roomInit)
 import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
-import Map.ObstacleGenerator exposing (obstacleGenerator)
+import Map.ObstacleGenerator exposing (obstacleGenerator,bossRoomObstacleGenerator)
 import Map.MonsterGenerator exposing (monsterGenerator)
 import Map.TreasureGenerator exposing (treasureGenerator)
+import Monster.Boss exposing (bossGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
 -- import Browser
@@ -57,7 +58,7 @@ roomPositionGenerator storey seed0=
         gateRoomTemp = getGateRoom
         whetherBoss =
             if  modBy 5 storey== 0 then
-                [{gateRoomTemp|boss=True,gate=True}]
+                [{gateRoomTemp|haveBoss=True,gate=True}]
             else
                 [{gateRoomTemp|gate=True}]
  
@@ -129,9 +130,9 @@ leavesUpdate : List Room -> List Room -> Int -> Random.Seed-> Int -> List Room
 leavesUpdate  roomUpdated roomList num seed0 storey=
     let
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
-        (obstacleTemp, seed1) = obstacleGenerator seed0
-        (monsterTemp, seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
-        (treasureTemp, seed3) = treasureGenerator seed2 obstacleTemp storey
+        (obstacleTemp, seed1) = bossRoomObstacleGenerator seed0
+        bossTemp = bossGenerator seed1 obstacleTemp storey -- 到时候把boss 给剔除出去
+        (treasureTemp, seed3) = treasureGenerator seed1 obstacleTemp storey
         roomTemp = List.head roomList
         roomListNew = List.drop 1 roomList
         getRoom = 
@@ -141,7 +142,7 @@ leavesUpdate  roomUpdated roomList num seed0 storey=
                 Nothing ->
                     roomConfig
         roomNewTemp = getRoom
-        roomNew = {roomNewTemp| obstacles = obstacleTemp,monsters=monsterTemp,treasure=treasureTemp} 
+        roomNew = {roomNewTemp| obstacles = obstacleTemp,monsters=[],treasure=treasureTemp,boss=bossTemp} 
     in 
         if num==0 then
             roomUpdated
