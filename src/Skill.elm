@@ -1,5 +1,6 @@
 
-module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel, getCurrentSubSystem, getSubSys, getSkill,subSysBerserker,skillDualWield)
+module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel
+                      ,getCurrentSubSystem, getSubSys, getSkill,skillState,subSysBerserker,skillDualWield,subSysPhantom,skillFlash)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -229,7 +230,7 @@ skillShootingSkillII =
     , level = 3
     , unlocked = False
     , desciption = "Skill: Amplify Damage I in subsystem Berserker"
-    , name = "Amplify Damage I"
+    , name = "Shooting Skill II"
     }
 
 
@@ -237,7 +238,7 @@ skillShootingSkillII =
 skillAmplifyDamageII : Skill
 skillAmplifyDamageII = 
     { id = 1
-    , level = 4
+    , level = 3
     , unlocked = False
     , desciption = "Skill: Amplify Damage in subsystem Berserker"
     , name = "Amplify Damage II"
@@ -317,3 +318,18 @@ defaultSystem =
     , points = 10
     , active = False
     }
+
+skillState : Int -> Int -> Int -> List SkillSubSystem -> SkillSubSystem -> Skill -> Bool
+skillState subId skillId skillLevel subsystems subSys skill =
+    let
+        bool = subsystems
+              |> List.filter (\sub -> sub.id == subId)
+              |> List.head
+              |> Maybe.withDefault subSys
+              |> .skills
+              |> List.filter (\s -> s.id == skillId && s.level == skillLevel)
+              |> List.head
+              |> Maybe.withDefault skill
+              |> .unlocked
+    in
+        bool

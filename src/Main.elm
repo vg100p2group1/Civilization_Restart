@@ -70,7 +70,10 @@ key on keycode =
             else
                 Noop
         50 ->
-            ChangeWeapon 2
+            if on then
+                Flash
+            else
+                Noop
         51 ->
             ChangeWeapon 3
         52 ->

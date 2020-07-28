@@ -37,7 +37,7 @@ type alias Me =
     , attr : Attr
     , synthesis : SynthesisSubSystem
     , package : Package 
-    , time :Int
+    , time : Int
     }
 
 type Direction

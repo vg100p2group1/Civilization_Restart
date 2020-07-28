@@ -21,7 +21,7 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield)
+import Skill exposing (subSysBerserker,skillDualWield,subSysPhantom,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -192,6 +192,9 @@ update msg model =
 
         DualWield ->
             (updateDualWield model, Cmd.none)
+
+        Flash ->
+            (updateFlashStatus model, Cmd.none)
 
         Noop ->
             let 
@@ -649,6 +652,7 @@ hit bullet me =
 updateDualWield : Model -> Model
 updateDualWield model =
     let
+        {-
         dual = model.myself.skillSys.subsys
               |> List.filter (\sub -> sub.id == 2)
               |> List.head
@@ -658,6 +662,8 @@ updateDualWield model =
               |> List.head
               |> Maybe.withDefault skillDualWield
               |> .unlocked
+        -}
+        dual = skillState 2 1 4 model.myself.skillSys.subsys subSysBerserker skillDualWield
         me = model.myself
         newMe =
             if dual then
@@ -667,3 +673,61 @@ updateDualWield model =
     in
         {model|myself=newMe}
 
+
+updateFlashStatus : Model -> Model
+updateFlashStatus model =
+    let
+        flash = skillState 0 0 4 model.myself.skillSys.subsys subSysPhantom skillFlash
+        me = model.myself
+        newModel =
+            if flash then
+                updateFlash model me.mouseData
+            else
+                model
+    in
+        newModel
+
+updateFlash : Model -> (Float, Float) ->  Model
+updateFlash model (mouseX,mouseY)  =
+    let
+        me = model.myself
+        posX = mouseX
+        posY = mouseY
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+                -- velocity decomposition
+        cos = (posX - 500) / unitV
+        sin = (posY - 500) / unitV
+        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (mouseX, mouseY) 0))
+        distance = min minDis_ 200
+        newX = distance * cos + me.x
+        newY = distance * sin + me.y
+    in
+        {model|myself={me|x=newX,y=newY,hitBox=Circle newX newY 50}}
+
+
+findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
+findMinPath model (mouseX,mouseY) distance=
+    let
+        me = model.myself
+        posX = mouseX
+        posY = mouseY
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+                -- decomposition
+        cos = (posX - 500) / unitV
+        sin = (posY - 520) / unitV
+        xTemp = 10 * cos
+        yTemp = 10 * sin
+        newXTemp = xTemp + me.x
+        newYTemp = yTemp + me.y
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (model.map.obstacles++(List.map (\value->value.position) model.map.walls)++model.map.roads)
+        isCollide = not (List.length collideType == 0)
+    in
+        case isCollide of
+            True ->
+                (model, distance)
+            False ->
+                let
+                    newModel = {model|myself={me|x=newXTemp,y=newYTemp,hitBox=Circle newXTemp newYTemp 50}}
+                    newDistance = Tuple.second (findMinPath newModel (mouseX,mouseY) (distance+10))
+                in
+                    (newModel, newDistance)
