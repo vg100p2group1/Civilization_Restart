@@ -230,7 +230,7 @@ skillShootingSkillII =
     , level = 3
     , unlocked = False
     , desciption = "Skill: Amplify Damage I in subsystem Berserker"
-    , name = "Amplify Damage I"
+    , name = "Shooting Skill II"
     }
 
 
@@ -238,7 +238,7 @@ skillShootingSkillII =
 skillAmplifyDamageII : Skill
 skillAmplifyDamageII = 
     { id = 1
-    , level = 4
+    , level = 3
     , unlocked = False
     , desciption = "Skill: Amplify Damage in subsystem Berserker"
     , name = "Amplify Damage II"
