@@ -123,7 +123,7 @@ update msg model =
 
                         (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
-                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package}
+                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr}
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in

@@ -227,7 +227,7 @@ skillAmplifyDamageI =
 skillShootingSkillII : Skill
 skillShootingSkillII =
     { id = 0
-    , level = 4
+    , level = 3
     , unlocked = False
     , desciption = "Skill: Shooting SKill II in subsystem Berserker"
     , name = "Shooting SKill II"
