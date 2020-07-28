@@ -229,8 +229,8 @@ skillShootingSkillII =
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill: Amplify Damage I in subsystem Berserker"
-    , name = "Shooting Skill II"
+    , desciption = "Skill: Shooting SKill II in subsystem Berserker"
+    , name = "Shooting SKill II"
     }
 
 
@@ -276,7 +276,6 @@ subSysPhantom =
     , text = ""
     , unlockLevel = 0
     }
-
 
 subSysMechanic : SkillSubSystem
 subSysMechanic = 

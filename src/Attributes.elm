@@ -39,8 +39,8 @@ getDefault at =
     case at of
         Attack -> 40
         Speed -> 30
-        Armor -> 50
-        Health -> 100
+        Armor -> 500
+        Health -> 1000
         Clip -> 80
         ShootSpeed -> 40
 
