@@ -1,7 +1,8 @@
-module Synthesis.WeaponUpgrade exposing (weaponUpgrade,getWeaponMaterial)
-import Synthesis.Material exposing (Material, weaponMaterial)
+module Synthesis.WeaponUpgrade exposing (weaponUpgrade,getWeaponMaterial,bulletSynthesis)
+import Synthesis.Material exposing (Material, weaponMaterial,bulletNeeded)
 import Synthesis.Package exposing (Package)
 import Weapon exposing (Weapon,Arsenal(..))
+import Attributes exposing (Attr,AttrType(..),setCurrentAttr)
 
 weaponUpgrade : Weapon -> Package -> (Weapon,Package,String)
 weaponUpgrade weapon package=
@@ -20,6 +21,23 @@ weaponUpgrade weapon package=
                 (weapon,package,"Fail,No Enough Material")
     in
         upgradeGun
+
+bulletSynthesis : Attr -> Package -> (Attr,Package,String)
+bulletSynthesis attr package=
+    let
+
+        materialNeeded = bulletNeeded
+        newPackage = Package (package.steel - materialNeeded.steel) (package.copper - materialNeeded.copper) (package.wolfram - materialNeeded.wolfram) (package.uranium - materialNeeded.uranium) 
+        newAttr = setCurrentAttr Clip 30 attr
+        synthesis =
+            if package.steel >= materialNeeded.steel && package.copper >= materialNeeded.copper 
+                    && package.wolfram >= materialNeeded.wolfram && package.uranium >= materialNeeded.uranium then
+                (newAttr, newPackage,"Success")
+            else 
+                (attr,package,"Fail,No Enough Material")
+    in
+        synthesis
+
 
 getWeaponMaterial : Weapon -> Material
 getWeaponMaterial weapon =

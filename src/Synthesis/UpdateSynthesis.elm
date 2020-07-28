@@ -2,7 +2,7 @@ module Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Messages exposing (SynthesisMsg(..))
 import Weapon exposing (defaultWeapon)
 import Model exposing (GameState(..),Model)
-import Synthesis.WeaponUpgrade exposing (weaponUpgrade)
+import Synthesis.WeaponUpgrade exposing (weaponUpgrade,bulletSynthesis)
 updateSynthesis : SynthesisMsg -> Model -> (Model, Cmd msg)
 updateSynthesis msg model =
     let
@@ -59,4 +59,12 @@ updateSynthesis msg model =
                     newMe = {me|synthesis={synthesisSub|tip = tip},weapons=newWeapon,package=packageNew}
 
                 in  
+                    ({model|myself=newMe},Cmd.none)
+            SynthesisBullet ->
+                let
+                    attr=me.attr
+                    (newAttr,packageNew,tip) = bulletSynthesis attr package
+                    synthesisSub = me.synthesis
+                    newMe = {me|synthesis={synthesisSub|tip = tip},attr=newAttr,package=packageNew} 
+                in
                     ({model|myself=newMe},Cmd.none)
