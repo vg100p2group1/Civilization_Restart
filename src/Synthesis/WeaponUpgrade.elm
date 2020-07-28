@@ -17,7 +17,7 @@ weaponUpgrade weapon package=
                     && package.wolfram >= materialNeeded.wolfram && package.uranium >= materialNeeded.uranium then
                 ({weapon|level=weapon.level+1}, newPackage,"Success")
             else 
-                (weapon,package,"Fail,Not Enough Material")
+                (weapon,package,"Fail,No Enough Material")
     in
         upgradeGun
 
