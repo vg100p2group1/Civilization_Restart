@@ -2,7 +2,7 @@ module Synthesis.ShowSynthesis exposing (showSynthesis)
 import Messages exposing (Msg)
 import Model exposing (Model)
 import Html exposing (Html, div, text, button, progress,img)
-import Html.Attributes exposing (style, disabled,src)
+import Html.Attributes exposing (style, disabled,src,class)
 import Html.Events exposing (onClick)
 import Weapon exposing (Arsenal(..),defaultWeapon)
 
@@ -64,16 +64,16 @@ showSynthesis model =
                 , style "background-size" "100% 100%"
                 ]
                 [    div [style "position" "absolute",style "margin-left" "170px",style "margin-top" "5px", style "color" "red",style "font-size" "25px"] [text "Upgrade & Synthesis System"]
-                    , div[][ button [style "margin-left" "40px",style "margin-top" "40px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon False] [text "<"]
+                    , div[][ button [class "btn btn-primary btn-ghost btn-shine", style "color" "black",style "margin-left" "40px",style "margin-top" "40px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon False] [text "<"]
                     , div [style "position" "absolute",style "margin-left" "230px",style "margin-top" "-25px",style "font-size" "15px"] [text ("Upgrade: "++getName)]
                     , div [style "position" "absolute",style "margin-left" "430px",style "margin-top" "-25px",style "font-size" "15px"] [text ("Level: "++String.fromInt weaponNow.level)]
 
                     , div [style "width" "100px",style "height" "110px" ][img [style "margin-left" "40px",style "margin-top" "10px",style "width" "100px",style "height" "100px",src getUrl][]]
-                    , button [style "margin-left" "40px",style "margin-top" "10px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon True] [text ">"]
+                    , button [class "btn btn-primary btn-ghost btn-shine", style "color" "black",style "margin-left" "40px",style "margin-top" "10px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon True] [text ">"]
                     
                     
                     
-                    , div[style "margin-top" "-120px" , style "padding-left" "170px",style "width" "80px",style "height" "80px"]
+                    , div[style "margin-top" "-120px" , style "padding-left" "200px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Iron.jpg"][]]
                          ,div [style "width" "100px",style "height" "20px",style "margin-left" "5px",style "margin-top" "5px"][text ("steel:"  ++String.fromInt package.steel ++ "/" ++ String.fromInt materialNeeded.steel)]]
 
@@ -88,7 +88,7 @@ showSynthesis model =
                     , div[style "margin-top" "-80px" , style "padding-left" "470px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Uranium.png"][]]
                          ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Uranium:" ++String.fromInt package.uranium ++ "/" ++ String.fromInt materialNeeded.uranium)]]
-                    , button [style "position" "absolute",style "margin-top" "-90px" , style "margin-left" "580px",style "width" "80px",style "height" "80px",onClick <| SynthesisSystem <| Synthesis] [text "Upgrade"]
+                    , button [ class "btn btn-primary btn-ghost btn-shine",style "color" "black",style "position" "absolute",style "margin-top" "-90px" , style "margin-left" "580px",style "width" "90px",style "height" "80px",onClick <| SynthesisSystem <| Synthesis] [text "Upgrade"]
                     ]
                     --Bullet
                     , div[style "margin-top" "50px"][ 
@@ -112,7 +112,7 @@ showSynthesis model =
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Uranium.png"][]]
                          ,div [style "width" "100px",style "height" "20px",style "margin-top" "5px"][text ("Uranium:" ++String.fromInt package.uranium ++ "/" ++ String.fromInt bulletNeeded.uranium)]]
 
-                    , button [style "position" "absolute",style "margin-top" "-90px" , style "margin-left" "580px",style "width" "80px",style "height" "80px",onClick <| SynthesisSystem <| SynthesisBullet] [text "Synthesis"]
+                    , button [ class "btn btn-primary btn-ghost btn-shine",style "position" "absolute",style "margin-top" "-90px" , style "color" "black",style "margin-left" "580px",style "width" "90px",style "height" "80px",onClick <| SynthesisSystem <| SynthesisBullet] [text "Synthesis"]
                     ]
                     , div [style "margin-left" "200px",style "margin-top" "5px",style "position" "absolute",style "font-size" "20px"][text("Tip: "++sys.tip)]
                 ]
