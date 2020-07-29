@@ -63,7 +63,7 @@ showSynthesis model =
                 , style "width" "680px"
                 , style "background-size" "100% 100%"
                 ]
-                [    div [style "position" "absolute",style "margin-left" "170px",style "margin-top" "5px", style "color" "red",style "font-size" "25px"] [text "Upgrade & Synthesis System"]
+                [    div [style "position" "absolute",style "margin-left" "200px",style "margin-top" "5px", style "color" "red",style "font-size" "25px"] [text "Upgrade & Synthesis System"]
                     , div[][ button [class "btn btn-primary btn-ghost btn-shine", style "color" "black",style "margin-left" "40px",style "margin-top" "40px",style "width" "100px", style "height" "30px",onClick <| SynthesisSystem <| NextWeapon False] [text "<"]
                     , div [style "position" "absolute",style "margin-left" "230px",style "margin-top" "-25px",style "font-size" "15px"] [text ("Upgrade: "++getName)]
                     , div [style "position" "absolute",style "margin-left" "430px",style "margin-top" "-25px",style "font-size" "15px"] [text ("Level: "++String.fromInt weaponNow.level)]
@@ -73,7 +73,7 @@ showSynthesis model =
                     
                     
                     
-                    , div[style "margin-top" "-120px" , style "padding-left" "200px",style "width" "80px",style "height" "80px"]
+                    , div[style "margin-top" "-120px" , style "padding-left" "170px",style "width" "80px",style "height" "80px"]
                         [ div [style "width" "50px",style "height" "50px"][img [style "margin-left" "15px",style "width" "50px",style "height" "50px",src "./images/Material/Iron.jpg"][]]
                          ,div [style "width" "100px",style "height" "20px",style "margin-left" "5px",style "margin-top" "5px"][text ("steel:"  ++String.fromInt package.steel ++ "/" ++ String.fromInt materialNeeded.steel)]]
 
