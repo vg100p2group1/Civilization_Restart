@@ -4,5 +4,6 @@ elm-stuff
 .idea
 # rm build folder
 build
+elm.js
 .~CHANGELOG.md
 .gitignore
