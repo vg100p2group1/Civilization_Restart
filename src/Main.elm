@@ -5,7 +5,7 @@ import Browser.Events exposing (onAnimationFrameDelta,onKeyDown,onKeyUp, onResiz
 import Html.Events exposing (keyCode)
 import Json.Decode as Decode
 import Json.Encode exposing (Value)
-import Messages exposing (Msg(..),SkillMsg(..),SynthesisMsg(..))
+import Messages exposing (Msg(..),SkillMsg(..),SynthesisMsg(..),ShiftMsg(..))
 import Task
 import View exposing (view)
 import Update
@@ -75,12 +75,17 @@ key on keycode =
             else
                 Noop
         51 ->
-            ChangeWeapon 3
+            Noop
         52 ->
-            ChangeWeapon 4
+            Noop
+        69 ->
+            if on then
+                ChangeWeapon Previous
+            else
+                Noop
         81 ->
             if on then
-                ChangeWeapon_
+                ChangeWeapon Next
             else Noop
         66 ->
             if on then
