@@ -38,7 +38,7 @@ getDefault : AttrType -> Int
 getDefault at =
     case at of
         Attack -> 40
-        Speed -> 30
+        Speed -> 10
         Armor -> 500
         Health -> 1000
         Clip -> 80
