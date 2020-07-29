@@ -363,7 +363,7 @@ speedCase me map collideDoor=
         (newXTemp,newYTemp) = (me.x+xSpeedFinalTemp,me.y+ySpeedFinalTemp) --Todo
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
-        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 20) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
             -- ++(List.map (\t->t.position) collideDoor)
             ) 
         -- d = Debug.log "Type" collideType
@@ -413,7 +413,7 @@ speedCase me map collideDoor=
         ((newX,newY),(xSpeedFinal,ySpeedFinal),(collisionX,collisionY)) = getXY
         
     in
-        ({me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 50)},(collisionX,collisionY))
+        ({me|xSpeed=xSpeedFinal,ySpeed=ySpeedFinal,x=newX,y=newY,hitBox=(Circle newX newY 20)},(collisionX,collisionY))
 
 wallCollisionTest : Circle -> List Rectangle -> List CollideDirection
 wallCollisionTest hitbox wallList =
@@ -507,7 +507,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) dual  me=
         yTemp = bulletSpeed / unitV * (posY - 500)
         bullet = generateBullet weapon
         newCircle = Circle meX (meY+10) bullet.r
-        newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp+me.xSpeed, speedY=yTemp+me.ySpeed}
+        newBullet = {bullet | x=meX,y=(meY+10),hitbox = newCircle, speedX=xTemp+me.xSpeed, speedY=yTemp+me.ySpeed}
         bulletList_ =
             case weapon.extraInfo of
                 Shotgun ->
@@ -523,7 +523,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) dual  me=
             if dual then
                 let
                     b1 = bulletList_ |> List.map (\b -> {b|y=b.y-20/unitV*(posX - 500),x=b.x+20/unitV*(posY - 510),hitbox=Circle (b.x+20/unitV*(posY - 500)) (b.y-20/unitV*(posX - 510)) b.r})
-                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y+20/unitV*(posX - 50),x=b.x-20/unitV*(posY - 510),hitbox=Circle (b.x-20/unitV*(posY - 500)) (b.y+20/unitV*(posX-510)) b.r})
+                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y+20/unitV*(posX - 500),x=b.x-20/unitV*(posY - 510),hitbox=Circle (b.x-20/unitV*(posY - 500)) (b.y+20/unitV*(posX-510)) b.r})
                 in
                     List.append b1 b2
             else
@@ -702,7 +702,7 @@ updateFlash model (mouseX,mouseY)  =
         newX = distance * cos + me.x
         newY = distance * sin + me.y
     in
-        {model|myself={me|x=newX,y=newY,hitBox=Circle newX newY 50}}
+        {model|myself={me|x=newX,y=newY,hitBox=Circle newX newY 20}}
 
 
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
@@ -719,7 +719,7 @@ findMinPath model (mouseX,mouseY) distance=
         yTemp = 10 * sin
         newXTemp = xTemp + me.x
         newYTemp = yTemp + me.y
-        collideType = wallCollisionTest (Circle newXTemp newYTemp 50) (model.map.obstacles++(List.map (\value->value.position) model.map.walls)++model.map.roads)
+        collideType = wallCollisionTest (Circle newXTemp newYTemp 20) (model.map.obstacles++(List.map (\value->value.position) model.map.walls)++model.map.roads)
         isCollide = not (List.length collideType == 0)
     in
         case isCollide of
@@ -727,7 +727,7 @@ findMinPath model (mouseX,mouseY) distance=
                 (model, distance)
             False ->
                 let
-                    newModel = {model|myself={me|x=newXTemp,y=newYTemp,hitBox=Circle newXTemp newYTemp 50}}
+                    newModel = {model|myself={me|x=newXTemp,y=newYTemp,hitBox=Circle newXTemp newYTemp 20}}
                     newDistance = Tuple.second (findMinPath newModel (mouseX,mouseY) (distance+10))
                 in
                     (newModel, newDistance)
