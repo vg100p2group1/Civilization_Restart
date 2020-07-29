@@ -98,8 +98,8 @@ atUnlock sub attr =
                     setCurrentAttr Armor 80 attr
                     |> setMaxAttr Armor 80
                 2 ->     -- Armor Upgrade II
-                    setCurrentAttr Armor 80 attr
-                    |> setMaxAttr Armor 80
+                    setCurrentAttr Armor 120 attr
+                    |> setMaxAttr Armor 120
                 3 ->
                     if id == 0 then -- More Bullets
                         setCurrentAttr Clip 100 attr
@@ -116,8 +116,8 @@ atUnlock sub attr =
                     setCurrentAttr ShootSpeed 30 attr
                     |> setMaxAttr ShootSpeed 30
                 2 ->    -- Amplify Damage I
-                    setCurrentAttr Attack 200 attr
-                    |> setMaxAttr Attack 200
+                    setCurrentAttr Attack 20 attr
+                    |> setMaxAttr Attack 20
                 3 -> 
                     if id == 0 then -- Shooting SKill II
                         setCurrentAttr ShootSpeed 35 attr
