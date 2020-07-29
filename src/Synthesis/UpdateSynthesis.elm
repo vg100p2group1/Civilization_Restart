@@ -1,10 +1,11 @@
 module Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Messages exposing (SynthesisMsg(..))
 import Weapon exposing (defaultWeapon)
-import Model exposing (GameState(..),Model)
+import Model exposing (GameState(..),Model,State(..))
 import Synthesis.WeaponUpgrade exposing (weaponUpgrade,bulletSynthesis)
 updateSynthesis : SynthesisMsg -> Model -> (Model, Cmd msg)
 updateSynthesis msg model =
+    if model.state == Others || model.state == SynthesisSys then
     let
         me = model.myself
         weapon = me.weapons
@@ -19,9 +20,9 @@ updateSynthesis msg model =
                     newMe = {me|synthesis = sysNew}
                     newModel =
                         if model.paused then
-                                {model|myself = newMe, paused = not model.paused, gameState = Playing}
+                                {model|myself = newMe, paused = not model.paused, gameState = Playing,state=Others}
                             else
-                                {model|myself = newMe, paused = not model.paused, gameState = Paused}
+                                {model|myself = newMe, paused = not model.paused, gameState = Paused,state=SynthesisSys}
                 in
                     (newModel,Cmd.none)
             NextWeapon next ->
@@ -40,7 +41,7 @@ updateSynthesis msg model =
                                 {sys|weaponNumber = sys.weaponNumber-1} 
                     
                 in
-                      ({model|myself={me|synthesis=getNext}},Cmd.none)
+                      ({model|myself={me|synthesis=getNext},state=SynthesisSys},Cmd.none)
             Synthesis ->
                 let
                     weaponNum = me.synthesis.weaponNumber
@@ -59,7 +60,7 @@ updateSynthesis msg model =
                     newMe = {me|synthesis={synthesisSub|tip = tip},weapons=newWeapon,package=packageNew}
 
                 in  
-                    ({model|myself=newMe},Cmd.none)
+                    ({model|myself=newMe,state=SynthesisSys},Cmd.none)
             SynthesisBullet ->
                 let
                     attr=me.attr
@@ -67,4 +68,6 @@ updateSynthesis msg model =
                     synthesisSub = me.synthesis
                     newMe = {me|synthesis={synthesisSub|tip = tip},attr=newAttr,package=packageNew} 
                 in
-                    ({model|myself=newMe},Cmd.none)
+                    ({model|myself=newMe,state=SynthesisSys},Cmd.none)
+    else
+        (model, Cmd.none)

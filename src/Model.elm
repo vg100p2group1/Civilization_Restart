@@ -49,7 +49,7 @@ defaultMe : Me
 defaultMe = 
     { x = 500
     , y = 500
-    , r = 50
+    , r = 20
     , xSpeed = playerSpeed
     , ySpeed = 0
     , rotate = 0
@@ -60,7 +60,7 @@ defaultMe =
     , mouseData = (500,500)
     , fire = False
     , dualWield = False
-    , hitBox = Circle 500 500 50
+    , hitBox = Circle 500 500 20
     , weapons = weaponList
     , currentWeapon = defaultWeapon
     , counter = 0
@@ -96,6 +96,8 @@ type State = Dialogue
            | NextStage
            | ChangeSkill
            | PickTreasure Treasure
+           | SynthesisSys
+           | SkillSys
            | Others
 
 type GameState = Paused

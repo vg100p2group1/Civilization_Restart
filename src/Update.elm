@@ -500,13 +500,13 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) dual  me=
 
         -- d1=Debug.log "mouse" (posX,posY)
         -- d2=Debug.log "me" (meX,meY)
-        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
+        unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 500) * (posY - 500))
         -- velocity decomposition
 
         xTemp = bulletSpeed / unitV * (posX - 500)
-        yTemp = bulletSpeed / unitV * (posY - 520)
+        yTemp = bulletSpeed / unitV * (posY - 500)
         bullet = generateBullet weapon
-        newCircle = Circle meX (meY+20) bullet.r
+        newCircle = Circle meX (meY+10) bullet.r
         newBullet = {bullet | x=meX,y=(meY+20),hitbox = newCircle, speedX=xTemp+me.xSpeed, speedY=yTemp+me.ySpeed}
         bulletList_ =
             case weapon.extraInfo of
@@ -522,8 +522,8 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) dual  me=
         bulletList =
             if dual then
                 let
-                    b1 = bulletList_ |> List.map (\b -> {b|y=b.y-20/unitV*(posX - 520),x=b.x+20/unitV*(posY - 520),hitbox=Circle (b.x+20/unitV*(posY - 520)) (b.y-20/unitV*(posX - 520)) b.r})
-                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y+20/unitV*(posX - 520),x=b.x-20/unitV*(posY - 520),hitbox=Circle (b.x-20/unitV*(posY - 520)) (b.y+20/unitV*(posX-520)) b.r})
+                    b1 = bulletList_ |> List.map (\b -> {b|y=b.y-20/unitV*(posX - 500),x=b.x+20/unitV*(posY - 510),hitbox=Circle (b.x+20/unitV*(posY - 500)) (b.y-20/unitV*(posX - 510)) b.r})
+                    b2 = bulletList_ |> List.map (\b -> {b|y=b.y+20/unitV*(posX - 50),x=b.x-20/unitV*(posY - 510),hitbox=Circle (b.x-20/unitV*(posY - 500)) (b.y+20/unitV*(posX-510)) b.r})
                 in
                     List.append b1 b2
             else
