@@ -235,7 +235,7 @@ changeWeapon number model =
                         a
                     Nothing ->
                         defaultWeapon
-            me = { pTemp | currentWeapon = {newWeapon|shiftCounter=12}}
+            me = { pTemp | currentWeapon = {newWeapon|shiftCounter=15}}
         in
             {model | myself = me}
     else
