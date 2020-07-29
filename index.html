@@ -5337,7 +5337,7 @@ var $author$project$Weapon$bulletConfig = A9(
 var $author$project$Weapon$defaultBulletGenerator = function (_v0) {
 	return $author$project$Weapon$bulletConfig;
 };
-var $author$project$Weapon$defaultWeapon = {auto: false, bulletGenerator: $author$project$Weapon$defaultBulletGenerator, bulletNumber: 0, color: 'green', counter: 1, extraInfo: $author$project$Weapon$Pistol, hasFired: false, image: '', level: 1, maxPeriod: 50, name: 'Pistol', number: 1, period: 50};
+var $author$project$Weapon$defaultWeapon = {auto: false, bulletGenerator: $author$project$Weapon$defaultBulletGenerator, bulletNumber: 0, color: 'green', counter: 1, extraInfo: $author$project$Weapon$Pistol, hasFired: false, image: '', level: 1, maxPeriod: 50, name: 'Pistol', number: 1, period: 50, shiftCounter: 0};
 var $author$project$Synthesis$Package$Package = F4(
 	function (steel, copper, wolfram, uranium) {
 		return {copper: copper, steel: steel, uranium: uranium, wolfram: wolfram};
@@ -5360,7 +5360,9 @@ var $author$project$Weapon$Weapon = function (bulletGenerator) {
 										return function (counter) {
 											return function (hasFired) {
 												return function (level) {
-													return {auto: auto, bulletGenerator: bulletGenerator, bulletNumber: bulletNumber, color: color, counter: counter, extraInfo: extraInfo, hasFired: hasFired, image: image, level: level, maxPeriod: maxPeriod, name: name, number: number, period: period};
+													return function (shiftCounter) {
+														return {auto: auto, bulletGenerator: bulletGenerator, bulletNumber: bulletNumber, color: color, counter: counter, extraInfo: extraInfo, hasFired: hasFired, image: image, level: level, maxPeriod: maxPeriod, name: name, number: number, period: period, shiftCounter: shiftCounter};
+													};
 												};
 											};
 										};
@@ -5375,10 +5377,10 @@ var $author$project$Weapon$Weapon = function (bulletGenerator) {
 	};
 };
 var $author$project$Weapon$weaponList = function () {
-	var shotgun = $author$project$Weapon$Weapon($author$project$Weapon$defaultBulletGenerator)($author$project$Weapon$Shotgun)('Shotgun')(4)('white')(0)(false)(10)(10)('')(1)(false)(1);
+	var shotgun = $author$project$Weapon$Weapon($author$project$Weapon$defaultBulletGenerator)($author$project$Weapon$Shotgun)('Shotgun')(4)('white')(0)(false)(10)(10)('')(1)(false)(1)(0);
 	var pistol = $author$project$Weapon$defaultWeapon;
-	var mortar = $author$project$Weapon$Weapon($author$project$Weapon$defaultBulletGenerator)($author$project$Weapon$Mortar)('Mortar')(3)('blue')(0)(false)(15)(15)('')(1)(false)(1);
-	var gatling = $author$project$Weapon$Weapon($author$project$Weapon$defaultBulletGenerator)($author$project$Weapon$Gatling)('Gatling')(2)('orange')(0)(true)(5)(5)('')(1)(false)(1);
+	var mortar = $author$project$Weapon$Weapon($author$project$Weapon$defaultBulletGenerator)($author$project$Weapon$Mortar)('Mortar')(3)('blue')(0)(false)(15)(15)('')(1)(false)(1)(0);
+	var gatling = $author$project$Weapon$Weapon($author$project$Weapon$defaultBulletGenerator)($author$project$Weapon$Gatling)('Gatling')(2)('orange')(0)(true)(5)(5)('')(1)(false)(1)(0);
 	return _List_fromArray(
 		[pistol, gatling, mortar, shotgun]);
 }();
@@ -10026,6 +10028,7 @@ var $author$project$Update$animate = function (model) {
 		-$elm$core$List$length(newShoot),
 		attr);
 	var newBullet_ = _Utils_ap(newShoot, model.bullet);
+	var shiftCounter = (weapon.shiftCounter <= 0) ? 0 : (weapon.shiftCounter - 1);
 	var weaponCounter = (weapon.counter <= 0) ? 0 : (weapon.counter - 1);
 	var _v1 = A3($author$project$Map$MonsterGenerator$updateMonster, model.map.monsters, newBullet_, me);
 	var newMonsters = _v1.a;
@@ -10082,7 +10085,7 @@ var $author$project$Update$animate = function (model) {
 					counter: newMe.counter + 1,
 					currentWeapon: _Utils_update(
 						weapon,
-						{counter: weaponCounter, period: newPeriod}),
+						{counter: weaponCounter, period: newPeriod, shiftCounter: shiftCounter}),
 					url: $author$project$Animation$PlayerMoving$playerMove(newMe),
 					weapons: newWeapons
 				}),
@@ -10092,23 +10095,31 @@ var $author$project$Update$animate = function (model) {
 };
 var $author$project$Update$changeWeapon = F2(
 	function (number, model) {
-		var weapon = $elm$core$List$head(
-			A2($elm$core$List$drop, number, model.myself.weapons));
-		var pTemp = model.myself;
-		var newWeapon = function () {
-			if (weapon.$ === 'Just') {
-				var a = weapon.a;
-				return a;
-			} else {
-				return $author$project$Weapon$defaultWeapon;
-			}
-		}();
-		var me = _Utils_update(
-			pTemp,
-			{currentWeapon: newWeapon});
-		return _Utils_update(
-			model,
-			{myself: me});
+		if (!model.myself.currentWeapon.shiftCounter) {
+			var weapon = $elm$core$List$head(
+				A2($elm$core$List$drop, number, model.myself.weapons));
+			var pTemp = model.myself;
+			var newWeapon = function () {
+				if (weapon.$ === 'Just') {
+					var a = weapon.a;
+					return a;
+				} else {
+					return $author$project$Weapon$defaultWeapon;
+				}
+			}();
+			var me = _Utils_update(
+				pTemp,
+				{
+					currentWeapon: _Utils_update(
+						newWeapon,
+						{shiftCounter: 15})
+				});
+			return _Utils_update(
+				model,
+				{myself: me});
+		} else {
+			return model;
+		}
 	});
 var $author$project$Update$mouseDataUpdate = F2(
 	function (model, mousedata) {

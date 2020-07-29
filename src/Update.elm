@@ -223,18 +223,21 @@ update msg model =
 
 changeWeapon : Int -> Model -> Model
 changeWeapon number model =
-    let
-        weapon = List.head (List.drop number model.myself.weapons)
-        newWeapon =
-            case weapon of
-                Just a ->
-                    a
-                Nothing ->
-                    defaultWeapon
-        pTemp = model.myself
-        me = { pTemp | currentWeapon = newWeapon}
-    in
-        {model | myself = me}
+    if model.myself.currentWeapon.shiftCounter == 0 then
+        let
+            weapon = List.head (List.drop number model.myself.weapons)
+            newWeapon =
+                case weapon of
+                    Just a ->
+                        a
+                    Nothing ->
+                        defaultWeapon
+            pTemp = model.myself
+            me = { pTemp | currentWeapon = {newWeapon|shiftCounter=15}}
+        in
+            {model | myself = me}
+    else
+        model
 
 mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
 mouseDataUpdate model mousedata = 
@@ -300,6 +303,11 @@ animate  model =
                 0
             else
                 weapon.counter - 1
+        shiftCounter =
+            if weapon.shiftCounter <= 0 then
+                0
+            else
+                weapon.shiftCounter - 1
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
@@ -323,7 +331,7 @@ animate  model =
         newState = updateState model
         meHit = hit hurtPlayer {newMe|attr=newAttr}
     in
-        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
+        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
 
