@@ -211,7 +211,7 @@ skillShootingSkillI =
     , level = 1
     , unlocked = False
     , desciption = "Skill: Shooting SKill I in subsystem Berserker"
-    , name = "Shooting SKill I"
+    , name = "Shooting Skill I"
     }
 
 
@@ -230,7 +230,7 @@ skillShootingSkillII =
     , level = 3
     , unlocked = False
     , desciption = "Skill: Shooting SKill II in subsystem Berserker"
-    , name = "Shooting SKill II"
+    , name = "Shooting Skill II"
     }
 
 
