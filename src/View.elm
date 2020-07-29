@@ -270,8 +270,8 @@ displayTreasure treasure =
 
 me : Me -> Svg.Svg Msg
 me myself=
-    Svg.image [Svg.Attributes.x "460", Svg.Attributes.y "460", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
-                   Svg.Attributes.width "80", Svg.Attributes.height "80"][]
+    Svg.image [Svg.Attributes.x "480", Svg.Attributes.y "480", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
+                   Svg.Attributes.width "40", Svg.Attributes.height "40"][]
 
 -- gun : Me -> Svg.Svg Msg
 -- gun myself =
