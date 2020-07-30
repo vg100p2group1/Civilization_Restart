@@ -48,16 +48,19 @@ columnWall number x y wallList=
 
 showOneColumnBrick : Float -> Float -> Svg.Svg Msg
 showOneColumnBrick x y =
-    Svg.image 
-        [ Svg.Attributes.x <| String.fromFloat x
-        , Svg.Attributes.y <| String.fromFloat y
-        , Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
-        , Svg.Attributes.preserveAspectRatio "none meet"
-        , Svg.Attributes.width <| String.fromFloat 50
-        , Svg.Attributes.height <| String.fromFloat 50
-        -- , Svg.Attributes.fill "black"
-        ]
-    []
+    -- Svg.image 
+    --     [ Svg.Attributes.x <| String.fromFloat x
+    --     , Svg.Attributes.y <| String.fromFloat y
+    --     , Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
+    --     , Svg.Attributes.preserveAspectRatio "none meet"
+    --     , Svg.Attributes.width <| String.fromFloat 50
+    --     , Svg.Attributes.height <| String.fromFloat 50
+    --     -- , Svg.Attributes.fill "black"
+    --     ]
+    -- []
+        Svg.use [Svg.Attributes.xlinkHref "#Wall2"
+                ,Svg.Attributes.x <| String.fromFloat x
+                ,Svg.Attributes.y <| String.fromFloat y][]
 
 
 rowWall : Float -> Float -> Float -> List (Svg.Svg Msg) ->  List (Svg.Svg Msg)
@@ -70,13 +73,16 @@ rowWall number x y wallList=
 
 showOneRowBrick : Float -> Float -> Svg.Svg Msg
 showOneRowBrick x y =
-    Svg.image 
-        [ Svg.Attributes.x <| String.fromFloat x
-        , Svg.Attributes.y <| String.fromFloat y
-        , Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
-        , Svg.Attributes.preserveAspectRatio "none meet"
-        , Svg.Attributes.width <| String.fromFloat 100
-        , Svg.Attributes.height <| String.fromFloat 50
-        -- , Svg.Attributes.fill "black"
-        ]
-    []
+    -- Svg.image 
+    --     [ Svg.Attributes.x <| String.fromFloat x
+    --     , Svg.Attributes.y <| String.fromFloat y
+    --     , Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
+    --     , Svg.Attributes.preserveAspectRatio "none meet"
+    --     , Svg.Attributes.width <| String.fromFloat 100
+    --     , Svg.Attributes.height <| String.fromFloat 50
+    --     -- , Svg.Attributes.fill "black"
+    --     ]
+    -- []
+    Svg.use [Svg.Attributes.xlinkHref "#Wall1"
+                ,Svg.Attributes.x <| String.fromFloat x
+                ,Svg.Attributes.y <| String.fromFloat y][]
