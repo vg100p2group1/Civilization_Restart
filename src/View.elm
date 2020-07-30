@@ -82,6 +82,63 @@ view model =
                 [playerDemonstrate model]
             ]
 
+defines : Svg.Svg Msg
+defines =
+    let
+      g1 = Svg.g[Svg.Attributes.id "Wall2"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 50
+            , Svg.Attributes.height <| String.fromFloat 50
+            -- , Svg.Attributes.fill "black"
+            ][]
+        ]
+      g2 = Svg.g[Svg.Attributes.id "Wall1"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Environment/Wall1.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 100
+            , Svg.Attributes.height <| String.fromFloat 50
+            -- , Svg.Attributes.fill "black"
+            ][]
+        ]
+      g3 = Svg.g[Svg.Attributes.id "Ex1"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Explosion/Ex_01.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 20
+            , Svg.Attributes.height <| String.fromFloat 20
+            -- , Svg.Attributes.fill "black"
+            ][]]
+      g4 = Svg.g[Svg.Attributes.id "Ex2"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Explosion/Ex_02.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 20
+            , Svg.Attributes.height <| String.fromFloat 20
+            -- , Svg.Attributes.fill "black"
+            ][]]
+        
+      g5 = Svg.g[Svg.Attributes.id "Bullet1_R"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Gun/Bullet1_R.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 20
+            , Svg.Attributes.height <| String.fromFloat 20
+            -- , Svg.Attributes.fill "black"
+            ][]]
+      g6 = Svg.g[Svg.Attributes.id "Bullet1"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Gun/Bullet1.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 20
+            , Svg.Attributes.height <| String.fromFloat 20
+            -- , Svg.Attributes.fill "black"
+            ][]]  
+    in
+        Svg.defs [][g1,g2,g3,g4,g5,g6]
+
 
 playerDemonstrate : Model -> Html.Html Msg
 playerDemonstrate model =
@@ -105,7 +162,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ( showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
+              ([defines]++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model
