@@ -22,9 +22,9 @@ treasureTypeList =
 treasureGenerator : Random.Seed -> List Obstacle-> Int -> (List Treasure,Random.Seed)
 treasureGenerator seed0 obstacle storey=
     let
-        (number,seed1) = Random.step (Random.int 3 5) seed0
+        (numberTemp,seed1) = Random.step (Random.int 1 10) seed0
         -- obstacle = room.obstacles
-        
+        number = (numberTemp // 10) + 1
         (tresureList,seed2) = treasureBuilding [] number obstacle seed1 storey
     in
         (tresureList,seed2)

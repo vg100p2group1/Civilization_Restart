@@ -19,12 +19,14 @@ import Animation.Explosion exposing (showExplosion)
 import Animation.ShowBullet exposing (showBullets)
 import Environment.ShowWalls exposing (showWalls)
 import Config exposing (bulletSpeed)
+import Environment.ShowFloor exposing (showFloor)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
 import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
+import Environment.ShowFloor exposing(showFloor)
 view : Model -> Html.Html Msg
 view model =
     let
@@ -108,7 +110,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ([defines]++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
+              ([defines]++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model
