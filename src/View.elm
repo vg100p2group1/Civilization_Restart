@@ -24,6 +24,7 @@ import Config exposing (bulletSpeed)
 --     playerDemonstrate model
 import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
+import Display.Define exposing (defines)
 view : Model -> Html.Html Msg
 view model =
     let
@@ -82,62 +83,7 @@ view model =
                 [playerDemonstrate model]
             ]
 
-defines : Svg.Svg Msg
-defines =
-    let
-      g1 = Svg.g[Svg.Attributes.id "Wall2"][
-          Svg.image 
-            [ Svg.Attributes.xlinkHref "./images/Environment/Wall2.png"
-            , Svg.Attributes.preserveAspectRatio "none meet"
-            , Svg.Attributes.width <| String.fromFloat 50
-            , Svg.Attributes.height <| String.fromFloat 50
-            -- , Svg.Attributes.fill "black"
-            ][]
-        ]
-      g2 = Svg.g[Svg.Attributes.id "Wall1"][
-          Svg.image 
-            [ Svg.Attributes.xlinkHref "./images/Environment/Wall1.png"
-            , Svg.Attributes.preserveAspectRatio "none meet"
-            , Svg.Attributes.width <| String.fromFloat 100
-            , Svg.Attributes.height <| String.fromFloat 50
-            -- , Svg.Attributes.fill "black"
-            ][]
-        ]
-      g3 = Svg.g[Svg.Attributes.id "Ex1"][
-          Svg.image 
-            [ Svg.Attributes.xlinkHref "./images/Explosion/Ex_01.png"
-            , Svg.Attributes.preserveAspectRatio "none meet"
-            , Svg.Attributes.width <| String.fromFloat 20
-            , Svg.Attributes.height <| String.fromFloat 20
-            -- , Svg.Attributes.fill "black"
-            ][]]
-      g4 = Svg.g[Svg.Attributes.id "Ex2"][
-          Svg.image 
-            [ Svg.Attributes.xlinkHref "./images/Explosion/Ex_02.png"
-            , Svg.Attributes.preserveAspectRatio "none meet"
-            , Svg.Attributes.width <| String.fromFloat 20
-            , Svg.Attributes.height <| String.fromFloat 20
-            -- , Svg.Attributes.fill "black"
-            ][]]
-        
-      g5 = Svg.g[Svg.Attributes.id "Bullet1_R"][
-          Svg.image 
-            [ Svg.Attributes.xlinkHref "./images/Gun/Bullet1_R.png"
-            , Svg.Attributes.preserveAspectRatio "none meet"
-            , Svg.Attributes.width <| String.fromFloat 20
-            , Svg.Attributes.height <| String.fromFloat 20
-            -- , Svg.Attributes.fill "black"
-            ][]]
-      g6 = Svg.g[Svg.Attributes.id "Bullet1"][
-          Svg.image 
-            [ Svg.Attributes.xlinkHref "./images/Gun/Bullet1.png"
-            , Svg.Attributes.preserveAspectRatio "none meet"
-            , Svg.Attributes.width <| String.fromFloat 20
-            , Svg.Attributes.height <| String.fromFloat 20
-            -- , Svg.Attributes.fill "black"
-            ][]]  
-    in
-        Svg.defs [][g1,g2,g3,g4,g5,g6]
+
 
 
 playerDemonstrate : Model -> Html.Html Msg
@@ -248,14 +194,20 @@ displayMonster monsters =
                 model = monsterTemp.position
                 monsterType = monsterTemp.monsterType
                 opacity = String.fromFloat (monsterTemp.monsterType.hp / 150)
-
-                monsterColor = if monsterTemp.active then "black" else monsterType.color
+                -- d1=Debug.log "face" monsterTemp.face
+                getUrl =
+                    if monsterTemp.face then
+                       monsterType.url
+                    else 
+                       monsterType.url++"L"
+                -- monsterColor = if monsterTemp.active then "black" else monsterType.color
             in
-                Svg.circle
-                    [ Svg.Attributes.cx <| String.fromFloat model.cx
-                    , Svg.Attributes.cy <| String.fromFloat model.cy
-                    , Svg.Attributes.r <| String.fromFloat model.r
-                    , Svg.Attributes.fill monsterColor
+                Svg.use
+                    [ Svg.Attributes.x <| String.fromFloat (model.cx-model.r)
+                    , Svg.Attributes.y <| String.fromFloat (model.cy-model.r)
+                    , Svg.Attributes.xlinkHref getUrl
+                    -- , Svg.Attributes.r<| String.fromFloat model.r
+                    -- , Svg.Attributes.fill monsterColor
                     , Svg.Attributes.fillOpacity opacity
                     ]
                 []
@@ -327,7 +279,7 @@ displayTreasure treasure =
 
 me : Me -> Svg.Svg Msg
 me myself=
-    Svg.image [Svg.Attributes.x "480", Svg.Attributes.y "480", Svg.Attributes.xlinkHref myself.url, Svg.Attributes.preserveAspectRatio "none meet", 
+    Svg.use [Svg.Attributes.x "480", Svg.Attributes.y "480", Svg.Attributes.xlinkHref myself.url, 
                    Svg.Attributes.width "40", Svg.Attributes.height "40"][]
 
 -- gun : Me -> Svg.Svg Msg

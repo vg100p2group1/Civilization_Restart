@@ -19,34 +19,34 @@ showGun myself =
         weaponNow = myself.currentWeapon
         showPistol=
             if myself.weaponDirection == DirectionRight then
-                Svg.image [Svg.Attributes.x "500", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "./images/Gun/Gun_1_R.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                Svg.use [Svg.Attributes.x "500", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "#Gun_1_R", Svg.Attributes.preserveAspectRatio "none meet", 
                     Svg.Attributes.width "20", Svg.Attributes.height "20",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
             else 
-                Svg.image [Svg.Attributes.x "480", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "./images/Gun/Gun_1_L.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                Svg.use [Svg.Attributes.x "480", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "#Gun_1_L", Svg.Attributes.preserveAspectRatio "none meet", 
                     Svg.Attributes.width "20", Svg.Attributes.height "20",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
         
         showGatling=
             if myself.weaponDirection == DirectionRight then
-                Svg.image [Svg.Attributes.x "490", Svg.Attributes.y "495", Svg.Attributes.xlinkHref "./images/Gun/Gun_2_R.png", Svg.Attributes.preserveAspectRatio "none meet", 
-                    Svg.Attributes.width "30", Svg.Attributes.height "20",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
+                Svg.use [Svg.Attributes.x "490", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "#Gun_2_R", Svg.Attributes.preserveAspectRatio "none meet", 
+                    Svg.Attributes.width "30", Svg.Attributes.height "16",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
             else 
-                Svg.image [Svg.Attributes.x "480", Svg.Attributes.y "495", Svg.Attributes.xlinkHref "./images/Gun/Gun_2_L.png", Svg.Attributes.preserveAspectRatio "none meet", 
-                    Svg.Attributes.width "30", Svg.Attributes.height "20",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
+                Svg.use [Svg.Attributes.x "480", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "#Gun_2_L", Svg.Attributes.preserveAspectRatio "none meet", 
+                    Svg.Attributes.width "30", Svg.Attributes.height "16",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
         
         showMortar=
             if myself.weaponDirection == DirectionRight then
-                Svg.image [Svg.Attributes.x "490", Svg.Attributes.y "485", Svg.Attributes.xlinkHref "./images/Gun/Gun_3_R.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                Svg.use [Svg.Attributes.x "490", Svg.Attributes.y "490", Svg.Attributes.xlinkHref "#Gun_3_R", Svg.Attributes.preserveAspectRatio "none meet", 
                     Svg.Attributes.width "40", Svg.Attributes.height "40",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
             else 
-                Svg.image [Svg.Attributes.x "470", Svg.Attributes.y "485", Svg.Attributes.xlinkHref "./images/Gun/Gun_3_L.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                Svg.use [Svg.Attributes.x "470", Svg.Attributes.y "490", Svg.Attributes.xlinkHref "#Gun_3_L", Svg.Attributes.preserveAspectRatio "none meet", 
                     Svg.Attributes.width "40", Svg.Attributes.height "40",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
 
         showShotgun=
             if myself.weaponDirection == DirectionRight then
-                Svg.image [Svg.Attributes.x "490", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "./images/Gun/Gun_4_R.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                Svg.use [Svg.Attributes.x "490", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "#Gun_4_R", Svg.Attributes.preserveAspectRatio "none meet", 
                     Svg.Attributes.width "40", Svg.Attributes.height "20",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
             else 
-                Svg.image [Svg.Attributes.x "470", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "./images/Gun/Gun_4_L.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                Svg.use [Svg.Attributes.x "470", Svg.Attributes.y "500", Svg.Attributes.xlinkHref "#Gun_4_L", Svg.Attributes.preserveAspectRatio "none meet", 
                     Svg.Attributes.width "40", Svg.Attributes.height "20",Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 510)")][]
 
     in
