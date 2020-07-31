@@ -31,7 +31,7 @@ type alias Obstacle =
 type alias MonsterType =
     {   hp : Float
     ,   attack : Float
-    ,   color : String     
+    ,   url : String     
        
     }
 type alias Monster =
@@ -44,6 +44,7 @@ type alias Monster =
     , timeBeforeAttack : Int
     , speed : Float
     , roomNum : Int
+    , face : Bool
     }
 
 type AttackMode 

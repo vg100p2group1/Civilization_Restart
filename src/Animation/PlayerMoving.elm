@@ -17,60 +17,60 @@ playerMove me =
         getUrl = 
             if me.moveUp==False && me.moveRight==False && me.moveLeft==False && me.moveDown==False  then 
                 if me.weaponDirection==DirectionRight then
-                    "./images/R_2.png"
+                    "#R_2"
                 else
-                    "./images/L_2.png" 
+                    "#L_2" 
             else
                 if me.weaponDirection==DirectionRight then 
                     if me.preDirection==DirectionRight then
                         case frameNow of
                             0->
-                                "./images/R_1.png"
+                                "#R_1"
                             1->
-                                "./images/R_2.png"
+                                "#R_2"
                             2->
-                                "./images/R_3.png"
+                                "#R_3"
                             3->
-                                "./images/R_2.png"
+                                "#R_2"
                             _ ->
-                                "./images/R_1.png"
+                                "#R_1"
                     else
                         case frameNow of
                             0->
-                                "./images/R_3.png"
+                                "#R_3"
                             1->
-                                "./images/R_2.png"
+                                "#R_2"
                             2->
-                                "./images/R_1.png"
+                                "#R_1"
                             3->
-                                "./images/R_2.png"
+                                "#R_2"
                             _ ->
-                                "./images/R_3.png"
+                                "#R_3"
                 else
                     if me.preDirection==DirectionLeft then 
                         case frameNow of
                             0->
-                                "./images/L_1.png"
+                                "#L_1"
                             1->
-                                "./images/L_2.png"
+                                "#L_2"
                             2->
-                                "./images/L_3.png"
+                                "#L_3"
                             3->
-                                "./images/L_2.png"
+                                "#L_2"
                             _ ->
-                                "./images/L_1.png"
+                                "#L_1"
                     else
                         case frameNow of
                             0->
-                                "./images/L_3.png"
+                                "#L_3"
                             1->
-                                "./images/L_2.png"
+                                "#L_2"
                             2->
-                                "./images/L_1.png"
+                                "#L_1"
                             3->
-                                "./images/L_2.png"
+                                "#L_2"
                             _ ->
-                                "./images/L_1.png"
+                                "#L_1"
 
     in
         getUrl

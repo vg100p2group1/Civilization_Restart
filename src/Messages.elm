@@ -1,4 +1,4 @@
-module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..))
+module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..))
 import Css exposing (Resize)
 import Browser.Dom exposing (Viewport)
 import Time exposing (Posix)
@@ -21,8 +21,8 @@ type Msg
     -- for testing
     | ShowDialogue
     | NextSentence
-    | ChangeWeapon Int
-    | ChangeWeapon_
+    | ChangeWeapon_ Int
+    | ChangeWeapon ShiftMsg
     | Start
     | Pause
     | Resume
@@ -33,7 +33,10 @@ type Msg
     | Flash
     | Tictoc Time.Posix
 
-    
+type ShiftMsg
+    = Previous
+    | Next
+
 type SkillMsg
     = TriggerSkillWindow
     | SubSystemChange Bool      -- Ture for next page and False for last page

@@ -1,5 +1,5 @@
 module Update exposing (update)
-import Messages exposing (Msg(..))
+import Messages exposing (Msg(..),ShiftMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door)
@@ -157,15 +157,19 @@ update msg model =
         ShowDialogue ->
             ({ model | state = Dialogue, gameState = Paused}, Cmd.none)
 
-        ChangeWeapon number ->
+        ChangeWeapon_ number ->
             if model.gameState == Playing then
                 (changeWeapon (number - 1) model, Cmd.none)
             else
                 (model, Cmd.none)
 
-        ChangeWeapon_ ->
+        ChangeWeapon shiftMsg->
             if model.gameState == Playing then
-                (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
+                case shiftMsg of
+                    Next ->
+                        (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
+                    Previous ->
+                        (changeWeapon (modBy 4 (model.myself.currentWeapon.number - 2)) model, Cmd.none)
             else
                 (model, Cmd.none)
 

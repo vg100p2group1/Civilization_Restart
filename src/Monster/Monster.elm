@@ -51,6 +51,10 @@ monsterAct  me monster =
 
         newPos = (Tuple.first nowPos + (Tuple.first direction)* speed,Tuple.second nowPos + (Tuple.second direction)* speed)
 
+        newFace = 
+            Tuple.first direction > 0  
+        -- d1=Debug.log "face" newFace
+
         newPosition = {nowPosition|cx=Tuple.first newPos,cy=Tuple.second newPos}
         
         distx = me.x - monster.position.cx
@@ -69,7 +73,7 @@ monsterAct  me monster =
         
         
     in 
-        if checkfeasible newPos region  differenceWidth differenceHeight   then {monster|position=newPosition,seed=seed1,active=checkActive,timeBeforeAttack=checkCanShoot}  else monsterAct me {monster|seed=seed1,direction = nowdir+90}
+        if checkfeasible newPos region  differenceWidth differenceHeight   then {monster|position=newPosition,seed=seed1,active=checkActive,timeBeforeAttack=checkCanShoot,face=newFace}  else monsterAct me {monster|seed=seed1,direction = nowdir+90}
 
 monsterShoot : List Monster -> Me -> List Bullet -> List Bullet
 monsterShoot monsterList me bulletList = 
@@ -96,7 +100,7 @@ monsterShoot monsterList me bulletList =
 
         newBullet monster  =
                 -- Bullet me.x me.y 5 (Circle me.x me.y 5) (10*(speedx monster)) (10*(speedy monster)) False Weapon.Monster monster.monsterType.attack
-             Bullet monster.position.cx monster.position.cy 5 (Circle monster.position.cx monster.position.cy 5) (bulletSpeed*(speedx monster)) (10*(speedy monster)) False Weapon.Monster monster.monsterType.attack
+             Bullet monster.position.cx monster.position.cy 10 (Circle monster.position.cx monster.position.cy 10) (bulletSpeed*(speedx monster)/2) (10*(speedy monster)/2) False Weapon.Monster monster.monsterType.attack
     in
 
         bulletList ++ newBullets

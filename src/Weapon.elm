@@ -81,9 +81,9 @@ generateBullet weapon =
                 Gatling ->
                     {bulletConfig|force=30* toFloat weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* toFloat weapon.level,r=8}
+                    {bulletConfig|force=100* toFloat weapon.level,r=5}
                 Shotgun ->
-                    {bulletConfig|force=45* toFloat weapon.level,r=8}
+                    {bulletConfig|force=45* toFloat weapon.level,r=5}
     in
         bullet
 

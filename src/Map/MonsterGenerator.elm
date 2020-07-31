@@ -19,9 +19,9 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 150 10 "Yellow"
-        m2=MonsterType 150 10 "Red"
-        m3=MonsterType 150 10 "Blue"
+        m1=MonsterType 150 20 "#Robot1"
+        m2=MonsterType 150 20 "#Robot2"
+        m3=MonsterType 150 20 "#Robot3"
     in 
         [m1,m2,m3]
 
@@ -71,7 +71,7 @@ monsterBuilding monsterList number obstacles seed0 =
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
         monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
 
-        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0
+        monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0 False
 
     in 
         if number==0 then
