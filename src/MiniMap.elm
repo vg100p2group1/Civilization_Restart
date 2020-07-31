@@ -1,20 +1,20 @@
 module MiniMap exposing (getMiniMap)
-import Map.Map exposing (Map,Room,roomConfig)
+import Map.Map exposing (Map,Room,roomConfig,Gate)
 import Shape exposing (recUpdate,Rectangle,recInit)
 
 
 getMiniMap : Map-> List Room -> (Map,(Int,Int))
 getMiniMap model rooms= 
     let
-       mapTemp = {model|gate=getMiniMapGate rooms}
+       mapTemp = {model|gate=getMiniMapGate rooms model.gate}
        (miniX,miniY) = getMini rooms
        updateMap = miniMapUpdate miniX miniY mapTemp
     in
        (updateMap,(miniX,miniY))
 
 
-getMiniMapGate : List Room -> Rectangle
-getMiniMapGate rooms =
+getMiniMapGate : List Room -> Gate -> Gate
+getMiniMapGate rooms gate=
     let
         gateRoomList = List.filter (\value->value.gate) rooms
 
@@ -32,7 +32,7 @@ getMiniMapGate rooms =
 
         updatedGate = recUpdate (Rectangle (500+newX) (500+newY) 1000 1000 recInit)
     in 
-        updatedGate
+        {gate| position = updatedGate}
 
 
 getMini : List Room -> (Int,Int)
@@ -67,5 +67,6 @@ miniMapUpdate x y model =
             List.map (\value -> posUpdate value) l
         wallPosUpdate l =
             List.map (\value -> {value|position=posUpdate value.position}) l 
+        gate = model.gate
     in
-        {model|walls = wallPosUpdate model.walls, roads = posListUpdate model.roads,gate = posUpdate model.gate}
+        {model|walls = wallPosUpdate model.walls, roads = posListUpdate model.roads,gate = {gate| position = posUpdate gate.position}}

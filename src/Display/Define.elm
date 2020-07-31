@@ -89,8 +89,32 @@ defines =
             , Svg.Attributes.height <| String.fromFloat 100
             -- , Svg.Attributes.fill "black"
             ][]] 
+      g11 = Svg.g[Svg.Attributes.id "Floor"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Floor/2.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 50
+            , Svg.Attributes.height <| String.fromFloat 50
+            -- , Svg.Attributes.fill "black"
+            ][]]
+      g12 = Svg.g[Svg.Attributes.id "Laser1"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Door/Laser1.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 50
+            , Svg.Attributes.height <| String.fromFloat 200
+            -- , Svg.Attributes.fill "black"
+            ][]] 
+      g13 = Svg.g[Svg.Attributes.id "Laser2"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Door/Laser2.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 200
+            , Svg.Attributes.height <| String.fromFloat 50
+            -- , Svg.Attributes.fill "black"
+            ][]] 
     in
-        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10]++definePlayer++defineWeapon++defineMonsters)
+        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13]++definePlayer++defineWeapon++defineMonsters++defineGate)
 
 
 definePlayer : List (Svg.Svg Msg)
@@ -307,3 +331,144 @@ defineMonsters =
 
     in
         [g1,g2,g3,g4,g1L,g2L,g3L]
+
+defineGate : List (Svg.Svg Msg)
+defineGate =
+    let
+        g0 = Svg.g[Svg.Attributes.id "Gate0"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_0.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g1 = Svg.g[Svg.Attributes.id "Gate1"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_1.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g2 = Svg.g[Svg.Attributes.id "Gate2"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_2.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g3 = Svg.g[Svg.Attributes.id "Gate3"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_3.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g4 = Svg.g[Svg.Attributes.id "Gate4"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_4.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g5 = Svg.g[Svg.Attributes.id "Gate5"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_5.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g6 = Svg.g[Svg.Attributes.id "Gate6"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_6.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g7 = Svg.g[Svg.Attributes.id "Gate7"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_7.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g8 = Svg.g[Svg.Attributes.id "Gate8"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_8.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g9 = Svg.g[Svg.Attributes.id "Gate9"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_9.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g10 = Svg.g[Svg.Attributes.id "Gate10"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_10.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g11 = Svg.g[Svg.Attributes.id "Gate11"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_11.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g12 = Svg.g[Svg.Attributes.id "Gate12"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_12.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g13 = Svg.g[Svg.Attributes.id "Gate13"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_13.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g14 = Svg.g[Svg.Attributes.id "Gate14"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Gate/Gate_14.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+    in 
+        [g0,g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14]
