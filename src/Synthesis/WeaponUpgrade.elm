@@ -64,3 +64,5 @@ getWeaponMaterial weapon =
                 getLevel weaponMaterial.mortar
             Shotgun ->
                 getLevel weaponMaterial.shotgun
+            NoWeapon ->
+                getLevel weaponMaterial.shotgun
