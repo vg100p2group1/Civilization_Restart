@@ -57,7 +57,7 @@ roomPositionGenerator storey seed0=
         
         gateRoomTemp = getGateRoom
         whetherBoss =
-            if  modBy 5 storey== 0 then
+            if  modBy 2 storey== 1 then
                 [{gateRoomTemp|haveBoss=True,gate=True}]
             else
                 [{gateRoomTemp|gate=True}]
