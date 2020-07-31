@@ -18,17 +18,17 @@ showBullets bullets =
                 if  model.from==Player then
                     -- if model.speedX > 0 then
                         if model.speedY>0 then  
-                            Svg.image [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "./images/Gun/Bullet1_R.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                            Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bullet1_R", Svg.Attributes.preserveAspectRatio "none meet", 
                                 Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")")][]
                         else
-                            Svg.image [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "./images/Gun/Bullet1.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                            Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bullet1", Svg.Attributes.preserveAspectRatio "none meet", 
                                 Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")")][]
                 else
                     if model.speedY > 0 then 
-                        Svg.image [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "./images/Gun/Bullet2_R.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                        Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bullet2_R", Svg.Attributes.preserveAspectRatio "none meet", 
                             Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")")][]
                     else
-                        Svg.image [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "./images/Gun/Bullet2.png", Svg.Attributes.preserveAspectRatio "none meet", 
+                        Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bullet2", Svg.Attributes.preserveAspectRatio "none meet", 
                             Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")"),
                             Svg.Attributes.scale "(-1,1)"][]
     in

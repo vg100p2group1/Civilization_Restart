@@ -227,17 +227,22 @@ update msg model =
 changeWeapon : Int -> Model -> Model
 changeWeapon number model =
     let
-        weapon = List.head (List.drop number model.myself.weapons)
-        newWeapon =
-            case weapon of
-                Just a ->
-                    a
-                Nothing ->
-                    defaultWeapon
         pTemp = model.myself
-        me = { pTemp | currentWeapon = newWeapon}
     in
-        {model | myself = me}
+    if pTemp.currentWeapon.shiftCounter == 0 then
+        let
+            weapon = List.head (List.drop number model.myself.weapons)
+            newWeapon =
+                case weapon of
+                    Just a ->
+                        a
+                    Nothing ->
+                        defaultWeapon
+            me = { pTemp | currentWeapon = {newWeapon|shiftCounter=15}}
+        in
+            {model | myself = me}
+    else
+        model
 
 mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
 mouseDataUpdate model mousedata = 
@@ -289,6 +294,7 @@ animate  model =
     let
         me = model.myself
         attr = me.attr
+        gate = model.map.gate
         isDead = 0 == getCurrentAttr Health attr
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
@@ -303,6 +309,11 @@ animate  model =
                 0
             else
                 weapon.counter - 1
+        shiftCounter =
+            if weapon.shiftCounter <= 0 then
+                0
+            else
+                weapon.shiftCounter - 1
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
@@ -317,7 +328,7 @@ animate  model =
 
         (newMe,collision) = speedCase me model.map collideDoor
 
-        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={gate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -327,7 +338,11 @@ animate  model =
         meHit = hit hurtPlayer {newMe|attr=newAttr}
         meCooling = coolSkills meHit
     in
+<<<<<<< HEAD
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
+=======
+        {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
+>>>>>>> dev
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
 
@@ -581,9 +596,15 @@ updateBullet me map bullets (collisionX,collisionY) =
                 List.partition (\b -> b.from /= Player && circleCollisonTest b.hitbox atField) flyingBullets
             else
                 ([], flyingBullets)
+<<<<<<< HEAD
 
         finalBullets = List.map updateXY outsideField
 
+=======
+
+        finalBullets = List.map updateXY outsideField
+
+>>>>>>> dev
         filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
     in
         (finalBullets,filteredBullets,hitPlayer ++ inField)
@@ -597,7 +618,7 @@ bulletToViewBox me bullets=
 updateState : Model -> State
 updateState model =
     let
-        collideGate = circleRecTest model.myself.hitBox model.map.gate.edge
+        collideGate = circleRecTest model.myself.hitBox model.map.gate.position.edge
         collideTreasureList = getCollideTreasure model.map.treasure model.myself
         getTreasure = 
             let 

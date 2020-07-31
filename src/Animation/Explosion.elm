@@ -15,25 +15,33 @@ explosion effect =
         getUrl =
             case counternow of 
                 0 ->
-                  "./images/Explosion/Ex_01.png"
+                  -- "./images/Explosion/Ex_01.png"
+                  "#Ex1"
                 1 ->
-                  "./images/Explosion/Ex_02.png"  
+                  "#Ex2"  
                 2 ->
-                  "./images/Explosion/Ex_02.png"   
+                  "#Ex2"   
                 3 ->
-                  "./images/Explosion/Ex_02.png" 
+                  "#Ex2" 
                 _ ->
-                  ""
+                  "#Ex2"
         -- d1 = Debug.log "counter,url" (counternow,getUrl)
     in
-        Svg.image [Svg.Attributes.x <| String.fromFloat (effect.x - effect.r), 
-                   Svg.Attributes.y <| String.fromFloat (effect.y - effect.r), 
-                   Svg.Attributes.xlinkHref getUrl, 
-                   Svg.Attributes.preserveAspectRatio "none meet", 
-                   Svg.Attributes.width <| String.fromFloat (effect.r*2), 
-                   Svg.Attributes.height <| String.fromFloat (effect.r*2)
+        -- Svg.image [Svg.Attributes.x <| String.fromFloat (effect.x - effect.r), 
+        --            Svg.Attributes.y <| String.fromFloat (effect.y - effect.r), 
+        --            Svg.Attributes.xlinkHref getUrl, 
+        --            Svg.Attributes.preserveAspectRatio "none meet", 
+        --            Svg.Attributes.width <| String.fromFloat (effect.r*2), 
+        --            Svg.Attributes.height <| String.fromFloat (effect.r*2)
+        --         --    Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 520)")
+        --           ][]
+        Svg.use [Svg.Attributes.x <| String.fromFloat (effect.x - effect.r), 
+                 Svg.Attributes.y <| String.fromFloat (effect.y - effect.r), 
+                 Svg.Attributes.xlinkHref getUrl
+                --  Svg.Attributes.width <| String.fromFloat (effect.r*2), 
+                --  Svg.Attributes.height <| String.fromFloat (effect.r*2)
                 --    Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 520)")
-                  ][]
+                ][]
 
 showExplosion : List ExplosionEffect -> List (Svg.Svg Msg)
 showExplosion  model =
