@@ -75,7 +75,10 @@ key on keycode =
             else
                 Noop
         51 ->
-            Noop
+            if on then
+                ATField
+            else
+                Noop        
         52 ->
             Noop
         69 ->

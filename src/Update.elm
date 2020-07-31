@@ -21,7 +21,7 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,subSysPhantom,skillFlash,skillState)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -206,6 +206,9 @@ update msg model =
         Flash ->
             (updateFlashStatus model, Cmd.none)
 
+        ATField ->
+            (updateATField model, Cmd.none)
+
         Noop ->
             let 
                 pTemp =  model.myself
@@ -242,17 +245,22 @@ update msg model =
 changeWeapon : Int -> Model -> Model
 changeWeapon number model =
     let
-        weapon = List.head (List.drop number model.myself.weapons)
-        newWeapon =
-            case weapon of
-                Just a ->
-                    a
-                Nothing ->
-                    defaultWeapon
         pTemp = model.myself
-        me = { pTemp | currentWeapon = newWeapon}
     in
-        {model | myself = me}
+    if pTemp.currentWeapon.shiftCounter == 0 then
+        let
+            weapon = List.head (List.drop number model.myself.weapons)
+            newWeapon =
+                case weapon of
+                    Just a ->
+                        a
+                    Nothing ->
+                        defaultWeapon
+            me = { pTemp | currentWeapon = {newWeapon|shiftCounter=15}}
+        in
+            {model | myself = me}
+    else
+        model
 
 mouseDataUpdate : Model -> (Float,Float) -> (Float,Float)  
 mouseDataUpdate model mousedata = 
@@ -309,7 +317,7 @@ animate  model =
         isDead = 0 == getCurrentAttr Health attr
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
-                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) model.myself.dualWield me
+                                    fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) (model.myself.dualWield > 0) me
                                  else
                                     ([], model.myself.currentWeapon)
                              else
@@ -320,6 +328,11 @@ animate  model =
                 0
             else
                 weapon.counter - 1
+        shiftCounter =
+            if weapon.shiftCounter <= 0 then
+                0
+            else
+                weapon.shiftCounter - 1
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
@@ -342,8 +355,9 @@ animate  model =
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
         meHit = hit hurtPlayer {newMe|attr=newAttr}
+        meCooling = coolSkills meHit
     in
-        {model| myself = {meHit|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
+        {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
 
@@ -567,7 +581,6 @@ updateBullet me map bullets (collisionX,collisionY) =
                     
                         b.hitbox.cx + b.speedX
                 newY = 
-                    
                         b.hitbox.cy + b.speedY
                 newHitbox = Circle newX newY b.hitbox.r
             in
@@ -589,14 +602,21 @@ updateBullet me map bullets (collisionX,collisionY) =
                     |> List.filter (\b -> not (List.any (circleRecTest b.hitbox) ((List.map .edge (List.map (\value->value.position) map.boss))))||(b.from == Monster))
 
         (flyingBullets, hitPlayer) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) allBullets
-        finalBullets = List.map updateXY flyingBullets
+        
+        -- AT Field can stop bullets
+        fieldOn = me.absoluteTerrifyField > 0
+        atField = Circle me.x me.y 20
+        (inField, outsideField) = 
+            if fieldOn then
+                List.partition (\b -> b.from /= Player && circleCollisonTest b.hitbox atField) flyingBullets
+            else
+                ([], flyingBullets)
+
+        finalBullets = List.map updateXY outsideField
 
         filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
-        
-        -- d1=Debug.log "f" filteredBullets  
-
     in
-        (finalBullets,filteredBullets,hitPlayer)
+        (finalBullets,filteredBullets,hitPlayer ++ inField)
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
@@ -690,8 +710,8 @@ updateDualWield model =
         dual = skillState 2 1 4 model.myself.skillSys.subsys subSysBerserker skillDualWield
         me = model.myself
         newMe =
-            if dual then
-                {me|dualWield = not me.dualWield}
+            if dual && me.dualWield == 0 then
+                {me|dualWield = 100}
             else
                 me
     in
@@ -704,30 +724,45 @@ updateFlashStatus model =
         flash = skillState 0 0 4 model.myself.skillSys.subsys subSysPhantom skillFlash
         me = model.myself
         newModel =
-            if flash then
-                updateFlash model me.mouseData
+            if flash && me.flash == 0 then
+                let
+                    afterFlash = updateFlash model
+                    meFlash = {afterFlash|flash = 1}
+                in
+                    {model|myself = meFlash}
             else
                 model
     in
         newModel
 
-updateFlash : Model -> (Float, Float) ->  Model
-updateFlash model (mouseX,mouseY)  =
+updateFlash : Model ->  Me
+updateFlash model =
     let
         me = model.myself
-        posX = mouseX
-        posY = mouseY
+        (posX, posY) = me.mouseData
         unitV = sqrt ((posX - 500) * (posX - 500) + (posY - 520) * (posY - 520))
                 -- velocity decomposition
         cos = (posX - 500) / unitV
         sin = (posY - 500) / unitV
-        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (mouseX, mouseY) 0))
+        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (posX, posY) 0))
         distance = min minDis_ 200
         newX = distance * cos + me.x
         newY = distance * sin + me.y
     in
-        {model|myself={me|x=newX,y=newY,hitBox=Circle newX newY 20}}
+        {me|x=newX,y=newY,hitBox=Circle newX newY 20}
 
+updateATField : Model -> Model
+updateATField model =
+    let
+        unlocked = skillState 1 0 4 model.myself.skillSys.subsys subSysMechanic skillAbsoluteTerritoryField
+        me = model.myself
+        newMe =
+            if unlocked && me.absoluteTerrifyField == 0 then
+                {me|absoluteTerrifyField = 50}
+            else
+                me
+    in
+        {model|myself = newMe}
 
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
@@ -755,3 +790,18 @@ findMinPath model (mouseX,mouseY) distance=
                     newDistance = Tuple.second (findMinPath newModel (mouseX,mouseY) (distance+10))
                 in
                     (newModel, newDistance)
+
+coolSkills : Me -> Me
+coolSkills me =
+    let
+        cool val =
+            if val > 1 then
+                val - 1
+            else if val == 1 then
+                -50
+            else if val < 0 then
+                val + 1
+            else
+                0
+    in
+        {me|dualWield = Debug.log "dw" (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField}

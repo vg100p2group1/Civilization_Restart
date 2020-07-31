@@ -1,0 +1,10 @@
+# rm elm-stuff
+elm-stuff
+# rm .idea
+.idea
+# rm build folder
+build
+elm.js
+index.html
+.~CHANGELOG.md
+.gitignore
