@@ -32,6 +32,7 @@ type Msg
     | DualWield
     | Flash
     | ATField
+    | Invisibility
     | Tictoc Time.Posix
     | PageChange PageMsg
 
