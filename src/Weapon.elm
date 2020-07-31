@@ -66,7 +66,6 @@ defaultWeapon =
     , level = 1
     }
 
-
 defaultBulletGenerator : WeaponInfo -> Bullet
 defaultBulletGenerator _ =
     bulletConfig

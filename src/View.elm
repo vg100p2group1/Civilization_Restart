@@ -1,10 +1,10 @@
 module View exposing (view)
-import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit)
+import Model exposing (Model,Me,Dialogues,State(..), Side(..), sentenceInit,Page(..))
 import Map.Map exposing (Map,Monster,Room,Treasure,Door,Boss)
 import Weapon exposing (Bullet)
 import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
-import Messages exposing (Msg(..), SkillMsg(..))
+import Messages exposing (Msg(..), SkillMsg(..),PageMsg(..))
 import Attributes exposing (Attr, AttrType(..), getCurrentAttr, getMaxAttr, getAttrName)
 import Html exposing (Html, div, text, button, progress)
 import Html.Attributes exposing (style, disabled)
@@ -23,6 +23,7 @@ import Environment.ShowFloor exposing (showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowDoor exposing (showDoor)
+import Pages.About exposing (aboutView)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -34,9 +35,28 @@ import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowGate exposing (showGate)
 import Environment.ShowDoor exposing (showDoor)
+import Pages.Welcome exposing (welcomeView)
+import Pages.About exposing (aboutView)
+import Pages.Help exposing (helpView)
+import Pages.Story exposing (storyView)
+
 
 view : Model -> Html.Html Msg
 view model =
+    case model.pageState of
+        WelcomePage->
+            welcomeView model
+        AboutPage ->
+            aboutView model  
+        HelpPage ->
+            helpView model  
+        StoryPage ->
+            storyView model  
+        _ ->
+            gameView model   
+
+gameView : Model -> Html.Html Msg
+gameView model =
     let
         ( w, h ) =
             model.size
