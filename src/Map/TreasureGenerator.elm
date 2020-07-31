@@ -13,8 +13,8 @@ treasureTypeList : List TreasureType
 treasureTypeList = 
     let
         m1=TreasureType 1 100 "Yellow"
-        m2=TreasureType 2 200 "Red"
-        m3=TreasureType 3 300 "Blue"
+        m2=TreasureType 2 100 "Red"
+        m3=TreasureType 3 100 "Blue"
     in 
         [m1,m2,m3]
 
