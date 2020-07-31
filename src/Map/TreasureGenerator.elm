@@ -1,4 +1,4 @@
-module Map.TreasureGenerator exposing (treasureGenerator,updateTreasure)
+module Map.TreasureGenerator exposing (treasureGenerator,updateTreasure,treasureLevelChange)
 import Shape exposing (Rectangle,recCollisionTest,recInit,recUpdate,circleCollisonTest)
 import Map.Map exposing (Treasure,TreasureType,Obstacle)
 import Random
@@ -16,7 +16,7 @@ treasureTypeList =
         m2=TreasureType 2 100 "Red"
         m3=TreasureType 3 100 "Blue"
     in 
-        [m1,m2,m3]
+        [m1,m2,m3,m3,m3]
 
 
 treasureGenerator : Random.Seed -> List Obstacle-> Int -> (List Treasure,Random.Seed)
@@ -47,7 +47,7 @@ treasureBuilding treasureList number obstacles seed0 storey=
     let
         (xTemp,seed1) = Random.step (Random.int 200 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 200 1500) seed1
-        (typeTemp, seed3) = Random.step (Random.int 0 (treasureTypeNum-1)) seed2
+        (typeTemp, seed3) = Random.step (Random.int 0 (storey // 3)) seed2
         getTreasureType = 
             let
                 headType =List.head <| List.drop typeTemp treasureTypeList 
@@ -86,8 +86,8 @@ updateSingleTreasure roomClearList treasure=
 generateMaterial : Random.Seed-> TreasureType -> Int -> (Material,Random.Seed)
 generateMaterial seed0 treasureType storey=
     let
-        maxNum = ((storey//5)*2)*treasureType.level +treasureType.level 
-        minNum = (storey//5)*treasureType.level+treasureType.level 
+        maxNum = treasureType.level * 3
+        minNum = treasureType.level * 2
 
         -- d1 = Debug.log "seed" seed0 
 
@@ -99,3 +99,11 @@ generateMaterial seed0 treasureType storey=
         (u,seed4)=Random.step (Random.int minNum maxNum) seed3 
     in
         (Material s c w u, seed4)
+
+treasureLevelChange : Treasure -> Map.Map.Treasure
+treasureLevelChange treasure = 
+    let
+        nowTreasureType = treasure.treasureType
+        newTreasureType = {nowTreasureType | level = 4}
+    in
+        {treasure|treasureType = newTreasureType}

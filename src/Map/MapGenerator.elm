@@ -3,7 +3,7 @@ import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator,bossRoomObstacleGenerator)
 import Map.MonsterGenerator exposing (monsterGenerator)
-import Map.TreasureGenerator exposing (treasureGenerator)
+import Map.TreasureGenerator exposing (treasureGenerator,treasureLevelChange)
 import Monster.Boss exposing (bossGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
@@ -70,8 +70,8 @@ roomPositionGenerator storey seed0=
             if whetherBoss.haveBoss then 
                 []
             else whetherBoss.monsters
-
-        newRoom = {whetherBoss|boss=newBoss,monsters=newMonster}
+        newTreasure = List.map treasureLevelChange whetherBoss.treasure
+        newRoom = {whetherBoss|boss=newBoss,monsters=newMonster,treasure = newTreasure}
 
         room4 = newRoom :: (List.drop 1 room3) 
         -- d2 = Debug.log "gateroom" whetherBoss
