@@ -103,6 +103,6 @@ monsterShoot monsterList me bulletList =
              Bullet monster.position.cx monster.position.cy 10 (Circle monster.position.cx monster.position.cy 10) (bulletSpeed*(speedx monster)/2) (10*(speedy monster)/2) False Weapon.Monster monster.monsterType.attack
     in
 
-        bulletList ++ newBullets
+        if (me.invisible>0) then bulletList else bulletList ++ newBullets 
 
 

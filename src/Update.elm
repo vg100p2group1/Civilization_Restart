@@ -20,7 +20,7 @@ import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
-import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
+import Attributes exposing (setCurrentAttr,getCurrentAttr, getMaxAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
 import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
@@ -610,7 +610,7 @@ updateBullet me map bullets (collisionX,collisionY) =
         
         -- AT Field can stop bullets
         fieldOn = me.absoluteTerrifyField > 0
-        atField = Circle me.x me.y 20
+        atField = Circle me.x me.y 100
         (inField, outsideField) = 
             if fieldOn then
                 List.partition (\b -> b.from /= Player && circleCollisonTest b.hitbox atField) flyingBullets
@@ -619,7 +619,7 @@ updateBullet me map bullets (collisionX,collisionY) =
 
         finalBullets = List.map updateXY outsideField
 
-        filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        filteredBullets = List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
     in
         (finalBullets,filteredBullets,hitPlayer ++ inField)
 
@@ -679,14 +679,15 @@ hit bullet me =
         me
     else
         let
-            totalHurt = bullet
+            (hitPlayer, inAT) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) bullet
+            totalHurt = hitPlayer
                     |> List.map .force
                     |> List.sum
                     |> Basics.round
             attr = me.attr
             health = getCurrentAttr Health attr
             armor = getCurrentAttr Armor attr
-            newAttr = 
+            hurtAttr = 
                 if totalHurt <= armor then     -- the armor is enough to protect the player
                     setCurrentAttr Armor -totalHurt attr
                 else if armor > 0 then      -- the armor is broken due to these bullets
@@ -694,6 +695,11 @@ hit bullet me =
                     |> setCurrentAttr Health (totalHurt - armor)
                 else
                     setCurrentAttr Health -(min totalHurt health) attr
+            currentClip = getCurrentAttr Clip attr
+            maxClip = getMaxAttr Clip attr
+            loseClip = maxClip - currentClip
+            catchBullet = List.length inAT
+            newAttr = setCurrentAttr Clip (min catchBullet loseClip) hurtAttr
         in
             {me | attr = newAttr}
 
@@ -822,4 +828,4 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField}
+        {me|dualWield = cool me.dualWield, flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField,invisible= cool me.invisible}

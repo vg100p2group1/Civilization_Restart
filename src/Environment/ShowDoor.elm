@@ -55,12 +55,12 @@ showOneDoor door=
                 if numX>numY then 
                     showFloors x (numX-1) x y (numX-1) numY [] ++  showWallsX x y numY [] 
                 else 
-                    showFloors x numX x y numX numY [] ++  showWallsY x y numX  [] 
+                    showFloors x (numX-1) x y (numX-1) numY [] ++  showWallsY x y numX  [] 
             else 
                 if numX>numY then
                     showFloors x (numX-1) x y (numX-1) numY [] 
                 else 
-                    showFloors x numX x y numX numY [] 
+                    showFloors x (numX-1) x y (numX-1) numY [] 
         -- doorFloor = showOneRectangle xBegin yBegin 
     in
         doorFloor
