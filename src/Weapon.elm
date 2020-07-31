@@ -68,7 +68,6 @@ defaultWeapon =
     , shiftCounter = 0
     }
 
-
 defaultBulletGenerator : WeaponInfo -> Bullet
 defaultBulletGenerator _ =
     bulletConfig
