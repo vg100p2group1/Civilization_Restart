@@ -330,19 +330,15 @@ animate  model =
 
         newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={gate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
-        (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
+        (newBulletList, filteredBulletList, interactPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
         newExplosion = updateExplosion model.explosion filteredBulletList
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
-        meHit = hit hurtPlayer {newMe|attr=newAttr}
+        meHit = hit interactPlayer {newMe|attr=newAttr}
         meCooling = coolSkills meHit
     in
-<<<<<<< HEAD
-        {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod}},
-=======
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
->>>>>>> dev
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
 
@@ -596,15 +592,9 @@ updateBullet me map bullets (collisionX,collisionY) =
                 List.partition (\b -> b.from /= Player && circleCollisonTest b.hitbox atField) flyingBullets
             else
                 ([], flyingBullets)
-<<<<<<< HEAD
 
         finalBullets = List.map updateXY outsideField
 
-=======
-
-        finalBullets = List.map updateXY outsideField
-
->>>>>>> dev
         filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
     in
         (finalBullets,filteredBullets,hitPlayer ++ inField)
@@ -676,7 +666,7 @@ hit bullet me =
                 if totalHurt <= armor then     -- the armor is enough to protect the player
                     setCurrentAttr Armor -totalHurt attr
                 else if armor > 0 then      -- the armor is broken due to these bullets
-                    setCurrentAttr Armor armor attr
+                    setCurrentAttr Armor -armor attr
                     |> setCurrentAttr Health (totalHurt - armor)
                 else
                     setCurrentAttr Health -(min totalHurt health) attr
