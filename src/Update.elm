@@ -227,7 +227,7 @@ update msg model =
             let
                 me = model.myself
                 sys = me.weaponUnlockSys
-                newModel = {model|myself={me|weaponUnlockSys={sys|active=True}}}
+                newModel = {model|myself={me|weaponUnlockSys={sys|active=True}},gameState=Paused}
             in
                 (newModel, Cmd.none)
 
