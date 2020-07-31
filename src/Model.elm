@@ -22,7 +22,9 @@ type alias Me =
     , moveDown : Bool
     , mouseData : (Float,Float)
     , fire : Bool
-    , dualWield : Bool
+    , dualWield : Int
+    , absoluteTerrifyField : Int
+    , flash : Int
   --   , name : String
   --   , score : Float
     , hitBox : Circle
@@ -59,7 +61,9 @@ defaultMe =
     , moveDown = False
     , mouseData = (500,500)
     , fire = False
-    , dualWield = False
+    , dualWield = 0
+    , absoluteTerrifyField = 0
+    , flash = 0
     , hitBox = Circle 500 500 20
     , weapons = weaponList
     , currentWeapon = defaultWeapon

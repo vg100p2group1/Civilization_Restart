@@ -31,6 +31,7 @@ type Msg
     | SynthesisSystem SynthesisMsg
     | DualWield
     | Flash
+    | ATField
     | Tictoc Time.Posix
 
 type ShiftMsg
