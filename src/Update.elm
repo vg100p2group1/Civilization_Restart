@@ -122,6 +122,8 @@ update msg model =
                         roomNew =
                             roomGenerator (model.storey+1) (initialSeed model.myself.time) 
 
+                        -- d1=Debug.log "room" (List.map (\value -> value.position) <| Tuple.first roomNew)
+
                         (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr}

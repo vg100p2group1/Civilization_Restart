@@ -146,7 +146,7 @@ defines =
             -- , Svg.Attributes.fill "black"
             ][]] 
     in
-        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17]++definePlayer++defineWeapon++defineMonsters++defineGate)
+        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17]++definePlayer++defineWeapon++defineMonsters++defineGate++defineObstacle)
 
 
 definePlayer : List (Svg.Svg Msg)
@@ -504,3 +504,36 @@ defineGate =
             ]
     in 
         [g0,g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14]
+
+defineObstacle : List (Svg.Svg Msg)
+defineObstacle =
+    let
+        g0 = Svg.g[Svg.Attributes.id "Obstacle1"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Obstacle/Obstacle1.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 100
+                , Svg.Attributes.height <| String.fromFloat 1200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g1 = Svg.g[Svg.Attributes.id "Obstacle2"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Obstacle/Obstacle2.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 400
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g2 = Svg.g[Svg.Attributes.id "Obstacle3"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Obstacle/Obstacle3.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 800
+                , Svg.Attributes.height <| String.fromFloat 800
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+    in 
+        [g0,g1,g2]
