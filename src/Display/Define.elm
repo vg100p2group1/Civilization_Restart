@@ -129,8 +129,24 @@ defines =
             , Svg.Attributes.height <| String.fromFloat 900
             -- , Svg.Attributes.fill "black"
             ][]] 
+      g16 = Svg.g[Svg.Attributes.id "Hole"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Blackhole/Hole.gif"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 1000
+            , Svg.Attributes.height <| String.fromFloat 1000
+            -- , Svg.Attributes.fill "black"
+            ][]]
+      g17 = Svg.g[Svg.Attributes.id "Light"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Floor/Light.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 2000
+            , Svg.Attributes.height <| String.fromFloat 2000
+            -- , Svg.Attributes.fill "black"
+            ][]] 
     in
-        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15]++definePlayer++defineWeapon++defineMonsters++defineGate)
+        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17]++definePlayer++defineWeapon++defineMonsters++defineGate)
 
 
 definePlayer : List (Svg.Svg Msg)
