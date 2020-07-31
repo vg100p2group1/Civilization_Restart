@@ -1,6 +1,6 @@
 
 
-module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit,Door,Boss,BossType,ShootingType,AttackMode(..),Aint)
+module Map.Map exposing (Treasure,TreasureType,Obstacle,Room,Map,Monster,MonsterType,Wall,WallProperty(..),roomConfig,mapConfig,treasureInit,Door,Boss,BossType,ShootingType,AttackMode(..),Aint,Gate)
 import Shape exposing (Rectangle,recInit)
 import Random exposing (Seed)
 import Synthesis.Material exposing (Material)
@@ -26,6 +26,11 @@ type alias TreasureType =
 type alias Obstacle =
     { position : Rectangle
     -- , type : Int
+    }
+
+type alias Gate =
+    { position : Rectangle
+    , counter : Int
     }
 
 type alias MonsterType =
@@ -121,7 +126,7 @@ type alias Map =
     , monsters : List Monster
     , treasure : List Treasure
     , doors : List Door
-    , gate : Rectangle
+    , gate : Gate
     , roomCleared : List Int
     , roomCount : Int
     , boss : List Boss
@@ -137,7 +142,7 @@ roomConfig : Room
 roomConfig = Room (0,0) False False [] [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Rectangle 0 0 0 0 recInit) [] 0 []
+mapConfig = Map [] [] [] [] [] [] (Gate (Rectangle 0 0 0 0 recInit) 0) [] 0 []
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)
