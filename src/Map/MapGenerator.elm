@@ -37,7 +37,7 @@ roomUpdate room =
 roomPositionGenerator : Int -> Random.Seed -> (List Room, Random.Seed)
 roomPositionGenerator storey seed0= 
     let
-        (roomNumber,seed1) = Random.step (Random.int 5 10) seed0 
+        (roomNumber,seed1) = Random.step (Random.int 5 7) seed0 
         -- d = Debug.log "roomNumber" roomNumber
 
         (room1,newNumber,seed2) = firstRoomGenerator roomNumber seed1 storey

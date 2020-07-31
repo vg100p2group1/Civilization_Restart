@@ -122,6 +122,8 @@ update msg model =
                         roomNew =
                             roomGenerator (model.storey+1) (initialSeed model.myself.time) 
 
+                        -- d1=Debug.log "room" (List.map (\value -> value.position) <| Tuple.first roomNew)
+
                         (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr}
@@ -354,12 +356,12 @@ animate  model =
 
         newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={newGate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
-        (newBulletList, filteredBulletList, interactPlayer) = updateBullet newMe model.map newBullet collision
+        (newBulletList, filteredBulletList, (hitPlayer, atFieldBullet)) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
         newExplosion = updateExplosion model.explosion filteredBulletList
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
-        meHit = hit interactPlayer {newMe|attr=newAttr}
+        meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
         meCooling = coolSkills meHit
     in
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
@@ -576,7 +578,7 @@ fireBullet weapon (mouseX,mouseY) (meX, meY) dual  me=
 
 
 
-updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet, List Bullet)
+updateBullet : Me-> Map -> List Bullet -> (Bool,Bool) -> (List Bullet, List Bullet, (List Bullet, List Bullet))
 updateBullet me map bullets (collisionX,collisionY) =
     let
         updateXY b =
@@ -621,7 +623,7 @@ updateBullet me map bullets (collisionX,collisionY) =
 
         filteredBullets = List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
     in
-        (finalBullets,filteredBullets,hitPlayer ++ inField)
+        (finalBullets,filteredBullets,(hitPlayer,inField))
 
 
 bulletToViewBox : Me -> List Bullet -> List Bullet
@@ -673,14 +675,13 @@ updateDialogues : Model -> Dialogues
 updateDialogues model =
     model.currentDialogues
 
-hit : List Bullet -> Me -> Me
-hit bullet me =
-    if List.isEmpty bullet then
+hit : List Bullet -> List Bullet-> Me -> Me
+hit bulletHit bulletAT me =
+    if List.isEmpty bulletHit && List.isEmpty bulletAT then
         me
     else
         let
-            (hitPlayer, inAT) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) bullet
-            totalHurt = hitPlayer
+            totalHurt = bulletHit
                     |> List.map .force
                     |> List.sum
                     |> Basics.round
@@ -698,7 +699,7 @@ hit bullet me =
             currentClip = getCurrentAttr Clip attr
             maxClip = getMaxAttr Clip attr
             loseClip = maxClip - currentClip
-            catchBullet = List.length inAT
+            catchBullet = List.length bulletAT
             newAttr = setCurrentAttr Clip (min catchBullet loseClip) hurtAttr
         in
             {me | attr = newAttr}
