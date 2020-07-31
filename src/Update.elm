@@ -14,14 +14,15 @@ import Monster.Boss exposing (updateBoss)
 import Map.MapDisplay exposing (showMap, mapWithGate,mapInit)
 import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import Map.TreasureGenerator exposing (updateTreasure)
+import Map.Gate exposing (updateGate)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
 import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
-import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
+import Attributes exposing (setCurrentAttr,getCurrentAttr, getMaxAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,subSysPhantom,subSysMechanic,skillFlash,skillState)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -209,6 +210,9 @@ update msg model =
         ATField ->
             (updateATField model, Cmd.none)
 
+        Invisibility ->
+            (updateInvisibility model, Cmd.none)
+
         Noop ->
             let 
                 pTemp =  model.myself
@@ -339,6 +343,7 @@ animate  model =
         (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
         newClearList = updateRoomList model.map.monsters model.map.roomCount [] model.map.boss
         newTreasure = updateTreasure model.map.treasure newClearList
+        newGate = updateGate model.map.gate newClearList
         (newBoss,newBullet) = updateBoss model.map.boss newBullet__ me
         map = model.map
         
@@ -347,7 +352,7 @@ animate  model =
 
         (newMe,collision) = speedCase me model.map collideDoor
 
-        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={gate|counter=gate.counter+1}}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={newGate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, interactPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -605,7 +610,7 @@ updateBullet me map bullets (collisionX,collisionY) =
         
         -- AT Field can stop bullets
         fieldOn = me.absoluteTerrifyField > 0
-        atField = Circle me.x me.y 20
+        atField = Circle me.x me.y 100
         (inField, outsideField) = 
             if fieldOn then
                 List.partition (\b -> b.from /= Player && circleCollisonTest b.hitbox atField) flyingBullets
@@ -614,7 +619,7 @@ updateBullet me map bullets (collisionX,collisionY) =
 
         finalBullets = List.map updateXY outsideField
 
-        filteredBullets= List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
+        filteredBullets = List.filter (\b-> b.from == Player) <| List.filter (\value -> not (List.member value allBullets)) bullets
     in
         (finalBullets,filteredBullets,hitPlayer ++ inField)
 
@@ -674,14 +679,15 @@ hit bullet me =
         me
     else
         let
-            totalHurt = bullet
+            (hitPlayer, inAT) = List.partition (\b -> (b.from == Player) || not (circleCollisonTest b.hitbox me.hitBox)) bullet
+            totalHurt = hitPlayer
                     |> List.map .force
                     |> List.sum
                     |> Basics.round
             attr = me.attr
             health = getCurrentAttr Health attr
             armor = getCurrentAttr Armor attr
-            newAttr = 
+            hurtAttr = 
                 if totalHurt <= armor then     -- the armor is enough to protect the player
                     setCurrentAttr Armor -totalHurt attr
                 else if armor > 0 then      -- the armor is broken due to these bullets
@@ -689,6 +695,11 @@ hit bullet me =
                     |> setCurrentAttr Health (totalHurt - armor)
                 else
                     setCurrentAttr Health -(min totalHurt health) attr
+            currentClip = getCurrentAttr Clip attr
+            maxClip = getMaxAttr Clip attr
+            loseClip = maxClip - currentClip
+            catchBullet = List.length inAT
+            newAttr = setCurrentAttr Clip (min catchBullet loseClip) hurtAttr
         in
             {me | attr = newAttr}
 
@@ -764,6 +775,19 @@ updateATField model =
     in
         {model|myself = newMe}
 
+updateInvisibility : Model -> Model
+updateInvisibility model =
+    let
+        unlocked = skillState 0 1 4 model.myself.skillSys.subsys subSysPhantom skillInvisible
+        me = model.myself
+        newMe =
+            if unlocked && me.invisible == 0 then
+                {me|invisible = 50}
+            else
+                me
+    in
+        {model|myself = newMe}
+
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
     let
@@ -804,4 +828,4 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = Debug.log "dw" (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField}
+        {me|dualWield = cool me.dualWield, flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField,invisible= cool me.invisible}

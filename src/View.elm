@@ -39,7 +39,7 @@ import Pages.Welcome exposing (welcomeView)
 import Pages.About exposing (aboutView)
 import Pages.Help exposing (helpView)
 import Pages.Story exposing (storyView)
-
+import Environment.ShowRoad exposing (showRoad)
 
 view : Model -> Html.Html Msg
 view model =
@@ -151,11 +151,16 @@ playerDemonstrate model =
 showMap : Map -> List (Svg.Svg Msg)
 showMap model =
     let
-       walls = showWalls <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value.position))) model.walls
+    --    walls = showWalls <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value.position))) model.walls
     --    d2=Debug.log "walls List" model.walls
     --    d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
        
-       roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
+       --<| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))
+       roads = 
+            if List.isEmpty (List.filter (\value -> value.enable) model.doors) then
+                showRoad model.roads
+            else 
+                []
 
        doors = showDoor <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
        obstacles = showObstacle  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
@@ -167,7 +172,7 @@ showMap model =
        gate = showGate model.gate -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ doors ++ roads ++ obstacles ++ monsters ++ [gate] ++ treasure ++ boss
+       roads ++ doors  ++ obstacles ++ monsters ++ [gate] ++ treasure ++ boss
     --    walls++gate
 
 
