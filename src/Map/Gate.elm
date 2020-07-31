@@ -37,7 +37,8 @@ findPosition room seed0=
         (yTemp,seed2) = Random.step (Random.int 200 1600) seed1
         gateTemp = recUpdate (Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit) 
         obstaclePosList = List.map (\value -> value.position)  room.obstacles
-        gateCollision=List.filter (recCollisionTest gateTemp.edge) <| List.map (\value->value.edge) obstaclePosList
+        treasurePosList = List.map (\value -> value.position) room.treasure
+        gateCollision=List.filter (recCollisionTest gateTemp.edge) <| List.map (\value->value.edge) obstaclePosList ++ List.map (\value->value.edge)  treasurePosList
 
     in
         if List.isEmpty gateCollision then

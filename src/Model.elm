@@ -1,5 +1,5 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..))
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..),Page(..))
 import Random
 import Map.Map exposing(Room,Map,Treasure)
 import Shape exposing (Circle)
@@ -22,7 +22,9 @@ type alias Me =
     , moveDown : Bool
     , mouseData : (Float,Float)
     , fire : Bool
-    , dualWield : Bool
+    , dualWield : Int
+    , absoluteTerrifyField : Int
+    , flash : Int
   --   , name : String
   --   , score : Float
     , hitBox : Circle
@@ -59,7 +61,9 @@ defaultMe =
     , moveDown = False
     , mouseData = (500,500)
     , fire = False
-    , dualWield = False
+    , dualWield = 0
+    , absoluteTerrifyField = 0
+    , flash = 0
     , hitBox = Circle 500 500 20
     , weapons = weaponList
     , currentWeapon = defaultWeapon
@@ -90,7 +94,14 @@ type alias Model =
     , gameState : GameState
     , storey : Int
     , isGameOver : Bool
+    , pageState : Page
     }
+
+type Page = WelcomePage
+          | HelpPage
+          | GamePage
+          | StoryPage
+          | AboutPage   
 
 type State = Dialogue
            | NextStage
@@ -156,7 +167,6 @@ mapToViewBox me map =
             {boss| position = recUpdate boss.position}
         bossesUpdated =  List.map bossUpdate map.boss
         treasureUpdated = List.map treasureUpdate map.treasure
-
 
         doorsUpdate doors =
             List.map (\value -> {value|position=recUpdate value.position}) doors
