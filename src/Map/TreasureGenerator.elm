@@ -13,8 +13,8 @@ treasureTypeList : List TreasureType
 treasureTypeList = 
     let
         m1=TreasureType 1 100 "Yellow"
-        m2=TreasureType 2 200 "Red"
-        m3=TreasureType 3 300 "Blue"
+        m2=TreasureType 2 100 "Red"
+        m3=TreasureType 3 100 "Blue"
     in 
         [m1,m2,m3]
 
@@ -61,7 +61,7 @@ treasureBuilding treasureList number obstacles seed0 storey=
 
         treasurePos = Rectangle (toFloat xTemp) (toFloat yTemp) treasureTypeTemp.size treasureTypeTemp.size recInit  
 
-        (treasureMaterial, seed4) = generateMaterial seed3 storey
+        (treasureMaterial, seed4) = generateMaterial seed3 treasureTypeTemp storey
 
         treasureNew = Treasure  (recUpdate treasurePos)  treasureTypeTemp  seed4 False 0 treasureMaterial
 
@@ -83,11 +83,11 @@ updateSingleTreasure roomClearList treasure=
     if List.member treasure.roomNum roomClearList then {treasure|canShow=True}else treasure
 
 
-generateMaterial : Random.Seed-> Int -> (Material,Random.Seed)
-generateMaterial seed0 storey=
+generateMaterial : Random.Seed-> TreasureType -> Int -> (Material,Random.Seed)
+generateMaterial seed0 treasureType storey=
     let
-        maxNum = (storey//5)*2+1
-        minNum = storey//5
+        maxNum = ((storey//5)*2)*treasureType.level +treasureType.level 
+        minNum = (storey//5)*treasureType.level+treasureType.level 
 
         -- d1 = Debug.log "seed" seed0 
 

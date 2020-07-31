@@ -286,6 +286,7 @@ animate  model =
     let
         me = model.myself
         attr = me.attr
+        gate = model.map.gate
         isDead = 0 == getCurrentAttr Health attr
         (newShoot, weapon) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
@@ -314,7 +315,7 @@ animate  model =
 
         (newMe,collision) = speedCase me model.map collideDoor
 
-        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={gate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
@@ -587,7 +588,7 @@ bulletToViewBox me bullets=
 updateState : Model -> State
 updateState model =
     let
-        collideGate = circleRecTest model.myself.hitBox model.map.gate.edge
+        collideGate = circleRecTest model.myself.hitBox model.map.gate.position.edge
         collideTreasureList = getCollideTreasure model.map.treasure model.myself
         getTreasure = 
             let 

@@ -1,10 +1,10 @@
 module Map.Gate exposing (gateGenerator)
-import Map.Map exposing (Room,roomConfig)
+import Map.Map exposing (Room,roomConfig,Gate)
 import Shape exposing (recInit,recUpdate,recCollisionTest,Rectangle)
 import Random
-import Svg.Styled.Attributes exposing (x)
+-- import Svg.Styled.Attributes exposing (x)
 
-gateGenerator : List Room-> Random.Seed -> (Rectangle,Random.Seed)
+gateGenerator : List Room-> Random.Seed -> (Gate,Random.Seed)
 gateGenerator rooms seed0 =
     let
         gateRoomList = List.filter (\value->value.gate) rooms
@@ -27,7 +27,7 @@ gateGenerator rooms seed0 =
         -- d1=Debug.log "x" x
         -- d2=Debug.log "y" y
     in
-        (updatedGate,seed1)
+        (Gate updatedGate 0,seed1)
 
 
 findPosition : Room -> Random.Seed -> (Rectangle,Random.Seed)
@@ -35,7 +35,7 @@ findPosition room seed0=
     let
         (xTemp,seed1) = Random.step (Random.int 200 1600) seed0
         (yTemp,seed2) = Random.step (Random.int 200 1600) seed1
-        gateTemp = recUpdate (Rectangle (toFloat xTemp) (toFloat yTemp) 100 100 recInit) 
+        gateTemp = recUpdate (Rectangle (toFloat xTemp) (toFloat yTemp) 200 200 recInit) 
         obstaclePosList = List.map (\value -> value.position)  room.obstacles
         gateCollision=List.filter (recCollisionTest gateTemp.edge) <| List.map (\value->value.edge) obstaclePosList
 
