@@ -1,6 +1,6 @@
 module Update exposing (update)
-import Messages exposing (Msg(..),ShiftMsg(..))
-import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..))
+import Messages exposing (Msg(..),ShiftMsg(..),PageMsg(..))
+import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..),Page(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
@@ -145,10 +145,16 @@ update msg model =
             else
                 (model, Cmd.none)
         Tick time ->
-            if model.paused then
-                (model, Cmd.none)
-            else
-                (animate model, Cmd.none)
+            -- let
+            --     d1=Debug.log "d1" model.pageState
+            -- in
+                if model.pageState == GamePage then  
+                    if model.paused then
+                        (model, Cmd.none)
+                    else
+                        (animate model, Cmd.none)
+                else 
+                    (model, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
@@ -222,7 +228,19 @@ update msg model =
                 ( { model | myself=newMe }
                     , Cmd.none
                 )
-        
+        PageChange pageMsg ->  
+            case pageMsg of 
+                Welcome ->
+                    ({model|pageState=WelcomePage},Cmd.none)
+                Help ->
+                    ({model|pageState=HelpPage},Cmd.none)
+                Game ->
+                    ({model|pageState=GamePage},Cmd.none)
+                About ->
+                    ({model|pageState=AboutPage},Cmd.none)
+                Story ->
+                    ({model|pageState=StoryPage},Cmd.none)
+
 
 changeWeapon : Int -> Model -> Model
 changeWeapon number model =
@@ -292,6 +310,7 @@ animate :  Model -> Model
 animate  model =
     -- (model,Cmd.none)
     let
+        -- d1=Debug.log "Model" model.myself
         me = model.myself
         attr = me.attr
         gate = model.map.gate

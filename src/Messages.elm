@@ -1,4 +1,4 @@
-module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..))
+module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..),PageMsg(..))
 import Css exposing (Resize)
 import Browser.Dom exposing (Viewport)
 import Time exposing (Posix)
@@ -33,6 +33,7 @@ type Msg
     | Flash
     | ATField
     | Tictoc Time.Posix
+    | PageChange PageMsg
 
 type ShiftMsg
     = Previous
@@ -49,3 +50,10 @@ type SynthesisMsg
     | NextWeapon Bool      
     | Synthesis        
     | SynthesisBullet
+
+type PageMsg
+    = Welcome
+    | Help
+    | Game
+    | About
+    | Story

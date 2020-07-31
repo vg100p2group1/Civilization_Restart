@@ -2,7 +2,7 @@ module Init exposing (init)
 
 import Map.MapDisplay exposing (mapInit)
 import Map.MapGenerator exposing (roomInit)
-import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..))
+import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..),Page(..))
 
 init : Model
 init =
@@ -25,4 +25,5 @@ init =
         , gameState = Playing
         , storey = 1
         , isGameOver = False
+        , pageState = WelcomePage
         }
