@@ -822,4 +822,4 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = Debug.log "dw" (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField}
+        {me|dualWield = (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField,invisible= cool me.invisible}
