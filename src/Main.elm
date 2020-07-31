@@ -80,7 +80,10 @@ key on keycode =
             else
                 Noop        
         52 ->
-            Noop
+            if on then
+                Invisibility
+            else
+                Noop 
         69 ->
             if on then
                 ChangeWeapon Previous

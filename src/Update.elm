@@ -21,7 +21,7 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,subSysPhantom,subSysMechanic,skillFlash,skillState)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -202,6 +202,9 @@ update msg model =
 
         ATField ->
             (updateATField model, Cmd.none)
+
+        Invisibility ->
+            (updateInvisibility model, Cmd.none)
 
         Noop ->
             let 
@@ -740,6 +743,19 @@ updateATField model =
         newMe =
             if unlocked && me.absoluteTerrifyField == 0 then
                 {me|absoluteTerrifyField = 50}
+            else
+                me
+    in
+        {model|myself = newMe}
+
+updateInvisibility : Model -> Model
+updateInvisibility model =
+    let
+        unlocked = skillState 0 1 4 model.myself.skillSys.subsys subSysPhantom skillInvisible
+        me = model.myself
+        newMe =
+            if unlocked && me.invisible == 0 then
+                {me|invisible = 50}
             else
                 me
     in
