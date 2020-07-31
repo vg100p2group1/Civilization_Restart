@@ -22,6 +22,7 @@ import Config exposing (bulletSpeed)
 import Environment.ShowFloor exposing (showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
+import Environment.ShowDoor exposing (showDoor)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -31,6 +32,8 @@ import Display.Define exposing (defines)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
+import Environment.ShowGate exposing (showGate)
+import Environment.ShowDoor exposing (showDoor)
 
 view : Model -> Html.Html Msg
 view model =
@@ -134,17 +137,17 @@ showMap model =
        
        roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
 
-       doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
+       doors = showDoor <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
        obstacles = showObstacle  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
        monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
        treasure = displayTreasure  model.treasure
        boss = displayBoss  model.boss
 
-       gate = displayDoors [Door model.gate False] -- To
+       gate = showGate model.gate -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ roads ++ doors ++ obstacles ++ monsters ++ gate ++ treasure ++ boss
+       walls ++ doors ++ roads ++ obstacles ++ monsters ++ [gate] ++ treasure ++ boss
     --    walls++gate
 
 
@@ -352,7 +355,7 @@ showMiniMap model r=
 
        walls = displayRec <| List.map wallPosUpdate miniMap.walls
        roads = displayRec miniMap.roads
-       gate = displayDoors [Door miniMap.gate False]
+       gate = displayDoors [Door miniMap.gate.position False]
 
        myself = model.myself
        xTemp = myself.x - toFloat(dx*2500)
