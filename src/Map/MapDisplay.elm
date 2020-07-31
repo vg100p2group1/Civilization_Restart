@@ -16,7 +16,7 @@ mapWithGate : List Room -> Int -> Map -> Random.Seed -> (List Room,Map)
 mapWithGate rooms number drawnrooms seed0 = 
     let
         (mapTemp,roomNew) = showMap rooms number drawnrooms []
-        (gateTemp, _) = gateGenerator rooms seed0
+        (gateTemp, seed1) = gateGenerator rooms seed0
     in
         (roomNew,{mapTemp| gate=gateTemp,roomCount=number})
 
