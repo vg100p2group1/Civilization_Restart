@@ -300,7 +300,7 @@ animate  model =
                                     ([], model.myself.currentWeapon)
                              else
                                 ([], model.myself.currentWeapon)
-        newAttr = setCurrentAttr Clip -(List.length newShoot) attr
+        newAttr = setCurrentAttr Clip (-(List.length newShoot) * weapon.cost) attr
         weaponCounter =
             if weapon.counter <= 0 then
                 0

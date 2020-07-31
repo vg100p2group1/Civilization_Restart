@@ -44,6 +44,7 @@ type alias Weapon =
     , hasFired : Bool
     , level : Int
     , shiftCounter : Float
+    , cost : Int
     }
 
 bulletConfig : Bullet
@@ -66,6 +67,7 @@ defaultWeapon =
     , hasFired = False
     , level = 1
     , shiftCounter = 0
+    , cost = 0
     }
 
 
@@ -93,9 +95,9 @@ weaponList : List Weapon
 weaponList =
     let
         pistol = defaultWeapon
-        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0
-        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0
-        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0
+        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0 1
+        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 5
+        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0 1
     in
 
         [pistol, gatling, mortar, shotgun]
