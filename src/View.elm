@@ -21,6 +21,7 @@ import Environment.ShowWalls exposing (showWalls)
 import Config exposing (bulletSpeed)
 import Environment.ShowFloor exposing (showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
+import Environment.ShowTreasure exposing (displayTreasure)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -29,6 +30,7 @@ import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
+import Environment.ShowTreasure exposing (displayTreasure)
 
 view : Model -> Html.Html Msg
 view model =
@@ -246,40 +248,7 @@ displayBoss boss =
                 []
     in
          List.map createBricksFormat boss
-displayTreasure : List Treasure  -> List (Svg.Svg Msg)
-displayTreasure treasure =
-    let
-        -- d=Debug.log "wall" obstacle
-        createBricksFormat treasureTemp =
-            let
-                model = treasureTemp.position
-                treasureType = treasureTemp.treasureType
-                
 
-                treasureColor = treasureType.color
-            in
-                if not treasureTemp.canShow  then 
-                Svg.rect
-                    [ Svg.Attributes.x <| String.fromFloat model.x
-                    , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat 0
-                    , Svg.Attributes.height <| String.fromFloat 0
-                    , Svg.Attributes.fill treasureColor
-                
-                    ]
-                []
-                else
-                Svg.rect
-                    [ Svg.Attributes.x <| String.fromFloat model.x
-                    , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat model.width
-                    , Svg.Attributes.height <| String.fromFloat model.height
-                    , Svg.Attributes.fill treasureColor
-                
-                    ]
-                []
-    in
-        List.map createBricksFormat treasure
 
 
 me : Me -> Svg.Svg Msg

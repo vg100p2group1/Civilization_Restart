@@ -81,8 +81,16 @@ defines =
             , Svg.Attributes.height <| String.fromFloat 1600
             -- , Svg.Attributes.fill "black"
             ][]]   
+      g10 = Svg.g[Svg.Attributes.id "Treasure1"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Treasure/Treasure1.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 100
+            , Svg.Attributes.height <| String.fromFloat 100
+            -- , Svg.Attributes.fill "black"
+            ][]] 
     in
-        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9]++definePlayer++defineWeapon++defineMonsters)
+        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10]++definePlayer++defineWeapon++defineMonsters)
 
 
 definePlayer : List (Svg.Svg Msg)
