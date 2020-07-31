@@ -53,11 +53,14 @@ showOneDoor door=
         doorFloor = 
             if door.enable then 
                 if numX>numY then 
-                    showFloors x numX x y numX numY [] ++  showWallsX x y numY [] 
+                    showFloors x (numX-1) x y (numX-1) numY [] ++  showWallsX x y numY [] 
                 else 
                     showFloors x numX x y numX numY [] ++  showWallsY x y numX  [] 
             else 
-                showFloors x numX x y numX numY [] 
+                if numX>numY then
+                    showFloors x (numX-1) x y (numX-1) numY [] 
+                else 
+                    showFloors x numX x y numX numY [] 
         -- doorFloor = showOneRectangle xBegin yBegin 
     in
         doorFloor

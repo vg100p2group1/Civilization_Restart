@@ -27,7 +27,6 @@ showRooms roomLeft me number svgList =
                     roomConfig
         
         svgNew = svgList ++ (showOneRoom roomNow me)
-
     in
         if (number==0) then
             svgList

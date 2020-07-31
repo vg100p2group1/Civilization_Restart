@@ -112,9 +112,25 @@ defines =
             , Svg.Attributes.width <| String.fromFloat 200
             , Svg.Attributes.height <| String.fromFloat 50
             -- , Svg.Attributes.fill "black"
+            ][]]
+      g14 = Svg.g[Svg.Attributes.id "Road1"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Road/Road1.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 900
+            , Svg.Attributes.height <| String.fromFloat 600
+            -- , Svg.Attributes.fill "black"
+            ][]] 
+      g15 = Svg.g[Svg.Attributes.id "Road2"][
+          Svg.image 
+            [ Svg.Attributes.xlinkHref "./images/Road/Road2.png"
+            , Svg.Attributes.preserveAspectRatio "none meet"
+            , Svg.Attributes.width <| String.fromFloat 600
+            , Svg.Attributes.height <| String.fromFloat 900
+            -- , Svg.Attributes.fill "black"
             ][]] 
     in
-        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13]++definePlayer++defineWeapon++defineMonsters++defineGate)
+        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15]++definePlayer++defineWeapon++defineMonsters++defineGate)
 
 
 definePlayer : List (Svg.Svg Msg)
