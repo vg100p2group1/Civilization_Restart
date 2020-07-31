@@ -1,9 +1,10 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..),Page(..))
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState,
+                       defaultMe, sentenceInit,mapToViewBox, GameState(..), WeaponUnlockSys,Page(..))
 import Random
 import Map.Map exposing(Room,Map,Treasure)
 import Shape exposing (Circle)
-import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
+import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect,Arsenal(..))
 import Config exposing (playerSpeed,viewBoxMax)
 import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
@@ -41,6 +42,24 @@ type alias Me =
     , synthesis : SynthesisSubSystem
     , package : Package 
     , time : Int
+    , arsenal : List Weapon
+    , weaponUnlockSys : WeaponUnlockSys
+    }
+
+type alias WeaponUnlockSys =
+    { active : Bool
+    , canUnlockWeapon : Bool
+    , chosen : Arsenal
+    , unlockedWeapons : List Weapon
+    , tip : String
+    }
+
+defaultWeaponUnlockSys =
+    { active = False
+    , canUnlockWeapon = True
+    , chosen = NoWeapon
+    , unlockedWeapons = [defaultWeapon]
+    , tip = ""
     }
 
 type Direction
@@ -67,7 +86,7 @@ defaultMe =
     , flash = 0
     , invisible = 0
     , hitBox = Circle 500 500 20
-    , weapons = weaponList
+    , weapons = [defaultWeapon]
     , currentWeapon = defaultWeapon
     , counter = 0
     , url = ""
@@ -78,6 +97,8 @@ defaultMe =
     , synthesis = defaultSynthesisSubSystem
     , package = packageInit 
     , time = 0
+    , arsenal = weaponList
+    , weaponUnlockSys = defaultWeaponUnlockSys
     }
 
 type alias Model =
@@ -111,6 +132,7 @@ type State = Dialogue
            | PickTreasure Treasure
            | SynthesisSys
            | SkillSys
+           | ChooseWeapon
            | Others
 
 type GameState = Paused

@@ -59,3 +59,5 @@ showGun myself =
                 showMortar
             Shotgun->
                 showShotgun
+            NoWeapon ->
+                showShotgun
