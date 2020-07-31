@@ -14,6 +14,7 @@ import Monster.Boss exposing (updateBoss)
 import Map.MapDisplay exposing (showMap, mapWithGate,mapInit)
 import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import Map.TreasureGenerator exposing (updateTreasure)
+import Map.Gate exposing (updateGate)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
@@ -340,8 +341,9 @@ animate  model =
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
-        newClearList = updateRoomList model.map.monsters model.map.roomCount []
+        newClearList = updateRoomList model.map.monsters model.map.roomCount [] model.map.boss
         newTreasure = updateTreasure model.map.treasure newClearList
+        newGate = updateGate model.map.gate newClearList
         (newBoss,newBullet) = updateBoss model.map.boss newBullet__ me
         map = model.map
         
@@ -350,7 +352,7 @@ animate  model =
 
         (newMe,collision) = speedCase me model.map collideDoor
 
-        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={gate|counter=gate.counter+1}}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={newGate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, interactPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList

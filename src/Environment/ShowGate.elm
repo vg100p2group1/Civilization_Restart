@@ -23,7 +23,10 @@ showGate gate =
         --            Svg.Attributes.height <| String.fromFloat (effect.r*2)
         --         --    Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" 500 520)")
         --           ][]
-        Svg.use [Svg.Attributes.x <| String.fromFloat gate.position.x, 
+        if gate.canShow then 
+            Svg.use [Svg.Attributes.x <| String.fromFloat gate.position.x, 
                  Svg.Attributes.y <| String.fromFloat gate.position.y, 
                  Svg.Attributes.xlinkHref getUrl
                 ][]
+        else
+            Svg.rect[][]

@@ -57,13 +57,23 @@ roomPositionGenerator storey seed0=
         
         gateRoomTemp = getGateRoom
         whetherBoss =
-            if  modBy 5 storey== 0 then
-                [{gateRoomTemp|haveBoss=True,gate=True}]
+            if  modBy 2 storey== 1 then
+                {gateRoomTemp|haveBoss=True,gate=True}
             else
-                [{gateRoomTemp|gate=True}]
- 
-        
-        room4 = whetherBoss ++ (List.drop 1 room3) 
+                {gateRoomTemp|gate=True}
+        newBoss = 
+            if whetherBoss.haveBoss then 
+                bossGenerator seed3 whetherBoss.obstacles storey
+            else []
+
+        newMonster = 
+            if whetherBoss.haveBoss then 
+                []
+            else whetherBoss.monsters
+
+        newRoom = {whetherBoss|boss=newBoss,monsters=newMonster}
+
+        room4 = newRoom :: (List.drop 1 room3) 
         -- d2 = Debug.log "gateroom" whetherBoss
     in
         (room4,seed3)
@@ -131,8 +141,8 @@ leavesUpdate  roomUpdated roomList num seed0 storey=
     let
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
         (obstacleTemp, seed1) = bossRoomObstacleGenerator seed0
-        bossTemp = bossGenerator seed1 obstacleTemp storey -- 到时候把boss 给剔除出去
-        (treasureTemp, seed3) = treasureGenerator seed1 obstacleTemp storey
+        (monsterTemp,seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
+        (treasureTemp, seed3) = treasureGenerator seed2 obstacleTemp storey
         roomTemp = List.head roomList
         roomListNew = List.drop 1 roomList
         getRoom = 
@@ -142,7 +152,7 @@ leavesUpdate  roomUpdated roomList num seed0 storey=
                 Nothing ->
                     roomConfig
         roomNewTemp = getRoom
-        roomNew = {roomNewTemp| obstacles = obstacleTemp,monsters=[],treasure=treasureTemp,boss=bossTemp} 
+        roomNew = {roomNewTemp| obstacles = obstacleTemp,treasure=treasureTemp,monsters=monsterTemp,boss=[]} 
     in 
         if num==0 then
             roomUpdated
