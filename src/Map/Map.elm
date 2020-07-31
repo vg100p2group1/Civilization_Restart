@@ -31,6 +31,8 @@ type alias Obstacle =
 type alias Gate =
     { position : Rectangle
     , counter : Int
+    , roomNum : Int
+    , canShow : Bool
     }
 
 type alias MonsterType =
@@ -142,7 +144,7 @@ roomConfig : Room
 roomConfig = Room (0,0) False False [] [] [] [] [] 0 0
 
 mapConfig : Map
-mapConfig = Map [] [] [] [] [] [] (Gate (Rectangle 0 0 0 0 recInit) 0) [] 0 []
+mapConfig = Map [] [] [] [] [] [] (Gate (Rectangle 0 0 0 0 recInit) 0 0 False) [] 0 []
 
 {-
 initMapUpdate : Me -> (List Rectangle) -> (List Rectangle)

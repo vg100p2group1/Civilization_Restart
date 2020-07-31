@@ -14,6 +14,7 @@ import Monster.Boss exposing (updateBoss)
 import Map.MapDisplay exposing (showMap, mapWithGate,mapInit)
 import Map.MonsterGenerator exposing (updateMonster,updateRoomList)
 import Map.TreasureGenerator exposing (updateTreasure)
+import Map.Gate exposing (updateGate)
 import Animation.PlayerMoving exposing (playerMove)
 import Control.ExplosionControl exposing (updateExplosion,explosionToViewbox)
 import Synthesis.UpdateSynthesis exposing (updateSynthesis)
@@ -21,7 +22,7 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,subSysPhantom,subSysMechanic,skillFlash,skillState)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -209,6 +210,9 @@ update msg model =
         ATField ->
             (updateATField model, Cmd.none)
 
+        Invisibility ->
+            (updateInvisibility model, Cmd.none)
+
         Noop ->
             let 
                 pTemp =  model.myself
@@ -337,8 +341,9 @@ animate  model =
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
         (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
-        newClearList = updateRoomList model.map.monsters model.map.roomCount []
+        newClearList = updateRoomList model.map.monsters model.map.roomCount [] model.map.boss
         newTreasure = updateTreasure model.map.treasure newClearList
+        newGate = updateGate model.map.gate newClearList
         (newBoss,newBullet) = updateBoss model.map.boss newBullet__ me
         map = model.map
         
@@ -347,14 +352,14 @@ animate  model =
 
         (newMe,collision) = speedCase me model.map collideDoor
 
-        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={gate|counter=gate.counter+1}}
+        newMap = {map | monsters = newMonsters,treasure=newTreasure,doors=newDoors,boss=newBoss,gate={newGate|counter=gate.counter+1}}
         newViewbox = mapToViewBox newMe newMap
-        (newBulletList, filteredBulletList, hurtPlayer) = updateBullet newMe model.map newBullet collision
+        (newBulletList, filteredBulletList, interactPlayer) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
         newExplosion = updateExplosion model.explosion filteredBulletList
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
-        meHit = hit hurtPlayer {newMe|attr=newAttr}
+        meHit = hit interactPlayer {newMe|attr=newAttr}
         meCooling = coolSkills meHit
     in
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
@@ -685,7 +690,7 @@ hit bullet me =
                 if totalHurt <= armor then     -- the armor is enough to protect the player
                     setCurrentAttr Armor -totalHurt attr
                 else if armor > 0 then      -- the armor is broken due to these bullets
-                    setCurrentAttr Armor armor attr
+                    setCurrentAttr Armor -armor attr
                     |> setCurrentAttr Health (totalHurt - armor)
                 else
                     setCurrentAttr Health -(min totalHurt health) attr
@@ -764,6 +769,19 @@ updateATField model =
     in
         {model|myself = newMe}
 
+updateInvisibility : Model -> Model
+updateInvisibility model =
+    let
+        unlocked = skillState 0 1 4 model.myself.skillSys.subsys subSysPhantom skillInvisible
+        me = model.myself
+        newMe =
+            if unlocked && me.invisible == 0 then
+                {me|invisible = 50}
+            else
+                me
+    in
+        {model|myself = newMe}
+
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
     let
@@ -804,4 +822,4 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = Debug.log "dw" (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField}
+        {me|dualWield = (cool me.dualWield), flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField}
