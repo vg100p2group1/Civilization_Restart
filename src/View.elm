@@ -20,6 +20,7 @@ import Animation.ShowBullet exposing (showBullets)
 import Environment.ShowWalls exposing (showWalls)
 import Config exposing (bulletSpeed)
 import Environment.ShowFloor exposing (showFloor)
+import Environment.ShowObstacle exposing (showObstacle)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -27,6 +28,8 @@ import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
 import Environment.ShowFloor exposing(showFloor)
+import Environment.ShowObstacle exposing (showObstacle)
+
 view : Model -> Html.Html Msg
 view model =
     let
@@ -130,7 +133,7 @@ showMap model =
        roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
 
        doors = displayDoors <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
-       obstacles = displayRec  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
+       obstacles = showObstacle  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
        monsters = displayMonster <| List.filter (\value-> circleRecTest value.position  (Rec 0 0 1000 1000) ) model.monsters
 
        treasure = displayTreasure  model.treasure
