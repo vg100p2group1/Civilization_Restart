@@ -24,6 +24,7 @@ import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowDoor exposing (showDoor)
 import Pages.About exposing (aboutView)
+import Shape exposing (recInit)
 -- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
@@ -39,7 +40,7 @@ import Pages.Welcome exposing (welcomeView)
 import Pages.About exposing (aboutView)
 import Pages.Help exposing (helpView)
 import Pages.Story exposing (storyView)
-import Environment.ShowRoad exposing (showRoad)
+import Environment.ShowRoad exposing (showRoad,showMiddle)
 
 view : Model -> Html.Html Msg
 view model =
@@ -138,7 +139,7 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ([defines]++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
+              ([defines]++ backgroundEntire model.viewbox ++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model
@@ -146,7 +147,14 @@ playerDemonstrate model =
             , showGameOver model
         ]
 
-
+backgroundEntire : Map ->  List (Svg.Svg Msg)
+backgroundEntire model=
+    let
+        roads = model.roads
+        background = showMiddle roads
+        backCanvas = displayRec [Rectangle 0 0 1000 1000 recInit]
+    in
+        backCanvas ++ background 
 
 showMap : Map -> List (Svg.Svg Msg)
 showMap model =
@@ -156,6 +164,7 @@ showMap model =
     --    d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
        
        --<| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))
+       
        roads = 
             if List.isEmpty (List.filter (\value -> value.enable) model.doors) then
                 showRoad model.roads
