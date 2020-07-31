@@ -34,7 +34,7 @@ import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowGate exposing (showGate)
 import Environment.ShowDoor exposing (showDoor)
-
+import Display.DisplayChoosingWeapon exposing (showWeaponChoosingSystem)
 view : Model -> Html.Html Msg
 view model =
     let
@@ -124,6 +124,7 @@ playerDemonstrate model =
             , showSkill model
             , showSynthesis model
             , showGameOver model
+            , showWeaponChoosingSystem model
         ]
 
 

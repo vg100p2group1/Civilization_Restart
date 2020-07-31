@@ -27,10 +27,12 @@ type Arsenal
     | Gatling
     | Mortar
     | Shotgun
+    | NoWeapon
 
 type alias Weapon = 
     { bulletGenerator : WeaponInfo -> Bullet
     , extraInfo : Arsenal
+    , info : String
     , name : String
     -- newly added
     , number : Int
@@ -54,6 +56,7 @@ defaultWeapon : Weapon
 defaultWeapon =
     { bulletGenerator = defaultBulletGenerator
     , extraInfo = Pistol
+    , info = "Weak Weapons"
     , name  = "Pistol"
     -- newly added
     , number = 1
@@ -88,6 +91,8 @@ generateBullet weapon =
                     {bulletConfig|force=100* toFloat weapon.level,r=5}
                 Shotgun ->
                     {bulletConfig|force=45* toFloat weapon.level,r=5}
+                NoWeapon ->
+                    bulletConfig
     in
         bullet
 
@@ -95,11 +100,10 @@ weaponList : List Weapon
 weaponList =
     let
         pistol = defaultWeapon
-        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0 1
-        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 5
-        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0 1
+        gatling = Weapon defaultBulletGenerator Gatling "2" "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0 1
+        mortar = Weapon defaultBulletGenerator Mortar "3" "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 5
+        shotgun = Weapon defaultBulletGenerator Shotgun "4" "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0 1
     in
-
         [pistol, gatling, mortar, shotgun]
 
 type alias ExplosionEffect =

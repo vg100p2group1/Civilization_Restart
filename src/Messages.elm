@@ -1,7 +1,8 @@
-module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..))
+module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..),WeaponChoosingMsg(..))
 import Css exposing (Resize)
 import Browser.Dom exposing (Viewport)
 import Time exposing (Posix)
+import Weapon exposing (Arsenal(..))
 -- import Model exposing (MouseMoveData)
 type Msg
     = Tick Float
@@ -32,6 +33,8 @@ type Msg
     | DualWield
     | Flash
     | Tictoc Time.Posix
+    | WeaponChoosing WeaponChoosingMsg
+    | UnlockTrigger
 
 type ShiftMsg
     = Previous
@@ -48,3 +51,9 @@ type SynthesisMsg
     | NextWeapon Bool      
     | Synthesis        
     | SynthesisBullet
+
+
+type WeaponChoosingMsg
+    = CloseWindow
+    | ChoosingWeapon Arsenal
+    | UnlockWeapon
