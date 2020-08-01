@@ -212,6 +212,9 @@ update msg model =
 
         Invisibility ->
             (updateInvisibility model, Cmd.none)
+        
+        PlaceBomb ->
+            (placeBomb model, Cmd.none)
 
         Noop ->
             let 
@@ -792,6 +795,10 @@ updateInvisibility model =
                 me
     in
         {model|myself = newMe}
+
+placeBomb : Model -> Model
+placeBomb model =
+    model
 
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=

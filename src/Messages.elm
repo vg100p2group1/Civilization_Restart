@@ -33,6 +33,7 @@ type Msg
     | Flash
     | ATField
     | Invisibility
+    | PlaceBomb
     | Tictoc Time.Posix
     | PageChange PageMsg
 

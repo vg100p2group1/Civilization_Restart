@@ -9,6 +9,7 @@ import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
 import Synthesis.Package exposing (Package,packageInit)
 import Synthesis.SynthesisSystem exposing (SynthesisSubSystem,defaultSynthesisSubSystem)
+import Bomb exposing (Bombs)
 type alias Me =
     { x : Float
     , y : Float
@@ -97,6 +98,7 @@ type alias Model =
     , storey : Int
     , isGameOver : Bool
     , pageState : Page
+    , bomb : Bombs
     }
 
 type Page = WelcomePage
