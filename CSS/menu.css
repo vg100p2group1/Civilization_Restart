@@ -60,15 +60,15 @@ html,
     float: right;
 }
 
-/*body {
-    background: #1a1a1a url("http://www.fantom-xp.com/wallpapers/12/After_the_Battle.jpg") no-repeat;
+body {
+    background: #1a1a1a;
     background-size: cover;
     text-align: center;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-}*/
+}
 
 h1 {
     color: #fff;
@@ -162,6 +162,7 @@ h1 {
     -webkit-transform: scale(1);
     transform: scale(1);
 }
+
 
 /*.overlay {
     height: 100%;
