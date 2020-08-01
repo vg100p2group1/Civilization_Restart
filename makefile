@@ -4,7 +4,7 @@ all:
 	cp index.html build/index.html
 	cp images build/ -rf
 	cp CSS build/ -rf
-
+	cp video build/ -rf
 .PHONY: clean
 clean:
 	rm build -r
