@@ -120,6 +120,7 @@ type alias Model =
     , isGameOver : Bool
     , pageState : Page
     , bomb : Bombs
+    , wholeCounter : Int 
     }
 
 type Page = WelcomePage
