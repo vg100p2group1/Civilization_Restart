@@ -1,13 +1,11 @@
-module Bomb exposing (Bomb, placeBomb)
-import Array exposing (isEmpty)
+module Bomb exposing (Bomb, placeBomb, bombTick, bombToExplosion)
+
+import Weapon exposing (ExplosionEffect)
 
 timeCountDown : Int
 timeCountDown = 100
 
-type alias Bombs = 
-    { waiting : List Bombs
-    , display : List Bombs
-    }
+type alias Bombs = List Bomb
 
 type alias Bomb = 
     { x : Float
@@ -16,7 +14,7 @@ type alias Bomb =
     , counter : Int     -- count down from 100 to 10, explode at 10 and disappear at 0
     }
 
-placeBomb : (Int, Int) -> Bomb
+placeBomb : (Float, Float) -> Bomb
 placeBomb (x, y) =
     Bomb x y 30 (timeCountDown+10)
 
@@ -24,20 +22,16 @@ isExplodeNow : Bomb -> Bool
 isExplodeNow bomb = 
     bomb.counter == 10
 
-canRemove : Bomb -> Bool
-canRemove bomb =
-    bomb.counter <= 0
-
-bombTick : List Bomb -> Bombs -> (Bombs, List Bomb)
-bombTick newBomb bombs =
+bombTick : Bombs -> Bombs -> (Bombs, Bombs)
+bombTick newBomb oldBomb =
     let
         next b = {b|counter = b.counter - 1}
-        newWaiting = List.map next bombs.waiting
-        newDisplay = List.map next bombs.display
+        newWaiting = List.map next oldBomb
         (explode, stillWait) = List.partition isExplodeNow newWaiting
-        stillDisplay = List.filter (\b -> not <| isExplodeNow b) newDisplay
         finalWait = stillWait ++ newBomb
-        finalDisplay = stillDisplay ++ explode
     in
-        ((Bombs finalWait finalDisplay), explode)
+        (finalWait, explode)
 
+bombToExplosion : Bomb -> ExplosionEffect
+bombToExplosion bomb =
+    ExplosionEffect bomb.x bomb.y bomb.r 0
