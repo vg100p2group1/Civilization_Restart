@@ -345,7 +345,8 @@ animate  model =
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
-        (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
+        (newBomb,explodeBomb) = bombTick model.bomb
+        (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ explodeBomb me
         newClearList = updateRoomList model.map.monsters model.map.roomCount [] model.map.boss
         newTreasure = updateTreasure model.map.treasure newClearList
         newGate = updateGate model.map.gate newClearList
@@ -361,7 +362,6 @@ animate  model =
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, (hitPlayer, atFieldBullet)) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
-        (newBomb,explodeBomb) = bombTick model.bomb
         newExplosion = updateExplosion model.explosion filteredBulletList explodeBomb
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model

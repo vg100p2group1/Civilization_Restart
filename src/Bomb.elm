@@ -1,6 +1,7 @@
-module Bomb exposing (Bomb, Bombs, makeBomb, bombTick, bombToExplosion)
+module Bomb exposing (Bomb, Bombs, makeBomb, bombTick, bombToExplosion, bombToHitbox)
 
 import Weapon exposing (ExplosionEffect)
+import Shape exposing (Circle)
 
 timeCountDown : Int
 timeCountDown = 100
@@ -16,7 +17,7 @@ type alias Bomb =
 
 makeBomb : (Float, Float) -> Bomb
 makeBomb (x, y) =
-    Bomb x y 10 (timeCountDown+10)
+    Bomb x y 100 (timeCountDown+10)
 
 isExplodeNow : Bomb -> Bool
 isExplodeNow bomb = 
@@ -34,3 +35,7 @@ bombTick bombs =
 bombToExplosion : Bomb -> ExplosionEffect
 bombToExplosion bomb =
     ExplosionEffect bomb.x bomb.y bomb.r 0
+
+bombToHitbox : Bomb -> Circle
+bombToHitbox bomb =
+    Circle bomb.x bomb.y bomb.r
