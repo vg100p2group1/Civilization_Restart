@@ -30,9 +30,7 @@ helpView model =
         --     ,div [class "grid-col"]
         --         [p[][text "Story"]]
         -- ]
-        div[style "width" "100vw", 
-            style "height" "100vw", 
-            style "background" "black",        
+        div[    
             style "overflow" "scroll",
             style "margin" "0 auto",
             style "overflow-x" "hidden",
@@ -56,7 +54,7 @@ helpView model =
                 div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "7)    Press R to open the synthesis window."]],
                 div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "8)    Press 1，2，3，4，5 to use active skills.  （Only 1,2 is available）"]],
                 div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "9)    Press F to pick the treasure."]],      
-                button[style "margin-left" "43%",style "width" "14%",onClick <| PageChange Welcome][text "Back to Menu" ]
+                button[class "btn btn-primary btn-ghost btn-shine",style "margin-left" "43%",style "width" "14%",onClick <| PageChange Welcome][text "Back to Menu" ]
             ]
             
             ]

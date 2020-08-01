@@ -118,6 +118,7 @@ type alias Model =
     , storey : Int
     , isGameOver : Bool
     , pageState : Page
+    , wholeCounter : Int 
     }
 
 type Page = WelcomePage
