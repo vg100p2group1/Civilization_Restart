@@ -22,7 +22,7 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, getMaxAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState,skillDirectionalBlasting)
 import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
@@ -230,6 +230,7 @@ update msg model =
         
         PlaceBomb ->
             (placeBomb model, Cmd.none)
+<<<<<<< HEAD
 
         WeaponChoosing weaponChoosingMsg ->
             (updateWeaponChoosing weaponChoosingMsg model, Cmd.none)
@@ -241,6 +242,8 @@ update msg model =
                 newModel = {model|myself={me|weaponUnlockSys={sys|active=True}},gameState=Paused}
             in
                 (newModel, Cmd.none)
+=======
+>>>>>>> Wu_Qifei
 
         Noop ->
             let 
@@ -830,12 +833,29 @@ updateInvisibility model =
 placeBomb : Model -> Model
 placeBomb model =
     let
+<<<<<<< HEAD
         me = model.myself
         newBomb = makeBomb (me.x, me.y)
         newBombs = newBomb :: model.bomb
     in
     {model|bomb = newBombs}
 
+=======
+         
+        me = model.myself
+        skillSys = me.skillSys
+        isUnlocked = Skill.skillState 1 1 3 skillSys.subsys subSysMechanic skillDirectionalBlasting
+        canUse = me.directionalBlasting == 0
+        newBomb = makeBomb (me.x, me.y)
+        newBombs = newBomb :: model.bomb
+        newMe = {me|directionalBlasting = 1}
+    in
+    if isUnlocked && canUse then
+        {model|bomb = newBombs, myself = newMe}
+    else
+        model
+    
+>>>>>>> Wu_Qifei
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
     let
@@ -867,18 +887,21 @@ findMinPath model (mouseX,mouseY) distance=
 coolSkills : Me -> Me
 coolSkills me =
     let
-        cool val =
+        cool val time =
             if val > 1 then
                 val - 1
             else if val == 1 then
-                -50
+                -time
             else if val < 0 then
                 val + 1
             else
                 0
     in
-        {me|dualWield = cool me.dualWield, flash = cool me.flash, absoluteTerrifyField = cool me.absoluteTerrifyField,invisible= cool me.invisible}
-
+        {me|dualWield = cool me.dualWield 100
+        , flash = cool me.flash 100
+        , absoluteTerrifyField = cool me.absoluteTerrifyField 100
+        , invisible= cool me.invisible 100
+        , directionalBlasting = cool me.directionalBlasting 1200}
 
 updateWeaponChoosing : WeaponChoosingMsg -> Model -> Model
 updateWeaponChoosing msg model =
@@ -929,4 +952,3 @@ updateWeaponChoosing msg model =
                     model
             else
                 model
-
