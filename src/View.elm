@@ -273,16 +273,14 @@ displayBoss boss =
                 opacity = String.fromFloat (bossType.hp / 500)
                 
 
-                bossColor =bossType.color
+                bossurl =bossType.url
             in
                 
-                Svg.rect
+                Svg.use
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat model.width
-                    , Svg.Attributes.height <| String.fromFloat model.height
-                    , Svg.Attributes.fill bossColor
-                    , Svg.Attributes.fillOpacity opacity
+                    , Svg.Attributes.xlinkHref bossurl
+                    -- , Svg.Attributes.fillOpacity opacity
                 
                     ]
                 []

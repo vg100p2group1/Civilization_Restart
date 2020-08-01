@@ -76,7 +76,7 @@ type alias BossType =
     ,   level : Int
     ,   width : Float
     ,   height : Float
-    ,   color : String 
+    ,   url : String 
     ,   shootingType : List ShootingType    
     
     }

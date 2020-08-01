@@ -50,7 +50,7 @@ type alias Weapon =
     }
 
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player 20
+bulletConfig = Bullet 500 500 8 (Circle 500 500 8) 0 0 False Player 20
 
 defaultWeapon : Weapon
 defaultWeapon =
@@ -87,9 +87,9 @@ generateBullet weapon =
                 Gatling ->
                     {bulletConfig|force=30* toFloat weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* toFloat weapon.level,r=5}
+                    {bulletConfig|force=100* toFloat weapon.level,r=8}
                 Shotgun ->
-                    {bulletConfig|force=45* toFloat weapon.level,r=5}
+                    {bulletConfig|force=45* toFloat weapon.level,r=8}
                 NoWeapon ->
                     bulletConfig
     in
