@@ -109,7 +109,11 @@ key on keycode =
                 ChangeGameState
             else
                 Noop
-
+        79 ->
+            if on then
+                UnlockTrigger
+            else
+                Noop
         _ ->
             Noop
 
