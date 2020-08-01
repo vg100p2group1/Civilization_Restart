@@ -25,6 +25,8 @@ import Init exposing (init)
 import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
+import Bomb exposing (makeBomb, bombTick)
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -225,6 +227,9 @@ update msg model =
 
         Invisibility ->
             (updateInvisibility model, Cmd.none)
+        
+        PlaceBomb ->
+            (placeBomb model, Cmd.none)
 
         WeaponChoosing weaponChoosingMsg ->
             (updateWeaponChoosing weaponChoosingMsg model, Cmd.none)
@@ -364,7 +369,8 @@ animate  model =
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
-        (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ me
+        (newBomb,explodeBomb) = bombTick model.bomb
+        (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ explodeBomb me
         newClearList = updateRoomList model.map.monsters model.map.roomCount [] model.map.boss
         newTreasure = updateTreasure model.map.treasure newClearList
         newGate = updateGate model.map.gate newClearList
@@ -380,7 +386,7 @@ animate  model =
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, (hitPlayer, atFieldBullet)) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
-        newExplosion = updateExplosion model.explosion filteredBulletList
+        newExplosion = updateExplosion model.explosion filteredBulletList explodeBomb
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
         meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
@@ -392,7 +398,7 @@ animate  model =
     in
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
-                explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
+                explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead, bomb = newBomb}
 
 
 
@@ -707,10 +713,10 @@ hit bulletHit bulletAT me =
         me
     else
 -}    let
-        totalHurt =Debug.log "aaaa" (bulletHit
+        totalHurt = bulletHit
                 |> List.map .force
                 |> List.sum
-                |> Basics.round)
+                |> Basics.round
         attr = me.attr
         health = getCurrentAttr Health attr
         armor = getCurrentAttr Armor attr
@@ -820,6 +826,15 @@ updateInvisibility model =
                 me
     in
         {model|myself = newMe}
+
+placeBomb : Model -> Model
+placeBomb model =
+    let
+        me = model.myself
+        newBomb = makeBomb (me.x, me.y)
+        newBombs = newBomb :: model.bomb
+    in
+    {model|bomb = newBombs}
 
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=

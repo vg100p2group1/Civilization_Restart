@@ -8,6 +8,7 @@ import Model exposing (Me)
 import Attributes exposing (getCurrentAttr,getMaxAttr,AttrType(..),defaultAttr)
 import Monster.Monster exposing (allMonsterAct)
 import Skill exposing (getSubSys, getSkill)
+import Bomb exposing (Bombs,bombToHitbox)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
 
@@ -82,12 +83,15 @@ monsterBuilding monsterList number obstacles seed0 storey=
             else 
                 monsterBuilding  monsterList number obstacles seed4 storey
 
-updateMonster_ : Monster -> List Bullet -> Me -> Monster
-updateMonster_ monster bullets me =
+updateMonster_ : Monster -> List Bullet -> Bombs -> Me -> Monster
+updateMonster_ monster bullets bombs me =
     let
         hitBullets = bullets
                   |> List.filter (\b -> b.from == Player)
                   |> List.filter (\b -> circleCollisonTest b.hitbox monster.position)
+        hitBombs = bombs
+                |> List.map bombToHitbox
+                |> List.filter (\b -> circleCollisonTest b monster.position)
         monsterType_ = monster.monsterType
         -- Skill Battle Fervor can influence the attack
         sub = getSubSys me.skillSys 2
@@ -102,8 +106,10 @@ updateMonster_ monster bullets me =
                 1 + loseHealthRate / 2
             else
                 1
+        bulletHurt = List.sum (List.map (\b -> b.force) hitBullets)
+        bombHurt = (Basics.toFloat <| List.length hitBombs) * 50.0
         attackFactor = (getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat) * battleFervorFactor
-        damage = attackFactor * List.sum (List.map (\b -> b.force) hitBullets)
+        damage = attackFactor * (bulletHurt + bombHurt)
         newMonsterType = {monsterType_ | hp = monsterType_.hp - damage}
         {- debug test
         newMonsterType =
@@ -115,12 +121,12 @@ updateMonster_ monster bullets me =
     in
         {monster | monsterType = newMonsterType}
 
-updateMonster : List Monster -> List Bullet -> Me -> (List Monster,List Bullet)
-updateMonster monsters bullets me =
+updateMonster : List Monster -> List Bullet -> Bombs -> Me -> (List Monster,List Bullet)
+updateMonster monsters bullets bombs me =
     let
         finalMonsters = monsters
                      |> List.filter (\m -> m.monsterType.hp > 0)
-                     |> List.map (\m -> updateMonster_ m bullets me)
+                     |> List.map (\m -> updateMonster_ m bullets bombs me)
     in
         allMonsterAct finalMonsters me bullets
 

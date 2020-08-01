@@ -84,6 +84,11 @@ key on keycode =
                 Invisibility
             else
                 Noop 
+        53 ->
+            if on then
+                PlaceBomb
+            else
+                Noop 
         69 ->
             if on then
                 ChangeWeapon Previous
