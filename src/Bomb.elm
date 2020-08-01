@@ -1,4 +1,4 @@
-module Bomb exposing (Bomb, Bombs, placeBomb, bombTick, bombToExplosion)
+module Bomb exposing (Bomb, Bombs, makeBomb, bombTick, bombToExplosion)
 
 import Weapon exposing (ExplosionEffect)
 
@@ -14,23 +14,22 @@ type alias Bomb =
     , counter : Int     -- count down from 100 to 10, explode at 10 and disappear at 0
     }
 
-placeBomb : (Float, Float) -> Bomb
-placeBomb (x, y) =
-    Bomb x y 30 (timeCountDown+10)
+makeBomb : (Float, Float) -> Bomb
+makeBomb (x, y) =
+    Bomb x y 10 (timeCountDown+10)
 
 isExplodeNow : Bomb -> Bool
 isExplodeNow bomb = 
     bomb.counter == 10
 
-bombTick : Bombs -> Bombs -> (Bombs, Bombs)
-bombTick newBomb oldBomb =
+bombTick : Bombs -> (Bombs, Bombs)
+bombTick bombs =
     let
         next b = {b|counter = b.counter - 1}
-        newWaiting = List.map next oldBomb
+        newWaiting = List.map next bombs
         (explode, stillWait) = List.partition isExplodeNow newWaiting
-        finalWait = stillWait ++ newBomb
     in
-        (finalWait, explode)
+        (stillWait, explode)
 
 bombToExplosion : Bomb -> ExplosionEffect
 bombToExplosion bomb =

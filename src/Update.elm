@@ -25,7 +25,7 @@ import Init exposing (init)
 import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
-import Bomb exposing (placeBomb)
+import Bomb exposing (makeBomb, bombTick)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -361,7 +361,8 @@ animate  model =
         newViewbox = mapToViewBox newMe newMap
         (newBulletList, filteredBulletList, (hitPlayer, atFieldBullet)) = updateBullet newMe model.map newBullet collision
         newBulletListViewbox = bulletToViewBox newMe newBulletList
-        newExplosion = updateExplosion model.explosion filteredBulletList
+        (newBomb,explodeBomb) = bombTick model.bomb
+        newExplosion = updateExplosion model.explosion filteredBulletList explodeBomb
         newExplosionViewbox = explosionToViewbox newMe newExplosion
         newState = updateState model
         meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
@@ -369,7 +370,7 @@ animate  model =
     in
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
-                explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead}
+                explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead, bomb = newBomb}
 
 
 
@@ -802,7 +803,7 @@ placeBomb : Model -> Model
 placeBomb model =
     let
         me = model.myself
-        newBomb = PlaceBomb me.x me.y
+        newBomb = makeBomb (me.x, me.y)
         newBombs = newBomb :: model.bomb
     in
     {model|bomb = newBombs}

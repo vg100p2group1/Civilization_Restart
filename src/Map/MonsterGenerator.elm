@@ -8,6 +8,7 @@ import Model exposing (Me)
 import Attributes exposing (getCurrentAttr,getMaxAttr,AttrType(..),defaultAttr)
 import Monster.Monster exposing (allMonsterAct)
 import Skill exposing (getSubSys, getSkill)
+import Bomb exposing (Bomb)
 -- import Map.Map exposing (Obstacle)
 -- import Shape exposing (recInit)
 
