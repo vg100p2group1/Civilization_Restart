@@ -20,20 +20,20 @@ monsterTypeList : List MonsterType
 monsterTypeList = 
     let
         m1=MonsterType 150 20 "#Robot1"
-        m2=MonsterType 150 20 "#Robot2"
-        m3=MonsterType 150 20 "#Robot3"
+        m2=MonsterType 300 40 "#Robot2"
+        m3=MonsterType 450 60 "#Robot3"
     in 
-        [m1,m2,m3]
+        [m1,m1,m2,m3,m2,m3,m3,m1,m2,m2,m3]
 
 
 
-monsterGenerator : Random.Seed -> List Obstacle -> (List Monster,Random.Seed)
-monsterGenerator seed0 obstacle =
+monsterGenerator : Random.Seed -> List Obstacle -> Int ->(List Monster,Random.Seed)
+monsterGenerator seed0 obstacle storey=
     let
-        (number,seed1) = Random.step (Random.int 5 10) seed0
+        (number,seed1) = Random.step (Random.int (storey+1) (storey+2+storey // 3)) seed0
         -- obstacle = room.obstacles
         
-        (monsterList,seed2) = monsterBuilding [] number obstacle seed1
+        (monsterList,seed2) = monsterBuilding [] number obstacle seed1 storey
     in
         (monsterList,seed2)
 
@@ -50,12 +50,12 @@ checkMonsterCollison monster obstacles monsterList=
 
 
 
-monsterBuilding : List Monster -> Int -> List Obstacle -> Random.Seed -> (List Monster,Random.Seed)
-monsterBuilding monsterList number obstacles seed0 =
+monsterBuilding : List Monster -> Int -> List Obstacle -> Random.Seed -> Int -> (List Monster,Random.Seed)
+monsterBuilding monsterList number obstacles seed0 storey=
     let
         (xTemp,seed1) = Random.step (Random.int 300 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 300 1500) seed1
-        (typeTemp, seed3) = Random.step (Random.int 0 monsterTypeNum) seed2
+        (typeTemp, seed3) = Random.step (Random.int 0 storey) seed2
         (monsterSpeed, seed4) = Random.step (Random.float 1 3 ) seed3
         getMonsterType = 
             let
@@ -78,9 +78,9 @@ monsterBuilding monsterList number obstacles seed0 =
             (monsterList,seed3)
         else
             if checkMonsterCollison monsterNew obstacles monsterList then
-                monsterBuilding (monsterNew :: monsterList) (number - 1) obstacles seed3
+                monsterBuilding (monsterNew :: monsterList) (number - 1) obstacles seed3 storey
             else 
-                monsterBuilding  monsterList number obstacles seed4
+                monsterBuilding  monsterList number obstacles seed4 storey
 
 updateMonster_ : Monster -> List Bullet -> Me -> Monster
 updateMonster_ monster bullets me =

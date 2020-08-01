@@ -3,7 +3,7 @@ import Random
 import Map.Map exposing (Room,Treasure,roomConfig)
 import Map.ObstacleGenerator exposing (obstacleGenerator,bossRoomObstacleGenerator)
 import Map.MonsterGenerator exposing (monsterGenerator)
-import Map.TreasureGenerator exposing (treasureGenerator)
+import Map.TreasureGenerator exposing (treasureGenerator,treasureLevelChange)
 import Monster.Boss exposing (bossGenerator)
 -- import Html
 -- import Html.Events exposing (onClick)
@@ -70,8 +70,8 @@ roomPositionGenerator storey seed0=
             if whetherBoss.haveBoss then 
                 []
             else whetherBoss.monsters
-
-        newRoom = {whetherBoss|boss=newBoss,monsters=newMonster}
+        newTreasure = List.map treasureLevelChange whetherBoss.treasure
+        newRoom = {whetherBoss|boss=newBoss,monsters=newMonster,treasure = newTreasure}
 
         room4 = newRoom :: (List.drop 1 room3) 
         -- d2 = Debug.log "gateroom" whetherBoss
@@ -85,7 +85,7 @@ firstRoomGenerator number seed0 storey=
     let
         (room0Direction,seed1) = Random.step (Random.int 0 1) seed0
         (obstacleTemp,seed2) = obstacleGenerator seed1
-        (monsterTemp,seed3) = monsterGenerator seed2 obstacleTemp
+        (monsterTemp,seed3) = monsterGenerator seed2 obstacleTemp storey
         (treasureTemp,seed4) = treasureGenerator seed3 obstacleTemp storey 
     in
         if room0Direction == 0 then
@@ -126,7 +126,7 @@ otherRoomGenerator roomList rooms number seed0 storey=
         (roomAdded,seed2) = roomPicking availableRoom (t - r) seed1
 
         (obstacleTemp,seed3) = obstacleGenerator seed2
-        (monsterTemp,seed4) = monsterGenerator seed3 obstacleTemp
+        (monsterTemp,seed4) = monsterGenerator seed3 obstacleTemp storey
         (treasureTemp,seed5) = treasureGenerator seed4 obstacleTemp storey
 
         roomNowUpdated = {roomNow|road= (List.map (\value -> value.position) roomAdded),rank=number,obstacles=obstacleTemp,monsters=monsterTemp,treasure=treasureTemp}
@@ -141,7 +141,7 @@ leavesUpdate  roomUpdated roomList num seed0 storey=
     let
         -- d=Debug.log "roomList" (List.map (\value->value.position) roomList)
         (obstacleTemp, seed1) = bossRoomObstacleGenerator seed0
-        (monsterTemp,seed2) = monsterGenerator seed1 obstacleTemp -- 到时候把boss 给剔除出去
+        (monsterTemp,seed2) = monsterGenerator seed1 obstacleTemp storey -- 到时候把boss 给剔除出去
         (treasureTemp, seed3) = treasureGenerator seed2 obstacleTemp storey
         roomTemp = List.head roomList
         roomListNew = List.drop 1 roomList

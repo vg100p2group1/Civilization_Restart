@@ -143,11 +143,17 @@ update msg model =
                                 meTemp = model.myself
                                 package = meTemp.package
                                 newPackage = packageUpdate package t
+                                nowSkill = meTemp.skillSys
+
+                                nowPoints = nowSkill.points
+
+                                newSkill =  if t.treasureType.level == 4 then {nowSkill| points = nowPoints + 4} else nowSkill
+
                                 newTreasureList = List.filter (\value->value/=t) model.map.treasure
                                 mapTemp = model.map
                                 mapNew = {mapTemp|treasure=newTreasureList}
                             in
-                                ({model|myself={meTemp|package=newPackage},map=mapNew},Cmd.none)
+                                ({model|myself={meTemp|package=newPackage,skillSys = newSkill},map=mapNew},Cmd.none)
                         _ ->
                             (model, Cmd.none)
             else
@@ -697,32 +703,38 @@ updateDialogues model =
 
 hit : List Bullet -> List Bullet-> Me -> Me
 hit bulletHit bulletAT me =
-    if List.isEmpty bulletHit && List.isEmpty bulletAT then
+{-    if List.isEmpty bulletHit && List.isEmpty bulletAT then 
         me
     else
-        let
-            totalHurt = bulletHit
-                    |> List.map .force
-                    |> List.sum
-                    |> Basics.round
-            attr = me.attr
-            health = getCurrentAttr Health attr
-            armor = getCurrentAttr Armor attr
-            hurtAttr = 
-                if totalHurt <= armor then     -- the armor is enough to protect the player
-                    setCurrentAttr Armor -totalHurt attr
-                else if armor > 0 then      -- the armor is broken due to these bullets
-                    setCurrentAttr Armor -armor attr
-                    |> setCurrentAttr Health (totalHurt - armor)
-                else
-                    setCurrentAttr Health -(min totalHurt health) attr
-            currentClip = getCurrentAttr Clip attr
-            maxClip = getMaxAttr Clip attr
-            loseClip = maxClip - currentClip
-            catchBullet = List.length bulletAT
-            newAttr = setCurrentAttr Clip (min catchBullet loseClip) hurtAttr
-        in
-            {me | attr = newAttr}
+-}    let
+        totalHurt =Debug.log "aaaa" (bulletHit
+                |> List.map .force
+                |> List.sum
+                |> Basics.round)
+        attr = me.attr
+        health = getCurrentAttr Health attr
+        armor = getCurrentAttr Armor attr
+        hurtAttr = 
+            if totalHurt <= armor then     -- the armor is enough to protect the player
+                setCurrentAttr Armor -totalHurt attr
+            else if armor > 0 then      -- the armor is broken due to these bullets
+                setCurrentAttr Armor -armor attr
+                |> setCurrentAttr Health (totalHurt - armor)
+            else
+                setCurrentAttr Health -(min totalHurt health) attr
+        armorRepair = 
+            if totalHurt == 0 && modBy 60 me.counter == 0 then
+                10
+            else
+                0
+        currentClip = getCurrentAttr Clip attr
+        maxClip = getMaxAttr Clip attr
+        loseClip = maxClip - currentClip
+        catchBullet = List.length bulletAT
+        newAttr = setCurrentAttr Clip (min catchBullet loseClip) hurtAttr
+                |> setCurrentAttr Armor armorRepair 
+    in
+        {me | attr = newAttr}
 
 
 updateDualWield : Model -> Model
