@@ -1,4 +1,4 @@
-module Bomb exposing (Bombs, placeBomb, bombTick, bombToExplosion)
+module Bomb exposing (Bomb, Bombs, placeBomb, bombTick, bombToExplosion)
 
 import Weapon exposing (ExplosionEffect)
 

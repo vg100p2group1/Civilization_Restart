@@ -25,6 +25,8 @@ import Init exposing (init)
 import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState)
 import Time exposing (..)
 import Random exposing (..)
+import Bomb exposing (placeBomb)
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -682,10 +684,10 @@ hit bulletHit bulletAT me =
         me
     else
 -}    let
-        totalHurt =Debug.log "aaaa" (bulletHit
+        totalHurt = bulletHit
                 |> List.map .force
                 |> List.sum
-                |> Basics.round)
+                |> Basics.round
         attr = me.attr
         health = getCurrentAttr Health attr
         armor = getCurrentAttr Armor attr
@@ -798,7 +800,12 @@ updateInvisibility model =
 
 placeBomb : Model -> Model
 placeBomb model =
-    model
+    let
+        me = model.myself
+        newBomb = PlaceBomb me.x me.y
+        newBombs = newBomb :: model.bomb
+    in
+    {model|bomb = newBombs}
 
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
