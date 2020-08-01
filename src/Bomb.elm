@@ -18,3 +18,11 @@ type alias Bomb =
 placeBomb : (Int, Int) -> Bomb
 placeBomb (x, y) =
     Bomb x y 30 (timeCountDown+10)
+
+isExplodeNow : Bomb -> Bool
+isExplodeNow bomb = 
+    bomb.counter == 10
+
+canRemove : Bomb -> Bool
+canRemove bomb =
+    bomb.counter <= 0
