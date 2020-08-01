@@ -27,6 +27,7 @@ type alias Me =
     , absoluteTerrifyField : Int
     , flash : Int
     , invisible : Int
+    , directionalBlasting : Int
   --   , name : String
   --   , score : Float
     , hitBox : Circle
@@ -67,6 +68,7 @@ defaultMe =
     , absoluteTerrifyField = 0
     , flash = 0
     , invisible = 0
+    , directionalBlasting = 0
     , hitBox = Circle 500 500 20
     , weapons = weaponList
     , currentWeapon = defaultWeapon

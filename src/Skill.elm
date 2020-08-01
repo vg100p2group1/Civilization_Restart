@@ -1,7 +1,7 @@
 
 module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel
                       ,getCurrentSubSystem, getSubSys, getSkill,skillState,subSysBerserker,subSysMechanic,skillDualWield,skillAbsoluteTerritoryField
-                      ,subSysPhantom,skillFlash, skillInvisible)
+                      ,subSysPhantom,skillFlash, skillInvisible, skillDirectionalBlasting)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
