@@ -143,11 +143,17 @@ update msg model =
                                 meTemp = model.myself
                                 package = meTemp.package
                                 newPackage = packageUpdate package t
+                                nowSkill = meTemp.skillSys
+
+                                nowPoints = nowSkill.points
+
+                                newSkill =  if t.treasureType.level == 4 then {nowSkill| points = nowPoints + 4} else nowSkill
+
                                 newTreasureList = List.filter (\value->value/=t) model.map.treasure
                                 mapTemp = model.map
                                 mapNew = {mapTemp|treasure=newTreasureList}
                             in
-                                ({model|myself={meTemp|package=newPackage},map=mapNew},Cmd.none)
+                                ({model|myself={meTemp|package=newPackage,skillSys = newSkill},map=mapNew},Cmd.none)
                         _ ->
                             (model, Cmd.none)
             else
