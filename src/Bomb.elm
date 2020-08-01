@@ -14,3 +14,7 @@ type alias Bomb =
     , r : Float
     , counter : Int     -- count down from 100 to 10, explode at 10 and disappear at 0
     }
+
+placeBomb : (Int, Int) -> Bomb
+placeBomb (x, y) =
+    Bomb x y 30 (timeCountDown+10)
