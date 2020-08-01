@@ -27,4 +27,5 @@ init =
         , isGameOver = False
         , pageState = WelcomePage
         , bomb = []
+        , wholeCounter = 0
         }

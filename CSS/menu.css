@@ -62,12 +62,6 @@ html,
 
 body {
     background: #1a1a1a;
-    background-size: cover;
-    text-align: center;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 h1 {
@@ -162,7 +156,6 @@ h1 {
     -webkit-transform: scale(1);
     transform: scale(1);
 }
-
 
 /*.overlay {
     height: 100%;

@@ -170,7 +170,7 @@ update msg model =
                     else
                         (animate model, Cmd.none)
                 else 
-                    (model, Cmd.none)
+                    ({model|wholeCounter=model.wholeCounter+1}, Cmd.none)
 
         NextSentence ->
             (updateSentence 0 model, Cmd.none)
