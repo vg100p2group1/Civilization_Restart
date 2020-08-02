@@ -10,6 +10,7 @@ import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
 import Synthesis.Package exposing (Package,packageInit)
 import Synthesis.SynthesisSystem exposing (SynthesisSubSystem,defaultSynthesisSubSystem)
+import Bomb exposing (Bombs)
 type alias Me =
     { x : Float
     , y : Float
@@ -27,6 +28,7 @@ type alias Me =
     , absoluteTerrifyField : Int
     , flash : Int
     , invisible : Int
+    , directionalBlasting : Int
   --   , name : String
   --   , score : Float
     , hitBox : Circle
@@ -85,6 +87,7 @@ defaultMe =
     , absoluteTerrifyField = 0
     , flash = 0
     , invisible = 0
+    , directionalBlasting = 0
     , hitBox = Circle 500 500 20
     , weapons = [defaultWeapon]
     , currentWeapon = defaultWeapon
@@ -118,6 +121,7 @@ type alias Model =
     , storey : Int
     , isGameOver : Bool
     , pageState : Page
+    , bomb : Bombs
     , wholeCounter : Int 
     }
 
