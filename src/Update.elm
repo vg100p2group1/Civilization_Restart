@@ -796,7 +796,7 @@ updateFlash model =
                 -- velocity decomposition
         cos = (posX - 500) / unitV
         sin = (posY - 500) / unitV
-        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (posX, posY) 0))
+        minDis_ = (Tuple.second (findMinPath model (posX, posY) 0))
         distance = min minDis_ 200
         newX = distance * cos + me.x
         newY = distance * sin + me.y

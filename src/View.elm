@@ -25,7 +25,6 @@ import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowDoor exposing (showDoor)
 import Pages.About exposing (aboutView)
 import Shape exposing (recInit)
--- view : Model -> Html.Html Msg
 -- view model =
 --     playerDemonstrate model
 import Synthesis.ShowSynthesis exposing (showSynthesis)
@@ -43,7 +42,7 @@ import Pages.Help exposing (helpView)
 import Pages.Story exposing (storyView)
 import Environment.ShowRoad exposing (showRoad,showMiddle)
 import Display.DisplayChoosingWeapon exposing (showWeaponChoosingSystem)
-
+import Animation.SkillEffect exposing (showSkillEffect,showBackEffect)
 view : Model -> Html.Html Msg
 view model =
     case model.pageState of
@@ -141,7 +140,8 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ([defines]++ backgroundEntire model.viewbox ++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
+              ([defines]++ backgroundEntire model.viewbox ++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++  showBackEffect model
+                ++ [me model.myself] ++ [showGun model.myself]  ++showSkillEffect model ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model

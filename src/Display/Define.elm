@@ -146,7 +146,129 @@ defines =
             -- , Svg.Attributes.fill "black"
             ][]] 
     in
-        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17]++definePlayer++defineWeapon++defineMonsters++defineGate++defineObstacle)
+        Svg.defs []([g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,g17]++definePlayer++defineWeapon++defineMonsters++defineGate++defineObstacle++defineEx++defineSkill)
+
+defineSkill : List (Svg.Svg Msg)
+defineSkill =
+    let
+        g1 = Svg.g[Svg.Attributes.id "AT"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/AT.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g2 = Svg.g[Svg.Attributes.id "Flame"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Flame.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 60
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g3 = Svg.g[Svg.Attributes.id "Invisible"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Invisible.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 100
+                , Svg.Attributes.height <| String.fromFloat 100
+                ][]
+            ]
+        g4 = Svg.g[Svg.Attributes.id "Fervor1"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Fervor_01.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 20
+                ][]
+            ]
+        g5 = Svg.g[Svg.Attributes.id "Fervor2"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Fervor_02.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 20
+                ][]
+            ]
+        g6 = Svg.g[Svg.Attributes.id "Fervor3"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Fervor_03.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 20
+                ][]
+            ]
+        g7 = Svg.g[Svg.Attributes.id "Fervor4"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Fervor_04.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 20
+                ][]
+            ]
+        g8 = Svg.g[Svg.Attributes.id "Fervor5"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/SkillEffect/Fervor_05.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 20
+                ][]
+            ]
+    in 
+        [g1,g2,g3,g4,g5,g6,g7,g8]
+
+defineEx : List (Svg.Svg Msg)
+defineEx =
+    let
+        g1 = Svg.g[Svg.Attributes.id "Bomb1"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Bomb/Bomb_01.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g2 = Svg.g[Svg.Attributes.id "Bomb2"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Bomb/Bomb_02.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g3 = Svg.g[Svg.Attributes.id "Bomb3"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Bomb/Bomb_03.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g4 = Svg.g[Svg.Attributes.id "Bomb4"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Bomb/Bomb_04.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 200
+                , Svg.Attributes.height <| String.fromFloat 200
+                -- , Svg.Attributes.fill "black"
+                ][]
+            ]
+        g0 = Svg.g[Svg.Attributes.id "Bomb"][
+            Svg.image 
+                [ Svg.Attributes.xlinkHref "./images/Bomb/Bomb.png"
+                , Svg.Attributes.preserveAspectRatio "none meet"
+                , Svg.Attributes.width <| String.fromFloat 50
+                , Svg.Attributes.height <| String.fromFloat 50
+                ][]
+            ]
+    in
+        [g1,g2,g3,g4,g0]
 
 
 definePlayer : List (Svg.Svg Msg)

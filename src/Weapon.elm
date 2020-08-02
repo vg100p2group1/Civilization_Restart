@@ -1,5 +1,5 @@
 
-module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion)
+module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion,ExplosionType(..))
 
 import Shape exposing (Circle)
 import Attributes exposing (getAttrName)
@@ -127,9 +127,15 @@ type alias ExplosionEffect =
         x : Float,
         y : Float,
         r : Float,
-        counter : Int
+        counter : Int,
+        explosionType : ExplosionType
     }
+
+type ExplosionType  
+            =BulletEffect
+            |BombEffect
+
 
 bulletToExplosion : Bullet -> ExplosionEffect 
 bulletToExplosion model = 
-    ExplosionEffect model.x model.y (model.r*2) 0
+    ExplosionEffect model.x model.y (model.r*2) 0 BulletEffect
