@@ -2,6 +2,7 @@
 module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion)
 
 import Shape exposing (Circle)
+import Attributes exposing (getAttrName)
 
 
 type alias Bullet =
@@ -81,15 +82,30 @@ generateBullet : Weapon -> Bullet
 generateBullet weapon =
     let
         bullet =
+            let
+               getLevel level =
+                    case level of 
+                        1 ->
+                            1.0
+                        2 ->
+                            1.5
+                        3 ->
+                            2.0
+                        4 ->
+                            2.3
+                        _ ->
+                            2.5
+                        
+            in
             case weapon.extraInfo of
                 Pistol ->
-                    bulletConfig
+                    {bulletConfig|force=20 * getLevel weapon.level}
                 Gatling ->
-                    {bulletConfig|force=30* toFloat weapon.level}
+                    {bulletConfig|force=30* getLevel weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* toFloat weapon.level,r=8}
+                    {bulletConfig|force=100* getLevel weapon.level}
                 Shotgun ->
-                    {bulletConfig|force=45* toFloat weapon.level,r=8}
+                    {bulletConfig|force=45* getLevel weapon.level}
                 NoWeapon ->
                     bulletConfig
     in
