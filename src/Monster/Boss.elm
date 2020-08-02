@@ -52,7 +52,7 @@ bossBuilding bossList obstacles bossNum  seed0=
                     Just a ->
                         a
                     Nothing ->
-                        BossType 500 0 0 0 "black" [] 
+                        BossType 500 0 0 0 "#Boss1" [] 
         bossPos =  Rectangle (toFloat xTemp) (toFloat yTemp) bossTypeTemp.width bossTypeTemp.height recInit
 
         bossNew = Map.Map.Boss (recUpdate bossPos) 0  bossTypeTemp  seed0 False 0 0
@@ -67,14 +67,14 @@ bossType1 =
     let
         stype1 = [shootingType1 0]
     in
-        BossType 500 1 200 200 "red" stype1 
+        BossType 500 1 200 200 "#Boss1" stype1 
 
 bossType2 : BossType
 bossType2 = 
     let
         stype2 = [shootingType2]
     in
-        BossType 500 1 200 200 "blue" stype2 
+        BossType 500 1 200 200 "#Boss2" stype2 
 
 bossType3 : BossType
 bossType3 = 
@@ -87,7 +87,7 @@ bossType3 =
 
         stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection1 18
     in
-        BossType 500 1 200 200 "blue" stype3   
+        BossType 500 1 200 200 "#Boss3" stype3   
 
 shootingType1 : Float -> ShootingType
 shootingType1 direction = 

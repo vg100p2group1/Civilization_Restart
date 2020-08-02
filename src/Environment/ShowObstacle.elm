@@ -36,32 +36,16 @@ showOneObstacle rect=
         x = rect.x
         y=  rect.y
         w= rect.width
-        h= rect.height
 
-        numX = (w  / 50)-1
-        numY = h / 50 
-        -- d1=Debug.log "num" (numX,numY)
-        obstacleFloor = showWalls x numX x y numX numY [] 
-        -- obstacleFloor = showOneRectangle xBegin yBegin 
+        getUrl = 
+            case (round w) of 
+                100 ->
+                    "#Obstacle1"
+                400 ->
+                    "#Obstacle2"
+                _ ->
+                    "#Obstacle3"
     in
-        obstacleFloor
-
-showWalls : Float -> Float -> Float -> Float -> Float -> Float -> List (Svg.Svg Msg) -> List (Svg.Svg Msg)
-showWalls xBegin numXBegin x y numX numY svgList=
-    if numY==0 then
-        svgList
-    else 
-       if numX==0 then
-            showWalls xBegin numXBegin xBegin (y+50) numXBegin (numY-1) (svgList ++ [showOneWall x y])
-       else 
-            showWalls xBegin numXBegin (x+50) y (numX-1) numY (svgList++[showOneWall x y])
-    
-    
-
-
-
-showOneWall : Float -> Float -> Svg.Svg Msg
-showOneWall x y =
-        Svg.use [Svg.Attributes.xlinkHref "#Wall2"
+       [Svg.use [Svg.Attributes.xlinkHref getUrl
                 ,Svg.Attributes.x <| String.fromFloat x
-                ,Svg.Attributes.y <| String.fromFloat y][]
+                ,Svg.Attributes.y <| String.fromFloat y][] ]

@@ -26,4 +26,6 @@ init =
         , storey = 1
         , isGameOver = False
         , pageState = WelcomePage
+        , bomb = []
+        , wholeCounter = 0
         }

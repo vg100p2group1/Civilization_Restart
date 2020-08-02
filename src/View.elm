@@ -36,11 +36,13 @@ import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowGate exposing (showGate)
 import Environment.ShowDoor exposing (showDoor)
+
 import Pages.Welcome exposing (welcomeView)
 import Pages.About exposing (aboutView)
 import Pages.Help exposing (helpView)
 import Pages.Story exposing (storyView)
 import Environment.ShowRoad exposing (showRoad,showMiddle)
+import Display.DisplayChoosingWeapon exposing (showWeaponChoosingSystem)
 
 view : Model -> Html.Html Msg
 view model =
@@ -145,6 +147,7 @@ playerDemonstrate model =
             , showSkill model
             , showSynthesis model
             , showGameOver model
+            , showWeaponChoosingSystem model
         ]
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)
@@ -270,16 +273,14 @@ displayBoss boss =
                 opacity = String.fromFloat (bossType.hp / 500)
                 
 
-                bossColor =bossType.color
+                bossurl =bossType.url
             in
                 
-                Svg.rect
+                Svg.use
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat model.width
-                    , Svg.Attributes.height <| String.fromFloat model.height
-                    , Svg.Attributes.fill bossColor
-                    , Svg.Attributes.fillOpacity opacity
+                    , Svg.Attributes.xlinkHref bossurl
+                    -- , Svg.Attributes.fillOpacity opacity
                 
                     ]
                 []

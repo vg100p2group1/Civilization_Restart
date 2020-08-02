@@ -1,7 +1,9 @@
-module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..),PageMsg(..))
+
+module Messages exposing (Msg(..), SkillMsg(..),SynthesisMsg(..),ShiftMsg(..),WeaponChoosingMsg(..),PageMsg(..))
 import Css exposing (Resize)
 import Browser.Dom exposing (Viewport)
 import Time exposing (Posix)
+import Weapon exposing (Arsenal(..))
 -- import Model exposing (MouseMoveData)
 type Msg
     = Tick Float
@@ -33,8 +35,11 @@ type Msg
     | Flash
     | ATField
     | Invisibility
+    | PlaceBomb
     | Tictoc Time.Posix
     | PageChange PageMsg
+    | WeaponChoosing WeaponChoosingMsg
+    | UnlockTrigger
 
 type ShiftMsg
     = Previous
@@ -52,9 +57,17 @@ type SynthesisMsg
     | Synthesis        
     | SynthesisBullet
 
+
 type PageMsg
     = Welcome
     | Help
     | Game
     | About
     | Story
+
+
+type WeaponChoosingMsg
+    = CloseWindow
+    | ChoosingWeapon Arsenal
+    | UnlockWeapon
+

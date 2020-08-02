@@ -84,6 +84,11 @@ key on keycode =
                 Invisibility
             else
                 Noop 
+        53 ->
+            if on then
+                PlaceBomb
+            else
+                Noop 
         69 ->
             if on then
                 ChangeWeapon Previous
@@ -109,7 +114,11 @@ key on keycode =
                 ChangeGameState
             else
                 Noop
-
+        79 ->
+            if on then
+                UnlockTrigger
+            else
+                Noop
         _ ->
             Noop
 
