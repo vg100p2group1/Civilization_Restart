@@ -1,6 +1,6 @@
 module Bomb exposing (Bomb, Bombs, makeBomb, bombTick, bombToExplosion, bombToHitbox)
 
-import Weapon exposing (ExplosionEffect)
+import Weapon exposing (ExplosionEffect,ExplosionType(..))
 import Shape exposing (Circle)
 
 timeCountDown : Int
@@ -34,7 +34,7 @@ bombTick bombs =
 
 bombToExplosion : Bomb -> ExplosionEffect
 bombToExplosion bomb =
-    ExplosionEffect bomb.x bomb.y bomb.r 0
+    ExplosionEffect bomb.x bomb.y bomb.r 0 BombEffect
 
 bombToHitbox : Bomb -> Circle
 bombToHitbox bomb =
