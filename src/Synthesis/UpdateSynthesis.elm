@@ -56,8 +56,13 @@ updateSynthesis msg model =
                     (weaponUpgraded,packageNew,tip) = weaponUpgrade weaponNow package
                     newWeapon = weaponHead ++ [weaponUpgraded] ++   List.drop (weaponNum+1) weapon       
                     synthesisSub = me.synthesis
+                    currentWeaponNow =
+                        if me.currentWeapon.extraInfo == weaponUpgraded.extraInfo then
+                            weaponUpgraded
+                        else
+                            me.currentWeapon
 
-                    newMe = {me|synthesis={synthesisSub|tip = tip},weapons=newWeapon,package=packageNew}
+                    newMe = {me|synthesis={synthesisSub|tip = tip},currentWeapon=currentWeaponNow,weapons=newWeapon,package=packageNew}
 
                 in  
                     ({model|myself=newMe,state=SynthesisSys},Cmd.none)

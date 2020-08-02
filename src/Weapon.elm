@@ -83,7 +83,8 @@ generateBullet weapon =
     let
         bullet =
             let
-               getLevel level =
+                -- d1=Debug.log "level" (getLevel weapon.level)
+                getLevel level =
                     case level of 
                         1 ->
                             1.0
