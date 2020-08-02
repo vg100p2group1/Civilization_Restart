@@ -700,9 +700,11 @@ hit bulletHit bulletAT me =
                 |> setCurrentAttr Health (totalHurt - armor)
             else
                 setCurrentAttr Health -(min totalHurt health) attr
+        currentArmor = getCurrentAttr Armor attr
+        maxArmor = getMaxAttr Armor attr
         armorRepair = 
             if totalHurt == 0 && modBy 60 me.counter == 0 then
-                10
+                min 10 (maxArmor - currentArmor)
             else
                 0
         currentClip = getCurrentAttr Clip attr
