@@ -148,7 +148,7 @@ playerDemonstrate model =
     in
         Html.div
         []
-        [ Html.div 
+        ([ Html.div 
             [ Html.Attributes.style "width" "100%"
             , Html.Attributes.style "height" "100%"
             , Html.Attributes.style "float" "left"
@@ -171,7 +171,7 @@ playerDemonstrate model =
             , showGameOver model
             , showWeaponChoosingSystem model
             
-        ]
+        ]++newAudio)
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)
 backgroundEntire model=
