@@ -376,7 +376,7 @@ animate  model =
         attr = me.attr
         gate = model.map.gate
         isDead = 0 == getCurrentAttr Health attr
-        (newShoot, weapon,newaudio) = if model.myself.fire then
+        (newShoot, weapon,newaudio_) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
                                     fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) (model.myself.dualWield > 0) me
                                  else
@@ -398,7 +398,7 @@ animate  model =
         newWeapons = List.map (\w -> {w | period = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * w.maxPeriod}) newMe.weapons
         newPeriod = (getCurrentAttr ShootSpeed defaultAttr |> toFloat) / (getCurrentAttr ShootSpeed newAttr |> toFloat) * newMe.currentWeapon.maxPeriod
         newBullet_ =  newShoot ++ model.bullet
-        (newBomb,explodeBomb) = bombTick model.bomb
+        (newBomb,explodeBomb,newaudio) = bombTick model.bomb newaudio_
         (newMonsters,newBullet__) = updateMonster model.map.monsters newBullet_ explodeBomb me
         newClearList = updateRoomList model.map.monsters model.map.roomCount [] model.map.boss
         newTreasure = updateTreasure model.map.treasure newClearList
@@ -795,9 +795,12 @@ updateDualWield model =
         -}
         dual = skillState 2 1 4 model.myself.skillSys.subsys subSysBerserker skillDualWield
         me = model.myself
+        
+        nowaudio = me.addAudio
+        newaudio = nowaudio ++ ["./audio/DualWeapon.ogg"]
         newMe =
             if dual && me.dualWield == 0 then
-                {me|dualWield = 100}
+                {me|dualWield = 100,addAudio=newaudio}
             else
                 me
     in
@@ -813,7 +816,9 @@ updateFlashStatus model =
             if flash && me.flash == 0 then
                 let
                     afterFlash = updateFlash model
-                    meFlash = {afterFlash|flash = 1}
+                    nowaudio = afterFlash.addAudio
+                    newaudio = nowaudio ++ ["./audio/Flash.ogg"]
+                    meFlash = {afterFlash|flash = 1,addAudio=newaudio}
                 in
                     {model|myself = meFlash}
             else
@@ -842,9 +847,12 @@ updateATField model =
     let
         unlocked = skillState 1 0 4 model.myself.skillSys.subsys subSysMechanic skillAbsoluteTerritoryField
         me = model.myself
+        
+        nowaudio = me.addAudio
+        newaudio = nowaudio ++ ["./audio/Absorb.ogg"]
         newMe =
             if unlocked && me.absoluteTerrifyField == 0 then
-                {me|absoluteTerrifyField = 50}
+                {me|absoluteTerrifyField = 50,addAudio=newaudio}
             else
                 me
     in
@@ -855,9 +863,12 @@ updateInvisibility model =
     let
         unlocked = skillState 0 1 4 model.myself.skillSys.subsys subSysPhantom skillInvisible
         me = model.myself
+        nowaudio = me.addAudio
+        newaudio = nowaudio ++ ["./audio/Invisible.ogg"]
+
         newMe =
             if unlocked && me.invisible == 0 then
-                {me|invisible = 50}
+                {me|invisible = 50,addAudio=newaudio}
             else
                 me
     in
@@ -873,7 +884,10 @@ placeBomb model =
         canUse = me.directionalBlasting == 0
         newBomb = makeBomb (me.x, me.y)
         newBombs = newBomb :: model.bomb
-        newMe = {me|directionalBlasting = 1}
+        
+        nowaudio = me.addAudio
+        newaudio = nowaudio ++ ["./audio/DualWeapon.ogg"]
+        newMe = {me|directionalBlasting = 1,addAudio=newaudio}
     in
     if isUnlocked && canUse then
         {model|bomb = newBombs, myself = newMe}

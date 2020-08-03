@@ -23,14 +23,15 @@ isExplodeNow : Bomb -> Bool
 isExplodeNow bomb = 
     bomb.counter == 10
 
-bombTick : Bombs -> (Bombs, Bombs)
-bombTick bombs =
+bombTick : Bombs -> List String-> (Bombs, Bombs,List String)
+bombTick bombs nowaudio=
     let
         next b = {b|counter = b.counter - 1}
         newWaiting = List.map next bombs
         (explode, stillWait) = List.partition isExplodeNow newWaiting
+        newaudio=if explode /= [] then nowaudio ++ ["./audio/Explosion.ogg"] else nowaudio
     in
-        (stillWait, explode)
+        (stillWait, explode,newaudio)
 
 bombToExplosion : Bomb -> ExplosionEffect
 bombToExplosion bomb =
