@@ -230,7 +230,6 @@ update msg model =
         
         PlaceBomb ->
             (placeBomb model, Cmd.none)
-<<<<<<< HEAD
 
         WeaponChoosing weaponChoosingMsg ->
             (updateWeaponChoosing weaponChoosingMsg model, Cmd.none)
@@ -242,8 +241,7 @@ update msg model =
                 newModel = {model|myself={me|weaponUnlockSys={sys|active=True}},gameState=Paused}
             in
                 (newModel, Cmd.none)
-=======
->>>>>>> Wu_Qifei
+
 
         Noop ->
             let 
@@ -833,14 +831,6 @@ updateInvisibility model =
 placeBomb : Model -> Model
 placeBomb model =
     let
-<<<<<<< HEAD
-        me = model.myself
-        newBomb = makeBomb (me.x, me.y)
-        newBombs = newBomb :: model.bomb
-    in
-    {model|bomb = newBombs}
-
-=======
          
         me = model.myself
         skillSys = me.skillSys
@@ -855,7 +845,7 @@ placeBomb model =
     else
         model
     
->>>>>>> Wu_Qifei
+
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
     let
