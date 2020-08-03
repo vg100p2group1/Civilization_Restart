@@ -60,10 +60,10 @@ showSynthesis model =
                 [ style "background" "rgba(236, 240, 241, 0.89)"
                 , style "color" "#34495f"
                 , style "height" "400px"
-                , style "left" "140px"
+                , style "left" "230px"
                 -- , style "padding" "0 140px"
                 , style "position" "absolute"
-                , style "top" "155px"
+                , style "top" "250px"
                 , style "width" "680px"
                 , style "background-size" "100% 100%"
                 ]
