@@ -1,7 +1,8 @@
 
-module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion)
+module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion,ExplosionType(..))
 
 import Shape exposing (Circle)
+import Attributes exposing (getAttrName)
 
 
 type alias Bullet =
@@ -81,15 +82,31 @@ generateBullet : Weapon -> Bullet
 generateBullet weapon =
     let
         bullet =
+            let
+                -- d1=Debug.log "level" (getLevel weapon.level)
+                getLevel level =
+                    case level of 
+                        1 ->
+                            1.0
+                        2 ->
+                            1.5
+                        3 ->
+                            2.0
+                        4 ->
+                            2.3
+                        _ ->
+                            2.5
+                        
+            in
             case weapon.extraInfo of
                 Pistol ->
-                    bulletConfig
+                    {bulletConfig|force=20 * getLevel weapon.level}
                 Gatling ->
-                    {bulletConfig|force=30* toFloat weapon.level}
+                    {bulletConfig|force=30* getLevel weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* toFloat weapon.level,r=8}
+                    {bulletConfig|force=100* getLevel weapon.level}
                 Shotgun ->
-                    {bulletConfig|force=45* toFloat weapon.level,r=8}
+                    {bulletConfig|force=45* getLevel weapon.level}
                 NoWeapon ->
                     bulletConfig
     in
@@ -110,9 +127,15 @@ type alias ExplosionEffect =
         x : Float,
         y : Float,
         r : Float,
-        counter : Int
+        counter : Int,
+        explosionType : ExplosionType
     }
+
+type ExplosionType  
+            =BulletEffect
+            |BombEffect
+
 
 bulletToExplosion : Bullet -> ExplosionEffect 
 bulletToExplosion model = 
-    ExplosionEffect model.x model.y (model.r*2) 0
+    ExplosionEffect model.x model.y (model.r*2) 0 BulletEffect

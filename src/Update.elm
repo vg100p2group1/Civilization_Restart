@@ -242,7 +242,6 @@ update msg model =
             in
                 (newModel, Cmd.none)
 
-
         Noop ->
             let 
                 pTemp =  model.myself
@@ -393,9 +392,9 @@ animate  model =
         meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
         meCooling = coolSkills meHit
 
-        --debug
-        number = Debug.log "number of weapons" (List.length meHit.weapons)
-        number2 = Debug.log "unlocked weapons" (List.length meHit.weaponUnlockSys.unlockedWeapons)
+        -- --debug
+        -- number = Debug.log "number of weapons" (List.length meHit.weapons)
+        -- number2 = Debug.log "unlocked weapons" (List.length meHit.weaponUnlockSys.unlockedWeapons)
     in
         {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
@@ -729,9 +728,11 @@ hit bulletHit bulletAT me =
                 |> setCurrentAttr Health (totalHurt - armor)
             else
                 setCurrentAttr Health -(min totalHurt health) attr
+        currentArmor = getCurrentAttr Armor attr
+        maxArmor = getMaxAttr Armor attr
         armorRepair = 
             if totalHurt == 0 && modBy 60 me.counter == 0 then
-                10
+                min 10 (maxArmor - currentArmor)
             else
                 0
         currentClip = getCurrentAttr Clip attr
@@ -795,7 +796,7 @@ updateFlash model =
                 -- velocity decomposition
         cos = (posX - 500) / unitV
         sin = (posY - 500) / unitV
-        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (posX, posY) 0))
+        minDis_ = (Tuple.second (findMinPath model (posX, posY) 0))
         distance = min minDis_ 200
         newX = distance * cos + me.x
         newY = distance * sin + me.y
