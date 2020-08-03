@@ -211,7 +211,7 @@ skillShootingSkillI =
     { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill: Shooting SKill I in subsystem Berserker"
+    , desciption = "A good warrior should be good at hit skilling enemy without much aiming."
     , name = "Shooting Skill I"
     }
 
@@ -221,7 +221,7 @@ skillAmplifyDamageI =
     { id = 0
     , level = 2
     , unlocked = False
-    , desciption = "Skill: Amplify Damage I in subsystem Berserker"
+    , desciption = "Hit where you at, causing more damage."
     , name = "Amplify Damage I"
     }
 
@@ -230,7 +230,7 @@ skillShootingSkillII =
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill: Shooting SKill II in subsystem Berserker"
+    , desciption = "The only limitation to my shooting speed is the limitation of my gun"
     , name = "Shooting Skill II"
     }
 
@@ -241,7 +241,7 @@ skillAmplifyDamageII =
     { id = 1
     , level = 3
     , unlocked = False
-    , desciption = "Skill: Amplify Damage in subsystem Berserker"
+    , desciption = "Tons of damage to your enemy."
     , name = "Amplify Damage II"
     }
 
@@ -250,8 +250,8 @@ skillBattleFervor =
     { id = 0
     , level = 4
     , unlocked = False
-    , desciption = "Skill: Battle Fervor in subsystem Berserker"
-    , name = "Battle Fervor"
+    , desciption = "Berserkers will not be stopped by their wounds. Their enemies's lives do. You will cause more harm when your health is low."
+    , name = "  "
     }
 
 skillDualWield : Skill
@@ -259,7 +259,7 @@ skillDualWield =
     { id = 1
     , level = 4
     , unlocked = False
-    , desciption = "Skill: Dual Wield in subsystem Berserker"
+    , desciption = "The skill of using two weapon in the same time. That really needs lots of practice"
     , name = "Dual Wield"
     }
 

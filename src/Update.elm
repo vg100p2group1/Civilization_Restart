@@ -863,7 +863,6 @@ placeBomb model =
     else
         model
     
-
 findMinPath : Model -> (Float, Float)-> Float -> (Model, Float)
 findMinPath model (mouseX,mouseY) distance=
     let
