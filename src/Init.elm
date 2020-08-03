@@ -27,8 +27,5 @@ init =
         , isGameOver = False
         , pageState = WelcomePage
         , bomb = []
-<<<<<<< HEAD
         , wholeCounter = 0
-=======
->>>>>>> Wu_Qifei
         }
