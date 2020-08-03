@@ -25,6 +25,7 @@ import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowDoor exposing (showDoor)
 import Pages.About exposing (aboutView)
 import Shape exposing (recInit)
+import Display.Cool exposing (showSkillCooling)
 -- view model =
 --     playerDemonstrate model
 import Synthesis.ShowSynthesis exposing (showSynthesis)
@@ -43,6 +44,8 @@ import Pages.Story exposing (storyView)
 import Environment.ShowRoad exposing (showRoad,showMiddle)
 import Display.DisplayChoosingWeapon exposing (showWeaponChoosingSystem)
 import Animation.SkillEffect exposing (showSkillEffect,showBackEffect)
+import Display.Cool exposing (showSkillCooling)
+
 view : Model -> Html.Html Msg
 view model =
     case model.pageState of
@@ -92,7 +95,16 @@ gameView model =
                 -- , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
                 [showMiniMap model r] 
-            
+            ,   Html.div
+
+                [ Html.Attributes.style "top" (String.fromFloat (100*r) ++ "px")
+                , Html.Attributes.style "left" "0px"
+                , Html.Attributes.style "width" (String.fromFloat (500*r) ++ "px")
+                , Html.Attributes.style "height" (String.fromFloat (500*r) ++ "px")
+                -- , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
+                ]
+                [showSkillCooling model r] 
+
             , Html.div
                 [ style "right" "0px"
                 , style "top" "0px"

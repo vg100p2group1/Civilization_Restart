@@ -8,7 +8,7 @@ import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
 import Svg 
 import Svg.Attributes 
-import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
+import Skill exposing (getCurrentSubSystem, Skill, unlockChosen,getCurrentSkillName)
 
 showSkill : Model -> Html Msg
 showSkill model =
@@ -24,6 +24,8 @@ showSkill model =
             sysName = curr.name
             currentCost = (Tuple.second (unlockChosen curr))
             chosenCanUnlock = currentCost > 0 && currentCost <= sys.points 
+            -- (id,level) = curr.chosen
+            skillName = getCurrentSkillName curr
         in
             div
             [ style "background" "rgba(236, 240, 241, 0.89)"
@@ -48,9 +50,10 @@ showSkill model =
             ]]
             ,div[style "margin-top" "-20px"
                 , style "margin-left" "350px"]
-                [ div [style "margin-left" "65px", style "margin-top" "-30px",style "font-size" "15px" ] [text <| "Points Left: "++ points]
-                , div[ style "margin" "5px 10px 5px 10px"
-                , style "height" "200px"
+                [ div [style "margin-left" "-110px", style "text-align" "center",style "font-size" "20px" ] [text  skillName]
+                , div [style "margin-left" "65px", style "margin-top" "15px",style "font-size" "15px" ] [text <| "Points Left: "++ points]
+                , div[ style "margin" "25px 10px 10px 10px"
+                , style "height" "150px"
                 , style "width" "200px"
                 , style "background" "#FFF"]
                 [text txt]
