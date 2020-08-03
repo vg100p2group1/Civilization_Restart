@@ -6,8 +6,8 @@ import Skill exposing (getCurrentSubSystem, Skill, unlockChosen)
 import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
 import Messages exposing (Msg(..), SkillMsg(..),PageMsg(..))
 import Attributes exposing (Attr, AttrType(..), getCurrentAttr, getMaxAttr, getAttrName)
-import Html exposing (Html, div, text, button, progress)
-import Html.Attributes exposing (style, disabled)
+import Html exposing (Html, div, text, button, progress,img)
+import Html.Attributes exposing (style, disabled,src)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
 import Svg 
@@ -24,22 +24,28 @@ import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowDoor exposing (showDoor)
 import Pages.About exposing (aboutView)
--- view : Model -> Html.Html Msg
+import Shape exposing (recInit)
+import Display.Cool exposing (showSkillCooling)
 -- view model =
 --     playerDemonstrate model
 import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
+import Display.DisplayTraining exposing (showTraining)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
 import Environment.ShowGate exposing (showGate)
 import Environment.ShowDoor exposing (showDoor)
+
 import Pages.Welcome exposing (welcomeView)
 import Pages.About exposing (aboutView)
 import Pages.Help exposing (helpView)
 import Pages.Story exposing (storyView)
-
+import Environment.ShowRoad exposing (showRoad,showMiddle)
+import Display.DisplayChoosingWeapon exposing (showWeaponChoosingSystem)
+import Animation.SkillEffect exposing (showSkillEffect,showBackEffect)
+import Display.Cool exposing (showSkillCooling)
 
 view : Model -> Html.Html Msg
 view model =
@@ -69,6 +75,18 @@ gameView model =
 
             else
                 Basics.min 1 (w / configheight)
+        
+        r3 =
+            if w / h > 1 then
+                Basics.min 1 (h / 230)
+
+            else
+                Basics.min 1 (w / 170)
+        rTemp =
+            if r<1 then 
+             2*r
+            else
+             r
     in
         Html.div
             [ Html.Attributes.style "width" "100%"
@@ -79,28 +97,12 @@ gameView model =
             , Html.Attributes.style "background" "linear-gradient(135deg, rgba(206,188,155,1) 0%, rgba(85,63,50,1) 51%, rgba(42,31,25,1) 100%)"
             , Html.Attributes.style "overflow" "scroll"
             , Html.Attributes.style "overflow-x" "hidden"
+
             ]
 
-            [ Html.div
+            [ 
 
-                [ Html.Attributes.style "top" "0px"
-                , Html.Attributes.style "left" "0px"
-                , Html.Attributes.style "width" (String.fromFloat (500*r) ++ "px")
-                , Html.Attributes.style "height" (String.fromFloat (500*r) ++ "px")
-                -- , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
-                ]
-                [showMiniMap model r] 
-            
-            , Html.div
-                [ style "right" "0px"
-                , style "top" "0px"
-                , style "position" "absolute"
-                , Html.Attributes.style "transform-origin" "100% 0 0"
-                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
-                ]
-                [showAttr model.myself.attr r]
-
-            , Html.div
+              Html.div
                 [ 
                     Html.Attributes.style "width" (String.fromFloat configwidth ++ "px")
                     , Html.Attributes.style "height" (String.fromFloat configheight ++ "px")
@@ -111,6 +113,61 @@ gameView model =
                     , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
                 ]
                 [playerDemonstrate model]
+            
+            , Html.div
+
+                [ 
+                  style "background" "rgba(236, 240, 241, 0.3)"
+                , style "color" "#34495f"
+                , Html.Attributes.style "left" (String.fromFloat ((w - configwidth*r) / 2) ++ "px")
+                , Html.Attributes.style "top" (String.fromFloat ((h - configheight*r) / 2) ++ "px")
+                , style "position" "absolute"
+                , style "padding" "50px"
+                , style "width" "550px"
+                , style "height" "550px"
+                , style "background-size" "100% 100%"
+                , Html.Attributes.style "transform-origin" "0% 0%"
+                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat (r*0.5) ++ ")")
+                ]
+                [showMiniMap model 1] 
+
+
+
+            ,Html.div
+
+                [ 
+                  style "background" "rgba(236, 240, 241, 0.3)"
+                , style "color" "#34495f"
+                , Html.Attributes.style "left" (String.fromFloat ((w - configwidth*r) / 2) ++ "px")
+                , Html.Attributes.style "bottom" (String.fromFloat ((h - configheight*r) / 2) ++ "px")
+                , style "position" "absolute"
+                , style "width" "310px"
+                , style "height" "70px"
+                , style "background-size" "100% 100%"
+                , style "padding-top" "10px"
+                , style "padding-bottom" "10px"
+                , style "padding-left" "10px"
+                , Html.Attributes.style "transform-origin" "0% 100%"
+                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
+                ]
+                [showSkillCooling model 1] 
+            
+            ,Html.div
+                [ 
+                  style "background" "rgba(236, 240, 241, 0.3)"
+                , style "color" "#34495f"
+                , Html.Attributes.style "left" (String.fromFloat ((w - configwidth*r) / 2 +(1000-230)*r) ++ "px")
+                , Html.Attributes.style "top" (String.fromFloat ((h - configheight*r) / 2) ++ "px")
+                , style "position" "absolute"
+                , style "width" "230px"
+                , style "height" "170px"
+                , style "background-size" "100% 100%"
+                -- , style "margin-right" <| (String.fromFloat (-20*r3)) ++ "px" 
+                -- , style "padding" "10px"
+                , Html.Attributes.style "transform-origin" "0% 0%"
+                , Html.Attributes.style "transform" ("scale(" ++ String.fromFloat r ++ ")")
+                ]
+                [showAttr model.myself.attr 1] 
             ]
 
 
@@ -125,10 +182,10 @@ playerDemonstrate model =
         Html.div
         []
         [ Html.div 
-            [ Html.Attributes.style "width" "100%"
-            , Html.Attributes.style "height" "100%"
-            , Html.Attributes.style "float" "left"
-            , Html.Attributes.style "border" "outset"
+            [ Html.Attributes.style "width" "1000"
+            , Html.Attributes.style "height" "1000"
+            -- , Html.Attributes.style "float" "left"
+            -- , Html.Attributes.style "border" "outset"
             ]
             [Svg.svg 
                 [ Mouse.onMove(.clientPos>>MouseMove)
@@ -138,24 +195,40 @@ playerDemonstrate model =
                 , Svg.Attributes.height "1000"
                 , Svg.Attributes.viewBox <| "0 0 " ++ gWidth ++ " " ++ gHeight
                 ]
-              ([defines]++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++ [me model.myself] ++ [showGun model.myself]  ++ showExplosion model.explosionViewbox)
+              ([defines]++ backgroundEntire model.viewbox ++ showFloor model ++ showBullets model.bulletViewbox ++ showMap model.viewbox ++  showBackEffect model
+                ++ [me model.myself] ++ [showGun model.myself]  ++showSkillEffect model ++ showExplosion model.explosionViewbox)
             ]
             , showDialogue model 0
             , showSkill model
             , showSynthesis model
             , showGameOver model
+            , showWeaponChoosingSystem model
+            , showTraining model
         ]
 
-
+backgroundEntire : Map ->  List (Svg.Svg Msg)
+backgroundEntire model=
+    let
+        roads = model.roads
+        background = showMiddle roads
+        backCanvas = displayRec [Rectangle 0 0 1000 1000 recInit]
+    in
+        backCanvas ++ background 
 
 showMap : Map -> List (Svg.Svg Msg)
 showMap model =
     let
-       walls = showWalls <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value.position))) model.walls
+    --    walls = showWalls <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value.position))) model.walls
     --    d2=Debug.log "walls List" model.walls
     --    d1=Debug.log "walls" <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.walls
        
-       roads = displayRec <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value))) model.roads
+       --<| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))
+       
+       roads = 
+            if List.isEmpty (List.filter (\value -> value.enable) model.doors) then
+                showRoad model.roads
+            else 
+                []
 
        doors = showDoor <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge  (recUpdate value.position))) model.doors
        obstacles = showObstacle  <| List.filter (\value-> recCollisionTest  (Rec 0 0 1000 1000) (.edge (recUpdate value)))  model.obstacles
@@ -167,7 +240,7 @@ showMap model =
        gate = showGate model.gate -- To
     --    d = Debug.log "gateshow" model.gate
     in
-       walls ++ doors ++ roads ++ obstacles ++ monsters ++ [gate] ++ treasure ++ boss
+       roads ++ doors  ++ obstacles ++ monsters ++ [gate] ++ treasure ++ boss
     --    walls++gate
 
 
@@ -200,7 +273,7 @@ displayDoors doors =
                     if door.enable then
                         "black"
                     else
-                        "grey"
+                        "orange"
                 model = door.position
             in 
                 Svg.rect 
@@ -256,16 +329,14 @@ displayBoss boss =
                 opacity = String.fromFloat (bossType.hp / 500)
                 
 
-                bossColor =bossType.color
+                bossurl =bossType.url
             in
                 
-                Svg.rect
+                Svg.use
                     [ Svg.Attributes.x <| String.fromFloat model.x
                     , Svg.Attributes.y <| String.fromFloat model.y
-                    , Svg.Attributes.width <| String.fromFloat model.width
-                    , Svg.Attributes.height <| String.fromFloat model.height
-                    , Svg.Attributes.fill bossColor
-                    , Svg.Attributes.fillOpacity opacity
+                    , Svg.Attributes.xlinkHref bossurl
+                    -- , Svg.Attributes.fillOpacity opacity
                 
                     ]
                 []
@@ -396,7 +467,12 @@ showAttr attr r=
     -- , style "position" "absolute"
         -- style "hight" "500px"
     ]
-    (List.map (makeProgress attr r) [Health, Clip, Armor, Attack, Speed, ShootSpeed])
+    ([
+        img[style "position" "absolute", style "margin-left" "15px",style "margin-top" "15px", style "width" "30px", style "height" "30px",src "./images/Attr/Health.png"][]
+       ,img[style "position" "absolute", style "margin-left" "15px",style "margin-top" "75px", style "width" "30px", style "height" "30px",src "./images/Attr/Armor.png"][]
+       ,img[style "position" "absolute", style "margin-left" "15px",style "margin-top" "135px",  style "width" "35px", style "height" "35px",src "./images/Attr/Bullet.png"][]
+    ]++List.map (makeProgress attr r) [Health, Armor,Clip])
+    -- ++(List.map (makeProgress attr r) [Health, Clip, Armor])
 
 makeProgress : Attr -> Float -> AttrType -> Html Msg
 makeProgress attr r t =
@@ -405,11 +481,11 @@ makeProgress attr r t =
         valueAttr = String.fromFloat <| (toFloat <| getCurrentAttr t attr) * r
     in
     div 
-    [style "margin" "20px"]
+    [style "margin-left" "67px",style "margin-bottom" "20px"]
     [ div
-        [style "width" "50px", style "font-size" "10px"]
+        [style "width" "50px", style "font-size" "20px",style "color" "Black"]
         [text (getAttrName t ++ ":")]
-    , progress
+      , progress
         [ Html.Attributes.max maxAttr
         , Html.Attributes.value valueAttr
         ]

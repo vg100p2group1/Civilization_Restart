@@ -27,7 +27,6 @@ showRooms roomLeft me number svgList =
                     roomConfig
         
         svgNew = svgList ++ (showOneRoom roomNow me)
-
     in
         if (number==0) then
             svgList
@@ -49,7 +48,7 @@ showOneRoom room me=
         -- roomFloor = showRoomFloor xBegin xBegin yBegin num num [] 
         roomFloor = showOneFloor xBegin yBegin 
     in
-        [roomFloor]
+        [showOneLight xBegin yBegin,roomFloor]
 
 -- showRoomFloor : Float -> Float -> Float -> Float -> Float -> List (Svg.Svg Msg) -> List (Svg.Svg Msg)
 -- showRoomFloor xBegin x y numX numY svgList=
@@ -70,3 +69,9 @@ showOneFloor x y =
         Svg.use [Svg.Attributes.xlinkHref "#Floor1"
                 ,Svg.Attributes.x <| String.fromFloat x
                 ,Svg.Attributes.y <| String.fromFloat y][]
+
+showOneLight : Float -> Float -> Svg.Svg Msg
+showOneLight x y =
+        Svg.use [Svg.Attributes.xlinkHref "#Light"
+                ,Svg.Attributes.x <| String.fromFloat (x-200)
+                ,Svg.Attributes.y <| String.fromFloat (y-200)][]

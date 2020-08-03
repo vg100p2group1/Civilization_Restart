@@ -1,5 +1,5 @@
 module Update exposing (update)
-import Messages exposing (Msg(..),ShiftMsg(..),PageMsg(..))
+import Messages exposing (Msg(..),ShiftMsg(..),PageMsg(..),WeaponChoosingMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..),Page(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
 import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door)
@@ -26,6 +26,7 @@ import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryFiel
 import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
+import UpdateTraining exposing (updateTraining)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -49,8 +50,9 @@ update msg model =
             let 
                 pTemp = model.myself 
                 me= {pTemp | moveLeft = on, moveRight =  False, preDirection=DirectionLeft}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model|myself= me,trainingSession={training|hasMovedLeft=True}}
                 , Cmd.none
                 )
 
@@ -58,8 +60,9 @@ update msg model =
             let 
                 pTemp =  model.myself
                 me= {pTemp | moveRight = on, moveLeft = False, preDirection=DirectionRight}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model| myself= me,trainingSession={training|hasMovedLeft=True}}
                 , Cmd.none
                 )
 
@@ -67,8 +70,9 @@ update msg model =
             let
                 pTemp =  model.myself 
                 me= {pTemp | moveUp = on, moveDown =  False}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model| myself= me,trainingSession={training|hasMovedUp=True}}
                 , Cmd.none
                 )
 
@@ -76,8 +80,9 @@ update msg model =
             let 
                 pTemp =  model.myself
                 me= {pTemp | moveDown = on, moveUp = False}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model| myself= me,trainingSession={training|hasMovedUp=True}}
                 , Cmd.none
                 )
         
@@ -102,13 +107,14 @@ update msg model =
             let
                 pTemp = model.myself
                 me = {pTemp | fire = True}
+                training = model.trainingSession
                 {-
                 newShoot = fireBullet model.myself.currentWeapon me.mouseData (me.x,me.y)
                 newBullet = newShoot ++ model.bullet
                 -}
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
-                ({model|myself = me},Cmd.none)
+                ({model|myself = me,trainingSession={training|hasFired=True}},Cmd.none)
         
         MouseUp ->
             let
@@ -124,9 +130,16 @@ update msg model =
                         roomNew =
                             roomGenerator (model.storey+1) (initialSeed model.myself.time) 
 
+                        -- d1=Debug.log "room" (List.map (\value -> value.position) <| Tuple.first roomNew)
+
                         (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
-                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr}
+                        weaponUnlockSys = meTemp.weaponUnlockSys
+                        newSys = if model.storey >= 1 && model.storey <= 4 then
+                                    {weaponUnlockSys|active=True}
+                                 else
+                                    weaponUnlockSys
+                        meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr,weaponUnlockSys=newSys}
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
@@ -138,11 +151,17 @@ update msg model =
                                 meTemp = model.myself
                                 package = meTemp.package
                                 newPackage = packageUpdate package t
+                                nowSkill = meTemp.skillSys
+
+                                nowPoints = nowSkill.points
+
+                                newSkill =  if t.treasureType.level == 4 then {nowSkill| points = nowPoints + 4} else nowSkill
+
                                 newTreasureList = List.filter (\value->value/=t) model.map.treasure
                                 mapTemp = model.map
                                 mapNew = {mapTemp|treasure=newTreasureList}
                             in
-                                ({model|myself={meTemp|package=newPackage},map=mapNew},Cmd.none)
+                                ({model|myself={meTemp|package=newPackage,skillSys = newSkill},map=mapNew},Cmd.none)
                         _ ->
                             (model, Cmd.none)
             else
@@ -157,10 +176,18 @@ update msg model =
                     else
                         (animate model, Cmd.none)
                 else 
-                    (model, Cmd.none)
+                    ({model|wholeCounter=model.wholeCounter+1}, Cmd.none)
 
-        NextSentence ->
-            (updateSentence 0 model, Cmd.none)
+        NextMsg ->
+            if model.state == Dialogue then
+                (updateSentence 0 model, Cmd.none)
+            else if model.state == OnTraining && model.trainingSession.step == 6 then
+            let
+                training = model.trainingSession
+            in
+                ({model|state=Others,trainingSession={training|step=7}}, Cmd.none)
+            else
+                (model, Cmd.none)
 
         -- the dialogue should be displayed when the player enters a new room actually
         ShowDialogue ->
@@ -176,9 +203,9 @@ update msg model =
             if model.gameState == Playing then
                 case shiftMsg of
                     Next ->
-                        (changeWeapon (modBy 4 model.myself.currentWeapon.number) model, Cmd.none)
+                        (changeWeapon (modBy (List.length model.myself.weapons) model.myself.currentWeapon.number) model, Cmd.none)
                     Previous ->
-                        (changeWeapon (modBy 4 (model.myself.currentWeapon.number - 2)) model, Cmd.none)
+                        (changeWeapon (modBy (List.length model.myself.weapons) (model.myself.currentWeapon.number - 2)) model, Cmd.none)
             else
                 (model, Cmd.none)
 
@@ -217,6 +244,17 @@ update msg model =
         
         PlaceBomb ->
             (placeBomb model, Cmd.none)
+
+        WeaponChoosing weaponChoosingMsg ->
+            (updateWeaponChoosing weaponChoosingMsg model, Cmd.none)
+
+        UnlockTrigger ->
+            let
+                me = model.myself
+                sys = me.weaponUnlockSys
+                newModel = {model|myself={me|weaponUnlockSys={sys|active=True}},gameState=Paused}
+            in
+                (newModel, Cmd.none)
 
         Noop ->
             let 
@@ -331,7 +369,7 @@ animate  model =
                                     ([], model.myself.currentWeapon)
                              else
                                 ([], model.myself.currentWeapon)
-        newAttr = setCurrentAttr Clip -(List.length newShoot) attr
+        newAttr = setCurrentAttr Clip (-(List.length newShoot) * weapon.cost) attr
         weaponCounter =
             if weapon.counter <= 0 then
                 0
@@ -367,8 +405,12 @@ animate  model =
         newState = updateState model
         meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
         meCooling = coolSkills meHit
+
+        -- --debug
+        -- number = Debug.log "number of weapons" (List.length meHit.weapons)
+        -- number2 = Debug.log "unlocked weapons" (List.length meHit.weaponUnlockSys.unlockedWeapons)
     in
-        {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
+        updateTraining {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead, bomb = newBomb}
 
@@ -413,7 +455,7 @@ speedCase me map collideDoor=
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
         collideType = wallCollisionTest (Circle newXTemp newYTemp 20) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
-            -- ++(List.map (\t->t.position) collideDoor)
+             ++(List.map (\t->t.position) collideDoor)
             ) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"
@@ -657,8 +699,11 @@ updateState model =
                 PickTreasure getTreasure
             else if model.state == Dialogue then
                 Dialogue 
+            else if model.trainingSession.step <= 6 then
+                OnTraining
             else
                 Others
+
     in
         newState
 
@@ -768,7 +813,7 @@ updateFlash model =
                 -- velocity decomposition
         cos = (posX - 500) / unitV
         sin = (posY - 500) / unitV
-        minDis_ = Debug.log "minimum distance" (Tuple.second (findMinPath model (posX, posY) 0))
+        minDis_ = (Tuple.second (findMinPath model (posX, posY) 0))
         distance = min minDis_ 200
         newX = distance * cos + me.x
         newY = distance * sin + me.y
@@ -845,6 +890,7 @@ findMinPath model (mouseX,mouseY) distance=
                 in
                     (newModel, newDistance)
 
+
 coolSkills : Me -> Me
 coolSkills me =
     let
@@ -863,3 +909,53 @@ coolSkills me =
         , absoluteTerrifyField = cool me.absoluteTerrifyField 100
         , invisible= cool me.invisible 100
         , directionalBlasting = cool me.directionalBlasting 1200}
+
+updateWeaponChoosing : WeaponChoosingMsg -> Model -> Model
+updateWeaponChoosing msg model =
+    let
+        me = model.myself
+        unlockSys = me.weaponUnlockSys
+        canUnlock = List.length unlockSys.unlockedWeapons < model.storey
+    in
+    case msg of
+        CloseWindow ->
+            let
+                newUnlockSys = {unlockSys|active=False}
+                newMe = {me|weaponUnlockSys=newUnlockSys}
+            in
+            {model|state=Others,gameState=Playing,myself=newMe}
+        ChoosingWeapon weaponMsg ->
+            {model|myself={me|weaponUnlockSys={unlockSys|chosen=weaponMsg}}}
+        UnlockWeapon ->
+            if canUnlock then
+                if not (List.member unlockSys.chosen (List.map (\w -> w.extraInfo) unlockSys.unlockedWeapons)) then
+                case unlockSys.chosen of
+                    Gatling ->
+                        let
+                            newWeapon_ = Maybe.withDefault defaultWeapon (List.head (List.drop 1 me.arsenal))
+                            newWeapon = {newWeapon_|number=List.length unlockSys.unlockedWeapons + 1}
+                            newMe = {me|weapons=List.append me.weapons [newWeapon],weaponUnlockSys={unlockSys|unlockedWeapons=List.append me.weapons [newWeapon]}}
+                        in
+                            {model|myself=newMe}
+                    Mortar ->
+                        let
+                            newWeapon_ = Maybe.withDefault defaultWeapon (List.head (List.drop 2 me.arsenal))
+                            newWeapon = {newWeapon_|number=List.length unlockSys.unlockedWeapons + 1}
+                            newMe = {me|weapons=List.append me.weapons [newWeapon],weaponUnlockSys={unlockSys|unlockedWeapons=List.append me.weapons [newWeapon]}}
+                        in
+                            {model|myself=newMe}
+                    Shotgun ->
+                        let
+                            newWeapon_ = Maybe.withDefault defaultWeapon (List.head (List.drop 3 me.arsenal))
+                            newWeapon = {newWeapon_|number=List.length unlockSys.unlockedWeapons + 1}
+                            newMe = {me|weapons=List.append me.weapons [newWeapon],weaponUnlockSys={unlockSys|unlockedWeapons=List.append me.weapons [newWeapon]}}
+                        in
+                            {model|myself=newMe}
+                    Pistol ->
+                        model
+                    NoWeapon ->
+                        model
+                else
+                    model
+            else
+                model

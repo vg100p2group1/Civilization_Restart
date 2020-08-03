@@ -1,15 +1,18 @@
 
-module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState, defaultMe, sentenceInit,mapToViewBox, GameState(..),Page(..))
+module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState,
+                       defaultMe, sentenceInit,mapToViewBox, GameState(..), WeaponUnlockSys,Page(..),defaultTraining,
+                       TrainingSession)
 import Random
 import Map.Map exposing(Room,Map,Treasure)
 import Shape exposing (Circle)
-import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect)
+import Weapon exposing (Bullet,Weapon,weaponList,defaultWeapon,ExplosionEffect,Arsenal(..))
 import Config exposing (playerSpeed,viewBoxMax)
 import Skill exposing (SkillSystem, defaultSystem)
 import Attributes exposing (Attr,defaultAttr)
 import Synthesis.Package exposing (Package,packageInit)
 import Synthesis.SynthesisSystem exposing (SynthesisSubSystem,defaultSynthesisSubSystem)
 import Bomb exposing (Bombs)
+import Dict exposing (Dict)
 type alias Me =
     { x : Float
     , y : Float
@@ -43,6 +46,24 @@ type alias Me =
     , synthesis : SynthesisSubSystem
     , package : Package 
     , time : Int
+    , arsenal : List Weapon
+    , weaponUnlockSys : WeaponUnlockSys
+    }
+
+type alias WeaponUnlockSys =
+    { active : Bool
+    , canUnlockWeapon : Bool
+    , chosen : Arsenal
+    , unlockedWeapons : List Weapon
+    , tip : String
+    }
+
+defaultWeaponUnlockSys =
+    { active = False
+    , canUnlockWeapon = True
+    , chosen = NoWeapon
+    , unlockedWeapons = [defaultWeapon]
+    , tip = ""
     }
 
 type Direction
@@ -70,7 +91,7 @@ defaultMe =
     , invisible = 0
     , directionalBlasting = 0
     , hitBox = Circle 500 500 20
-    , weapons = weaponList
+    , weapons = [defaultWeapon]
     , currentWeapon = defaultWeapon
     , counter = 0
     , url = ""
@@ -81,6 +102,8 @@ defaultMe =
     , synthesis = defaultSynthesisSubSystem
     , package = packageInit 
     , time = 0
+    , arsenal = weaponList
+    , weaponUnlockSys = defaultWeaponUnlockSys
     }
 
 type alias Model =
@@ -101,6 +124,41 @@ type alias Model =
     , isGameOver : Bool
     , pageState : Page
     , bomb : Bombs
+    , wholeCounter : Int
+    , trainingSession : TrainingSession
+    }
+
+type alias TrainingSession =
+    { step : Int
+    , hasMovedLeft : Bool
+    , hasMovedUp : Bool
+    , hasFired : Bool
+    , hasB : Bool
+    , hasR: Bool
+    , tips : Dict Int String
+    }
+
+
+defaultTips : Dict Int String
+defaultTips = Dict.fromList
+              [ (1, "Press A and D to Move Left and Right")
+              , (2, "Press W and S to Move Up and Down")
+              , (3, "Clicking the mouse to Shoot")
+              , (4, "Press B to Open the Skill Tree System")
+              , (5, "Press R to open the Synthesis System")
+              , (6, "Press Enter to Start your adventure!")
+              ]
+
+
+defaultTraining : TrainingSession
+defaultTraining =
+    { step = 1
+    , hasMovedLeft = False
+    , hasMovedUp = False
+    , hasFired = False
+    , hasB = False
+    , hasR = False
+    , tips = defaultTips
     }
 
 type Page = WelcomePage
@@ -115,6 +173,7 @@ type State = Dialogue
            | PickTreasure Treasure
            | SynthesisSys
            | SkillSys
+           | OnTraining
            | Others
 
 type GameState = Paused

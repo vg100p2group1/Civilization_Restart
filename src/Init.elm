@@ -2,7 +2,8 @@ module Init exposing (init)
 
 import Map.MapDisplay exposing (mapInit)
 import Map.MapGenerator exposing (roomInit)
-import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..),Page(..))
+import Model exposing (Model, defaultMe, State(..), Sentence, Side(..), Role(..), sentenceInit,mapToViewBox,GameState(..),Page(..),
+                       defaultTraining)
 
 init : Model
 init =
@@ -17,7 +18,7 @@ init =
         , rooms = (roomNew,Tuple.second roomInit)
         , viewbox = mapToViewBox defaultMe mapNew
         , size = (0, 0)
-        , state = Others
+        , state = OnTraining
         , currentDialogues = [{sentenceInit | text = "hello", side = Left}, {sentenceInit | text = "bad", side = Right}, {sentenceInit | text = "badddddd", side = Left}, {sentenceInit | text = "good", side = Right}]
         , explosion = []
         , explosionViewbox = []
@@ -27,4 +28,6 @@ init =
         , isGameOver = False
         , pageState = WelcomePage
         , bomb = []
+        , wholeCounter = 0
+        , trainingSession = defaultTraining
         }

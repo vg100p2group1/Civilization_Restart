@@ -28,13 +28,15 @@ showSynthesis model =
         getUrl =
             case weaponNow.extraInfo of 
                 Pistol -> 
-                    "./images/Gun/UI1.png"
+                    "./images/Gun/Pistol.png"
                 Gatling ->
-                    "./images/Gun/UI2.png"
+                    "./images/Gun/Gatling.png"
                 Mortar ->
-                    "./images/Gun/UI3.png"
+                    "./images/Gun/Mortar.png"
                 Shotgun ->
-                    "./images/Gun/UI4.png"
+                    "./images/Gun/Shotgun.png"
+                NoWeapon ->
+                    ""
         
         getName =
             case weaponNow.extraInfo of 
@@ -46,6 +48,8 @@ showSynthesis model =
                     "Mortar"
                 Shotgun ->
                     "Shotgun"
+                NoWeapon ->
+                    ""
         
         package = model.myself.package
         materialNeeded = getWeaponMaterial weaponNow
@@ -56,10 +60,10 @@ showSynthesis model =
                 [ style "background" "rgba(236, 240, 241, 0.89)"
                 , style "color" "#34495f"
                 , style "height" "400px"
-                , style "left" "140px"
+                , style "left" "230px"
                 -- , style "padding" "0 140px"
                 , style "position" "absolute"
-                , style "top" "155px"
+                , style "top" "250px"
                 , style "width" "680px"
                 , style "background-size" "100% 100%"
                 ]

@@ -1,7 +1,7 @@
 
 module Skill exposing (SkillSystem, SkillSubSystem, Skill, defaultSystem, switchSubSystem, choose, unlockChosen, canUnlockLevel
                       ,getCurrentSubSystem, getSubSys, getSkill,skillState,subSysBerserker,subSysMechanic,skillDualWield,skillAbsoluteTerritoryField
-                      ,subSysPhantom,skillFlash, skillInvisible, skillDirectionalBlasting)
+                      ,subSysPhantom,skillFlash, skillInvisible, skillDirectionalBlasting,skillBattleFervor,getCurrentSkillName)
 
 type alias SkillSystem = 
     { subsys : List SkillSubSystem
@@ -28,7 +28,7 @@ type alias Skill =
     }
 
 emptySkill : Skill
-emptySkill = Skill -1 1000 False "Nothing" "Empty Skill"
+emptySkill = Skill -1 1000 False "Nothing" "Empty"
 
 getCurrentSubSystem : SkillSystem -> SkillSubSystem
 getCurrentSubSystem sys = 
@@ -102,7 +102,7 @@ skillSpeedUpI =
     { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill: Speed Up! I in subsystem Phantom"
+    , desciption = "Move faster."
     , name = "Speed Up! I"
     }
 
@@ -111,7 +111,7 @@ skillMissI =
     { id = 0
     , level = 2
     , unlocked = False
-    , desciption = "Skill: Miss I in subsystem Phantom"
+    , desciption = "Be sensitive to the danger and have possibility to avoid being shot."
     , name = "Miss I"
     }
 
@@ -120,7 +120,7 @@ skillSpeedUpII =
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill: Speed Up! II in subsystem Phantom"
+    , desciption = "Move even faster."
     , name = "Speed Up! II"
     }
 
@@ -129,7 +129,7 @@ skillMissII =
     { id = 1
     , level = 3
     , unlocked = False
-    , desciption = "Skill: Miss II in subsystem Phantom"
+    , desciption = "Be extreme sensitive to the danger and have higher possibility to avoid being shot."
     , name = "Miss II"
     }
 
@@ -138,8 +138,8 @@ skillFlash =
     { id = 0
     , level = 4
     , unlocked = False
-    , desciption = "Skill: Flash in subsystem Phantom"
-    , name = "Flash"
+    , desciption = "The ulimate technology of the lost empire. The miniaturized space jump equipment enables the user to flash to the nearby place immediately."
+    , name = "Space Jump"
     }
 
 skillInvisible : Skill
@@ -147,7 +147,7 @@ skillInvisible =
     { id = 1
     , level = 4
     , unlocked = False
-    , desciption = "Skill: Invisible in subsystem Phantom"
+    , desciption = "Release a group of nano-robot which can prevent yourself from being detected by the robots."
     , name = "Invisible"
     }
 
@@ -315,7 +315,7 @@ defaultSystem : SkillSystem
 defaultSystem =
     { subsys = [subSysPhantom, subSysMechanic, subSysBerserker]
     , current = 0
-    , points = 30
+    , points = 20
     , active = False
     }
 
@@ -333,3 +333,11 @@ skillState subId skillId skillLevel subsystems subSys skill =
               |> .unlocked
     in
         bool
+
+getCurrentSkillName : SkillSubSystem -> String
+getCurrentSkillName sub =
+    let
+        position = sub.chosen
+        skill = getSkill sub position
+    in
+        skill.name

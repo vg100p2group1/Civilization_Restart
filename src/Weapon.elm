@@ -1,7 +1,8 @@
 
-module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion)
+module Weapon exposing (Bullet,WeaponInfo,Weapon,defaultWeapon,ShooterType(..),bulletConfig,weaponList,generateBullet,Arsenal(..),ExplosionEffect,bulletToExplosion,ExplosionType(..))
 
 import Shape exposing (Circle)
+import Attributes exposing (getAttrName)
 
 
 type alias Bullet =
@@ -27,10 +28,12 @@ type Arsenal
     | Gatling
     | Mortar
     | Shotgun
+    | NoWeapon
 
 type alias Weapon = 
     { bulletGenerator : WeaponInfo -> Bullet
     , extraInfo : Arsenal
+    , info : String
     , name : String
     -- newly added
     , number : Int
@@ -44,15 +47,17 @@ type alias Weapon =
     , hasFired : Bool
     , level : Int
     , shiftCounter : Float
+    , cost : Int
     }
 
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 5 (Circle 500 500 5) 0 0 False Player 20
+bulletConfig = Bullet 500 500 8 (Circle 500 500 8) 0 0 False Player 20
 
 defaultWeapon : Weapon
 defaultWeapon =
     { bulletGenerator = defaultBulletGenerator
     , extraInfo = Pistol
+    , info = "Weak Weapons"
     , name  = "Pistol"
     -- newly added
     , number = 1
@@ -66,6 +71,7 @@ defaultWeapon =
     , hasFired = False
     , level = 1
     , shiftCounter = 0
+    , cost = 0
     }
 
 defaultBulletGenerator : WeaponInfo -> Bullet
@@ -76,15 +82,33 @@ generateBullet : Weapon -> Bullet
 generateBullet weapon =
     let
         bullet =
+            let
+                -- d1=Debug.log "level" (getLevel weapon.level)
+                getLevel level =
+                    case level of 
+                        1 ->
+                            1.0
+                        2 ->
+                            1.5
+                        3 ->
+                            2.0
+                        4 ->
+                            2.3
+                        _ ->
+                            2.5
+                        
+            in
             case weapon.extraInfo of
                 Pistol ->
-                    bulletConfig
+                    {bulletConfig|force=20 * getLevel weapon.level}
                 Gatling ->
-                    {bulletConfig|force=30* toFloat weapon.level}
+                    {bulletConfig|force=30* getLevel weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* toFloat weapon.level,r=5}
+                    {bulletConfig|force=100* getLevel weapon.level}
                 Shotgun ->
-                    {bulletConfig|force=45* toFloat weapon.level,r=5}
+                    {bulletConfig|force=45* getLevel weapon.level}
+                NoWeapon ->
+                    bulletConfig
     in
         bullet
 
@@ -92,11 +116,10 @@ weaponList : List Weapon
 weaponList =
     let
         pistol = defaultWeapon
-        gatling = Weapon defaultBulletGenerator Gatling "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0
-        mortar = Weapon defaultBulletGenerator Mortar "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0
-        shotgun = Weapon defaultBulletGenerator Shotgun "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0
+        gatling = Weapon defaultBulletGenerator Gatling "2" "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0 1
+        mortar = Weapon defaultBulletGenerator Mortar "3" "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 5
+        shotgun = Weapon defaultBulletGenerator Shotgun "4" "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0 1
     in
-
         [pistol, gatling, mortar, shotgun]
 
 type alias ExplosionEffect =
@@ -104,9 +127,15 @@ type alias ExplosionEffect =
         x : Float,
         y : Float,
         r : Float,
-        counter : Int
+        counter : Int,
+        explosionType : ExplosionType
     }
+
+type ExplosionType  
+            =BulletEffect
+            |BombEffect
+
 
 bulletToExplosion : Bullet -> ExplosionEffect 
 bulletToExplosion model = 
-    ExplosionEffect model.x model.y (model.r*2) 0
+    ExplosionEffect model.x model.y (model.r*2) 0 BulletEffect
