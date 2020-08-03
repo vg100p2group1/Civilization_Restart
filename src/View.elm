@@ -31,6 +31,7 @@ import Display.Cool exposing (showSkillCooling)
 import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
+import Display.DisplayTraining exposing (showTraining)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
@@ -160,6 +161,7 @@ playerDemonstrate model =
             , showSynthesis model
             , showGameOver model
             , showWeaponChoosingSystem model
+            , showTraining model
         ]
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)

@@ -1,6 +1,7 @@
 
 module Model exposing (Me,Model,State(..), Dialogues, Sentence, Side(..), Role(..),Direction(..),AnimationState,
-                       defaultMe, sentenceInit,mapToViewBox, GameState(..), WeaponUnlockSys,Page(..))
+                       defaultMe, sentenceInit,mapToViewBox, GameState(..), WeaponUnlockSys,Page(..),defaultTraining,
+                       TrainingSession)
 import Random
 import Map.Map exposing(Room,Map,Treasure)
 import Shape exposing (Circle)
@@ -11,6 +12,7 @@ import Attributes exposing (Attr,defaultAttr)
 import Synthesis.Package exposing (Package,packageInit)
 import Synthesis.SynthesisSystem exposing (SynthesisSubSystem,defaultSynthesisSubSystem)
 import Bomb exposing (Bombs)
+import Dict exposing (Dict)
 type alias Me =
     { x : Float
     , y : Float
@@ -122,7 +124,41 @@ type alias Model =
     , isGameOver : Bool
     , pageState : Page
     , bomb : Bombs
-    , wholeCounter : Int 
+    , wholeCounter : Int
+    , trainingSession : TrainingSession
+    }
+
+type alias TrainingSession =
+    { step : Int
+    , hasMovedLeft : Bool
+    , hasMovedUp : Bool
+    , hasFired : Bool
+    , hasB : Bool
+    , hasR: Bool
+    , tips : Dict Int String
+    }
+
+
+defaultTips : Dict Int String
+defaultTips = Dict.fromList
+              [ (1, "Press A and D to Move Left and Right")
+              , (2, "Press W and S to Move Up and Down")
+              , (3, "Clicking the mouse to Shoot")
+              , (4, "Press B to Open the Skill Tree System")
+              , (5, "Press R to open the Synthesis System")
+              , (6, "Press Enter to Start your adventure!")
+              ]
+
+
+defaultTraining : TrainingSession
+defaultTraining =
+    { step = 1
+    , hasMovedLeft = False
+    , hasMovedUp = False
+    , hasFired = False
+    , hasB = False
+    , hasR = False
+    , tips = defaultTips
     }
 
 type Page = WelcomePage
@@ -137,7 +173,7 @@ type State = Dialogue
            | PickTreasure Treasure
            | SynthesisSys
            | SkillSys
-           | ChooseWeapon
+           | OnTraining
            | Others
 
 type GameState = Paused

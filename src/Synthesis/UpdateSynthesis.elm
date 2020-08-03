@@ -5,7 +5,7 @@ import Model exposing (GameState(..),Model,State(..))
 import Synthesis.WeaponUpgrade exposing (weaponUpgrade,bulletSynthesis)
 updateSynthesis : SynthesisMsg -> Model -> (Model, Cmd msg)
 updateSynthesis msg model =
-    if model.state == Others || model.state == SynthesisSys then
+    if model.state == Others || model.state == SynthesisSys || model.state == OnTraining then
     let
         me = model.myself
         weapon = me.weapons
@@ -23,8 +23,9 @@ updateSynthesis msg model =
                                 {model|myself = newMe, paused = not model.paused, gameState = Playing,state=Others}
                             else
                                 {model|myself = newMe, paused = not model.paused, gameState = Paused,state=SynthesisSys}
+                    training = newModel.trainingSession
                 in
-                    (newModel,Cmd.none)
+                    ({newModel|trainingSession={training|hasR=True}},Cmd.none)
             NextWeapon next ->
                 let -- true for next,false for previous
                     

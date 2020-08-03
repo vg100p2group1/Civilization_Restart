@@ -26,6 +26,7 @@ import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryFiel
 import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
+import UpdateTraining exposing (updateTraining)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -49,8 +50,9 @@ update msg model =
             let 
                 pTemp = model.myself 
                 me= {pTemp | moveLeft = on, moveRight =  False, preDirection=DirectionLeft}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model|myself= me,trainingSession={training|hasMovedLeft=True}}
                 , Cmd.none
                 )
 
@@ -58,8 +60,9 @@ update msg model =
             let 
                 pTemp =  model.myself
                 me= {pTemp | moveRight = on, moveLeft = False, preDirection=DirectionRight}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model| myself= me,trainingSession={training|hasMovedLeft=True}}
                 , Cmd.none
                 )
 
@@ -67,8 +70,9 @@ update msg model =
             let
                 pTemp =  model.myself 
                 me= {pTemp | moveUp = on, moveDown =  False}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model| myself= me,trainingSession={training|hasMovedUp=True}}
                 , Cmd.none
                 )
 
@@ -76,8 +80,9 @@ update msg model =
             let 
                 pTemp =  model.myself
                 me= {pTemp | moveDown = on, moveUp = False}
+                training = model.trainingSession
             in
-                ( {model| myself= me}
+                ( {model| myself= me,trainingSession={training|hasMovedUp=True}}
                 , Cmd.none
                 )
         
@@ -102,13 +107,14 @@ update msg model =
             let
                 pTemp = model.myself
                 me = {pTemp | fire = True}
+                training = model.trainingSession
                 {-
                 newShoot = fireBullet model.myself.currentWeapon me.mouseData (me.x,me.y)
                 newBullet = newShoot ++ model.bullet
                 -}
                 -- newBulletViewbox = List.map (\value -> {value| x=500,y=500}) newBullet
             in
-                ({model|myself = me},Cmd.none)
+                ({model|myself = me,trainingSession={training|hasFired=True}},Cmd.none)
         
         MouseUp ->
             let
@@ -172,8 +178,16 @@ update msg model =
                 else 
                     ({model|wholeCounter=model.wholeCounter+1}, Cmd.none)
 
-        NextSentence ->
-            (updateSentence 0 model, Cmd.none)
+        NextMsg ->
+            if model.state == Dialogue then
+                (updateSentence 0 model, Cmd.none)
+            else if model.state == OnTraining && model.trainingSession.step == 6 then
+            let
+                training = model.trainingSession
+            in
+                ({model|state=Others,trainingSession={training|step=7}}, Cmd.none)
+            else
+                (model, Cmd.none)
 
         -- the dialogue should be displayed when the player enters a new room actually
         ShowDialogue ->
@@ -396,7 +410,7 @@ animate  model =
         -- number = Debug.log "number of weapons" (List.length meHit.weapons)
         -- number2 = Debug.log "unlocked weapons" (List.length meHit.weaponUnlockSys.unlockedWeapons)
     in
-        {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
+        updateTraining {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter}},
                 viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead, bomb = newBomb}
 
@@ -685,8 +699,11 @@ updateState model =
                 PickTreasure getTreasure
             else if model.state == Dialogue then
                 Dialogue 
+            else if model.trainingSession.step <= 6 then
+                OnTraining
             else
                 Others
+
     in
         newState
 

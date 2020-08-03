@@ -22,7 +22,7 @@ type Msg
     | Noop
     -- for testing
     | ShowDialogue
-    | NextSentence
+    | NextMsg
     | ChangeWeapon_ Int
     | ChangeWeapon ShiftMsg
     | Start

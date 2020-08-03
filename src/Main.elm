@@ -59,7 +59,7 @@ key on keycode =
                 Noop
         13 ->
             if on then
-                NextSentence
+                NextMsg
             else
                 Noop
         71 ->
