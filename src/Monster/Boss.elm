@@ -17,9 +17,10 @@ bossTypeList =
         m1=bossType1
         m2=bossType2
         m3=bossType3
+        m4=bossType4
         
     in 
-        [m1,m3,m1,m2]
+        [m1,m2,m3,m4]
 
 
 
@@ -29,7 +30,7 @@ bossGenerator seed0 obstacle storey=
         
         -- obstacle = room.obstacles
         
-        bossList= bossBuilding [] obstacle (modBy 3 storey ) seed0
+        bossList= bossBuilding [] obstacle ( storey // 2) seed0
     in
         bossList
 
@@ -42,7 +43,7 @@ bossBuilding : List Boss -> List Obstacle -> Int -> Random.Seed -> List Boss
 bossBuilding bossList obstacles bossNum  seed0=
     let
         xTemp = 1000
-        yTemp =   1000
+        yTemp =  1000
         
         bossTypeTemp = 
             let
@@ -65,19 +66,18 @@ bossBuilding bossList obstacles bossNum  seed0=
 bossType1 : BossType
 bossType1 = 
     let
-        stype1 = [shootingType1 0]
+        addDirection num =
+            if num == 0 then [] else shootingType0 num :: addDirection (num - 1)
+
+
+        stype1 = addDirection 36
     in
-        BossType 500 1 200 200 "#Boss1" stype1 
+        BossType 300 1 200 200 "#Boss3" stype1 
+
+
 
 bossType2 : BossType
 bossType2 = 
-    let
-        stype2 = [shootingType2]
-    in
-        BossType 500 1 200 200 "#Boss2" stype2 
-
-bossType3 : BossType
-bossType3 = 
     let
         addDirection num =
             if num == 0 then [] else shootingType1 num :: addDirection (num - 1)
@@ -87,15 +87,43 @@ bossType3 =
 
         stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection1 18
     in
-        BossType 500 1 200 200 "#Boss3" stype3   
+        BossType 2000 1 200 200 "#Boss3" stype3  
+
+bossType3 : BossType
+bossType3 = 
+    let
+        stype2 = [shootingType3]
+    in
+        BossType 2000 1 200 200 "#Boss2" stype2  
+
+bossType4 : BossType
+bossType4 = 
+    let
+        addDirection num =
+            if num == 0 then [] else shootingType0 num :: addDirection (num - 1)
+        addDirection1 num =
+            if num == 9 then [] else shootingType0 num :: addDirection (num - 1)
+
+
+        stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection1 18
+    in
+        BossType 2000 1 200 200 "#Boss3" stype3  
+
+shootingType0 : Float -> ShootingType
+shootingType0 direction = 
+    ShootingType Circled 30 direction 30 10 10 10
 
 shootingType1 : Float -> ShootingType
 shootingType1 direction = 
-    ShootingType Circled 10 (2* direction) 30 10 10 10    
+    ShootingType Circled 20 direction 30 10 10 10    
 
 shootingType2 : ShootingType
 shootingType2 = 
-    ShootingType Targeted 5 20 30 5 5 10 
+    ShootingType Targeted 10 20 30 5 5 10 
+
+shootingType3 : ShootingType
+shootingType3 = 
+    ShootingType Targeted 25 60 30 20 5 7 
 
  
                 

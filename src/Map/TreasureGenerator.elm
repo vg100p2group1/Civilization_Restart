@@ -16,7 +16,7 @@ treasureTypeList =
         m2=TreasureType 2 100 "Red"
         m3=TreasureType 3 100 "Blue"
     in 
-        [m1,m2,m3,m3,m3]
+        [m1,m2,m3,m3,m3,m2,m3,m3]
 
 
 treasureGenerator : Random.Seed -> List Obstacle-> Int -> (List Treasure,Random.Seed)
