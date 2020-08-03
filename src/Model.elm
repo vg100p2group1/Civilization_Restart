@@ -48,6 +48,7 @@ type alias Me =
     , time : Int
     , arsenal : List Weapon
     , weaponUnlockSys : WeaponUnlockSys
+    , addAudio : List String
     }
 
 type alias WeaponUnlockSys =
@@ -104,6 +105,7 @@ defaultMe =
     , time = 0
     , arsenal = weaponList
     , weaponUnlockSys = defaultWeaponUnlockSys
+    ,addAudio= []
     }
 
 type alias Model =
