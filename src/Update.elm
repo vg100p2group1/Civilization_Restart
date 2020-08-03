@@ -252,7 +252,14 @@ update msg model =
             let
                 me = model.myself
                 sys = me.weaponUnlockSys
-                newModel = {model|myself={me|weaponUnlockSys={sys|active=True}},gameState=Paused}
+                newModel = if model.state == Others || model.state == Unlocking || model.state == OnTraining then
+                               if sys.active == False then
+                               {model|myself={me|weaponUnlockSys={sys|active=True}},gameState=Paused,state=Unlocking}
+                               else
+                               {model|myself={me|weaponUnlockSys={sys|active=False}},gameState=Playing,state=Others}
+                           else
+                               model
+
             in
                 (newModel, Cmd.none)
 

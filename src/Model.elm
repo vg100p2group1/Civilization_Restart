@@ -61,7 +61,7 @@ type alias WeaponUnlockSys =
 defaultWeaponUnlockSys =
     { active = False
     , canUnlockWeapon = True
-    , chosen = NoWeapon
+    , chosen = Pistol
     , unlockedWeapons = [defaultWeapon]
     , tip = ""
     }
@@ -175,6 +175,7 @@ type State = Dialogue
            | SkillSys
            | OnTraining
            | Others
+           | Unlocking
 
 type GameState = Paused
                | Playing
