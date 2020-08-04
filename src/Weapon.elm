@@ -51,7 +51,7 @@ type alias Weapon =
     }
 
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 8 (Circle 500 500 8) 0 0 False Player 20
+bulletConfig = Bullet 500 500 8 (Circle 500 500 8) 0 0 False Player 10
 
 defaultWeapon : Weapon
 defaultWeapon =
@@ -64,14 +64,14 @@ defaultWeapon =
     , color = "green"
     , bulletNumber = 0
     , auto = False
-    , period = 25
-    , maxPeriod = 25
+    , period = 35
+    , maxPeriod = 35
     , image = ""
     , counter = 1
     , hasFired = False
     , level = 1
     , shiftCounter = 0
-    , cost = 0
+    , cost = 1
     }
 
 defaultBulletGenerator : WeaponInfo -> Bullet
@@ -100,11 +100,11 @@ generateBullet weapon =
             in
             case weapon.extraInfo of
                 Pistol ->
-                    {bulletConfig|force=20 * getLevel weapon.level}
+                    {bulletConfig|force=12 * getLevel weapon.level}
                 Gatling ->
-                    {bulletConfig|force=30* getLevel weapon.level}
+                    {bulletConfig|force=20* getLevel weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* getLevel weapon.level}
+                    {bulletConfig|force=80* getLevel weapon.level}
                 Shotgun ->
                     {bulletConfig|force=45* getLevel weapon.level}
                 NoWeapon ->
