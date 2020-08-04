@@ -36,9 +36,10 @@ type alias Gate =
     }
 
 type alias MonsterType =
-    {   hp : Float
+    {   hp : Float  
+    ,   maxhp : Float
     ,   attack : Float
-    ,   url : String     
+    ,   url : String   
        
     }
 type alias Monster =

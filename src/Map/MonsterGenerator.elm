@@ -20,13 +20,13 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 30 20 "#Robot1"
-        m2=MonsterType 60 20 "#Robot1"
-        m7=MonsterType 200 20 "#Robot1"
-        m3=MonsterType 300 40 "#Robot2"
-        m4=MonsterType 600 40 "#Robot2"
-        m5=MonsterType 1000 60 "#Robot3"
-        m6=MonsterType 2000 60 "#Robot3"
+        m1=MonsterType 30 30 20 "#Robot1"
+        m2=MonsterType 60 60  20 "#Robot1"
+        m7=MonsterType 200 200 20 "#Robot1"
+        m3=MonsterType 300 300 40 "#Robot2"
+        m4=MonsterType 600 600 40 "#Robot2"
+        m5=MonsterType 1000 1000 60 "#Robot3"
+        m6=MonsterType 2000 2000 60 "#Robot3"
 
     in 
         [m1,m2,m7,m3,m4,m5,m6,m6,m6,m6,m5]
@@ -71,7 +71,7 @@ monsterBuilding monsterList number obstacles seed0 storey=
                     Just a ->
                         a
                     Nothing ->
-                        MonsterType 0 0 ""
+                        MonsterType 0 0 0 ""
         monsterTypeTemp = getMonsterType
 
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
