@@ -315,7 +315,7 @@ defaultSystem : SkillSystem
 defaultSystem =
     { subsys = [subSysPhantom, subSysMechanic, subSysBerserker]
     , current = 0
-    , points = 20
+    , points = 0
     , active = False
     }
 

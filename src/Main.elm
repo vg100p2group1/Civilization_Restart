@@ -71,7 +71,7 @@ key on keycode =
                 Noop
         -- C
         67 ->
-            ShowDialogue
+            Noop
         -- 1
         49 ->
             if on then

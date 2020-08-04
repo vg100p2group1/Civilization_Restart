@@ -74,21 +74,21 @@ showWeaponChoosingSystem model =
                     Markdown.toHtml [] """
 * A machine gun with fast rate of fire and huge damage
 * It used to be called "Death sickle"
-* In the past, three soldiers are need to to move this big guy
+* In the past, three soldiers were need to to move this big guy
 * With exoskeleton armor, a well trained warrior can easily use it
 """
                 Shotgun ->
                     Markdown.toHtml [] """
 * Manufactured by the biggest gun producer in the M&M empire
 * It was the most popular weapon before "the end day"
-* Use three bulets every shot
+* Use three bullets every shot
 * Can make huge damage in short distance
 """
                 _ ->
                     Markdown.toHtml [] """
 * The most accurate and powerful rifle gun ever made
 * Rather than a gun, some people prefer to call it a cannon
-* The main purpose of the gun was to destroy vehcles like helicopters
+* The main purpose of the gun was to destroy vehicles like helicopters
 * Now it becomes the best weapon to deal with huge robot monsters
 """
             ]
