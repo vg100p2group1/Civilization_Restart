@@ -2,7 +2,7 @@ module Update exposing (update)
 import Messages exposing (Msg(..),ShiftMsg(..),PageMsg(..),WeaponChoosingMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..),Page(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
-import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door)
+import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door,Boss)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
@@ -143,7 +143,7 @@ update msg model =
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
-                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
+                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Others,currentDialogues=newDialogues,gameState=Playing,storey=model.storey+1},Cmd.none)
                 else 
                     case model.state of
                         PickTreasure t ->
@@ -727,6 +727,8 @@ updateState model =
                         a
                     Nothing ->
                         treasureInit 
+        dialogWithBoss = 
+            checkDistance model.myself model.map.boss
         -- collideTreasure =/
         newState =
             if collideGate then
@@ -737,12 +739,25 @@ updateState model =
                 Dialogue 
             else if model.trainingSession.step <= 6 then
                 OnTraining
+            else if dialogWithBoss && model.currentDialogues/=[]then
+                Dialogue
             else
                 Others
 
     in
         newState
 
+checkDistance : Me -> List Boss -> Basics.Bool
+checkDistance me boss=
+    List.any (distSmall me) boss
+
+distSmall : Me -> Boss -> Basics.Bool
+distSmall me boss = 
+    let
+        distx = abs (me.x - boss.position.edge.cx)
+        disty = abs (me.y - boss.position.edge.cy)
+    in
+        (distx <= 1200) && (disty<=1200)
 
 getCollideTreasure : List Treasure-> Me -> List Treasure
 getCollideTreasure treasureList me= 
