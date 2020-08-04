@@ -37,7 +37,7 @@ monsterTypeList =
 monsterGenerator : Random.Seed -> List Obstacle -> Int ->(List Monster,Random.Seed)
 monsterGenerator seed0 obstacle storey=
     let
-        (number,seed1) = Random.step (Random.int (storey //3 +10) (storey // 3  + 15)) seed0
+        (number,seed1) = Random.step (Random.int (storey //3 +7) (storey // 3  + 9)) seed0
         -- obstacle = room.obstacles
         
         (monsterList,seed2) = monsterBuilding [] number obstacle seed1 storey
