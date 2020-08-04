@@ -36,10 +36,10 @@ type alias Gate =
     }
 
 type alias MonsterType =
-    {   hp : Float
-    ,   attack : Float
-    ,   url : String     
-       
+    { hp : Float
+    , attack : Float
+    , url : String
+    , maxHp : Float
     }
 type alias Monster =
     { position : Shape.Circle
