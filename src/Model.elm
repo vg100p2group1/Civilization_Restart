@@ -128,6 +128,7 @@ type alias Model =
     , bomb : Bombs
     , wholeCounter : Int
     , trainingSession : TrainingSession
+    , isWin : Bool
     }
 
 type alias TrainingSession =

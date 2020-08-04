@@ -149,8 +149,9 @@ update msg model =
                                 6 -> Dialogs.dialog4
                                 8 -> Dialogs.dialog5
                                 _->[]
+                        win = model.storey >= 9
                     in
-                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
+                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1,isWin=win},Cmd.none)
                 else 
                     case model.state of
                         PickTreasure t ->
