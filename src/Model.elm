@@ -105,7 +105,7 @@ defaultMe =
     , time = 0
     , arsenal = weaponList
     , weaponUnlockSys = defaultWeaponUnlockSys
-    ,addAudio= []
+    , addAudio= []
     }
 
 type alias Model =
@@ -137,6 +137,7 @@ type alias TrainingSession =
     , hasFired : Bool
     , hasB : Bool
     , hasR : Bool
+    , hasG : Bool
     , tips : Dict Int String
     }
 
@@ -147,8 +148,9 @@ defaultTips = Dict.fromList
               , (2, "Press W and S to Move Up and Down")
               , (3, "Clicking the mouse to Shoot")
               , (4, "Press B to Open the Skill Tree System")
-              , (5, "Press R to open the Synthesis System")
-              , (6, "Press Enter to Start your adventure!")
+              , (5, "Press V to open the Synthesis System")
+              , (6, "Press G to open the Weapon Unlocking System")
+              , (7, "Small tip: You can press R to quit all the windows. Now press Enter to start your adventure!")
               ]
 
 
@@ -160,6 +162,7 @@ defaultTraining =
     , hasFired = False
     , hasB = False
     , hasR = False
+    , hasG = False
     , tips = defaultTips
     }
 

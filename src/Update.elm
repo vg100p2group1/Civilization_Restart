@@ -143,7 +143,7 @@ update msg model =
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = updateDialogues model
                     in
-                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Others,currentDialogues=newDialogues,gameState=Playing,storey=model.storey+1},Cmd.none)
+                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
                 else 
                     case model.state of
                         PickTreasure t ->
@@ -181,11 +181,11 @@ update msg model =
         NextMsg ->
             if model.state == Dialogue then
                 (updateSentence 0 model, Cmd.none)
-            else if model.state == OnTraining && model.trainingSession.step == 6 then
+            else if model.state == OnTraining && model.trainingSession.step == 7 then
             let
                 training = model.trainingSession
             in
-                ({model|state=Others,trainingSession={training|step=7}}, Cmd.none)
+                ({model|state=Others,trainingSession={training|step=8}}, Cmd.none)
             else
                 (model, Cmd.none)
 
@@ -259,9 +259,9 @@ update msg model =
                                {model|myself={me|weaponUnlockSys={sys|active=False}},gameState=Playing,state=Others}
                            else
                                model
-
+                training = newModel.trainingSession
             in
-                (newModel, Cmd.none)
+                ({newModel|trainingSession={training|hasG=True}}, Cmd.none)
 
         Noop ->
             let 
@@ -439,7 +439,10 @@ animate  model =
         newState = updateState model
         meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
         meCooling = coolSkills meHit
-
+        gameState = if newState == SkillSys || newState == Dialogue || newState == SynthesisSys || newState == Unlocking then
+                        Paused
+                    else
+                        model.gameState
 
 
         -- --debug
@@ -447,7 +450,7 @@ animate  model =
         -- number2 = Debug.log "unlocked weapons" (List.length meHit.weaponUnlockSys.unlockedWeapons)
     in
         updateTraining {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter},addAudio=newaudio},
-                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
+                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,gameState=gameState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead, bomb = newBomb}
 
 
@@ -736,11 +739,13 @@ updateState model =
             else if  not (List.isEmpty collideTreasureList) then
                 PickTreasure getTreasure
             else if model.state == Dialogue then
-                Dialogue 
-            else if model.trainingSession.step <= 6 then
-                OnTraining
+                Dialogue
+            else if model.state == Unlocking then
+                Unlocking
             else if dialogWithBoss && model.currentDialogues/=[]then
                 Dialogue
+            else if model.trainingSession.step <= 7 then
+                OnTraining
             else
                 Others
 
