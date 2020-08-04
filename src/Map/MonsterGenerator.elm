@@ -109,8 +109,9 @@ updateMonster_ monster bullets bombs me =
         -- Skill Explosion is Art will influence the attack of bombs
         subMechanic = getSubSys me.skillSys 1
         skillExplode = getSkill subMechanic (1,4)
+        explodeFactor = if skillExplode.unlocked then 800 else 200
         bulletHurt = List.sum (List.map (\b -> b.force) hitBullets)
-        bombHurt = (Basics.toFloat <| List.length hitBombs) * 50
+        bombHurt = (Basics.toFloat <| List.length hitBombs) * explodeFactor
         attackFactor = (getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat) * battleFervorFactor
         damage = attackFactor * (bulletHurt + bombHurt)
         newMonsterType = {monsterType_ | hp = monsterType_.hp - damage}
