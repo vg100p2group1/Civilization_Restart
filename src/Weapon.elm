@@ -100,7 +100,7 @@ generateBullet weapon =
             in
             case weapon.extraInfo of
                 Pistol ->
-                    {bulletConfig|force=12 * getLevel weapon.level}
+                    {bulletConfig|force=20* getLevel weapon.level}
                 Gatling ->
                     {bulletConfig|force=20* getLevel weapon.level}
                 Mortar ->
@@ -117,7 +117,7 @@ weaponList =
     let
         pistol = defaultWeapon
         gatling = Weapon defaultBulletGenerator Gatling "2" "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0 1
-        mortar = Weapon defaultBulletGenerator Mortar "3" "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 5
+        mortar = Weapon defaultBulletGenerator Mortar "3" "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 8
         shotgun = Weapon defaultBulletGenerator Shotgun "4" "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0 1
     in
         [pistol, gatling, mortar, shotgun]
