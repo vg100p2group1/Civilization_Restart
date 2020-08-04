@@ -57,6 +57,7 @@ type alias Monster =
 type AttackMode 
     = Circled
     | Targeted
+    | Bomb
 
 type alias ShootingType =
     {   attackMode : AttackMode
