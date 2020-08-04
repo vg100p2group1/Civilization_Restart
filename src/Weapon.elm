@@ -51,7 +51,7 @@ type alias Weapon =
     }
 
 bulletConfig : Bullet
-bulletConfig = Bullet 500 500 8 (Circle 500 500 8) 0 0 False Player 20
+bulletConfig = Bullet 500 500 8 (Circle 500 500 8) 0 0 False Player 10
 
 defaultWeapon : Weapon
 defaultWeapon =
@@ -64,14 +64,14 @@ defaultWeapon =
     , color = "green"
     , bulletNumber = 0
     , auto = False
-    , period = 25
-    , maxPeriod = 25
+    , period = 35
+    , maxPeriod = 35
     , image = ""
     , counter = 1
     , hasFired = False
     , level = 1
     , shiftCounter = 0
-    , cost = 0
+    , cost = 1
     }
 
 defaultBulletGenerator : WeaponInfo -> Bullet
@@ -100,11 +100,11 @@ generateBullet weapon =
             in
             case weapon.extraInfo of
                 Pistol ->
-                    {bulletConfig|force=20 * getLevel weapon.level}
+                    {bulletConfig|force=20* getLevel weapon.level}
                 Gatling ->
-                    {bulletConfig|force=30* getLevel weapon.level}
+                    {bulletConfig|force=20* getLevel weapon.level}
                 Mortar ->
-                    {bulletConfig|force=100* getLevel weapon.level}
+                    {bulletConfig|force=80* getLevel weapon.level}
                 Shotgun ->
                     {bulletConfig|force=45* getLevel weapon.level}
                 NoWeapon ->
@@ -117,7 +117,7 @@ weaponList =
     let
         pistol = defaultWeapon
         gatling = Weapon defaultBulletGenerator Gatling "2" "Gatling" 2 "orange" 0 True 5 5 "" 1 False 1 0 1
-        mortar = Weapon defaultBulletGenerator Mortar "3" "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 5
+        mortar = Weapon defaultBulletGenerator Mortar "3" "Mortar" 3 "blue" 0 False 15 15 "" 1 False 1 0 8
         shotgun = Weapon defaultBulletGenerator Shotgun "4" "Shotgun" 4 "white" 0 False 10 10 "" 1 False 1 0 1
     in
         [pistol, gatling, mortar, shotgun]

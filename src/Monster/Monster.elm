@@ -68,7 +68,7 @@ monsterAct  me monster =
 
         checkCanShoot =
             let count = monster.timeBeforeAttack
-            in  if monster.active then if count ==0 then 30 else  count-1  else count
+            in  if monster.active then if count ==0 then 16 else  count-1  else count
 
         
         

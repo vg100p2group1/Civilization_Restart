@@ -96,11 +96,11 @@ atUnlock sub attr =
         1 ->    -- Mechanic
             case level of
                 1 ->     -- Armor Upgrade I
-                    setCurrentAttr Armor 80 attr
-                    |> setMaxAttr Armor 80
+                    setCurrentAttr Armor 60 attr
+                    |> setMaxAttr Armor 60
                 2 ->     -- Armor Upgrade II
-                    setCurrentAttr Armor 120 attr
-                    |> setMaxAttr Armor 120
+                    setCurrentAttr Armor 100 attr
+                    |> setMaxAttr Armor 100
                 3 ->
                     if id == 0 then -- More Bullets
                         setCurrentAttr Clip 100 attr

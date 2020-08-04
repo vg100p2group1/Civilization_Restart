@@ -27,7 +27,11 @@ showBullets bullets =
                     if model.speedY > 0 then 
                         Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bullet2_R", Svg.Attributes.preserveAspectRatio "none meet", 
                             Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")")][]
-                    else
+                    else if model.speedY == 0  && model.speedX == 0 then 
+                        Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bomb", Svg.Attributes.preserveAspectRatio "none meet", 
+                            Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")"),
+                            Svg.Attributes.scale "(-1,1)"][]
+                        else
                         Svg.use [Svg.Attributes.x <| String.fromFloat (model.x-model.r*2.5), Svg.Attributes.y <| String.fromFloat (model.y-model.r*2.5), Svg.Attributes.xlinkHref "#Bullet2", Svg.Attributes.preserveAspectRatio "none meet", 
                             Svg.Attributes.width <| String.fromFloat (model.r*5), Svg.Attributes.height <| String.fromFloat (model.r*5),Svg.Attributes.transform ("rotate("++ String.fromFloat theta++" "++String.fromFloat model.x++" "++ String.fromFloat model.y++")"),
                             Svg.Attributes.scale "(-1,1)"][]

@@ -36,10 +36,11 @@ type alias Gate =
     }
 
 type alias MonsterType =
-    {   hp : Float
+    {   hp : Float  
+    ,   maxhp : Float
     ,   attack : Float
-    ,   url : String     
-       
+    ,   url : String   
+
     }
 type alias Monster =
     { position : Shape.Circle
@@ -57,6 +58,7 @@ type alias Monster =
 type AttackMode 
     = Circled
     | Targeted
+    | Bomb
 
 type alias ShootingType =
     {   attackMode : AttackMode

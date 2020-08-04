@@ -4,7 +4,7 @@ import Weapon exposing (ExplosionEffect,ExplosionType(..))
 import Shape exposing (Circle)
 
 timeCountDown : Int
-timeCountDown = 100
+timeCountDown = 50
 
 type alias Bombs = List Bomb
 
@@ -17,11 +17,11 @@ type alias Bomb =
 
 makeBomb : (Float, Float) -> Bomb
 makeBomb (x, y) =
-    Bomb x y 100 (timeCountDown+10)
+    Bomb x y 100 timeCountDown
 
 isExplodeNow : Bomb -> Bool
 isExplodeNow bomb = 
-    bomb.counter == 10
+    bomb.counter == 0
 
 bombTick : Bombs -> List String-> (Bombs, Bombs,List String)
 bombTick bombs nowaudio=

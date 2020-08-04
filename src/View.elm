@@ -32,6 +32,7 @@ import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
 import Display.DisplayTraining exposing (showTraining)
+import Display.DisplayMonsterHp exposing (showMonsterHp)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
@@ -214,7 +215,8 @@ playerDemonstrate model =
             , showGameOver model
             , showWeaponChoosingSystem model
             , showTraining model
-        ]++newAudio)
+            , showWin model
+        ]++newAudio++showMonsterHp model.myself model.map.monsters)
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)
 backgroundEntire model=
@@ -389,28 +391,40 @@ showDialogue model deltaTime =
             let
                 txt = Maybe.withDefault sentenceInit (List.head model.currentDialogues)
                 location =
-                    case txt.side of
-                        Left -> "120px 0 0 -50px"
-                        Right -> "120px 0 0 390px"
-                        Bottom -> "300px 0 0 120px"
+                    if txt.text == "Enjoy the game now!" then
+                        "250px 0 0 150px"
+                    else
+                        "250px 0 0 50px"
+                image_ =
+                    case model.storey of
+                        1 -> "url(images/Dialogue/boss1"
+                        3 -> "url(images/Dialogue/boss2"
+                        5 -> "url(images/Dialogue/boss3"
+                        _ -> "url(images/Dialogue/boss1"
+                image = case txt.side of
+                            Right -> image_ ++ ".jpg)"
+                            _ -> image_ ++ "_" ++ ".jpg)"
             in
                 div
-                [ style "background" "rgba(236, 240, 241, 0.89)"
-                , style "color" "#34495f"
-                , style "height" "400px"
-                , style "left" "280px"
+                [ style "background-image" image
+                --, style "color" "#34495f"
+                , style "border-radius" "35px"
+                , style "height" "350px"
+                , style "left" "200px"
                 , style "padding" "0 140px"
                 , style "position" "absolute"
-                , style "top" "155px"
-                , style "width" "400px"
-                , style "background-image" txt.image
+                , style "top" "300px"
+                , style "width" "700px"
+                --, style "background-image" txt.image
                 , style "background-size" "100% 100%"
                 ]
-                [ div [style "margin" "20px 0 0 120px", style "color" "red"] [text "Press ENTER to continue"]
+                [ div [style "margin" "20px 0 0 140px", style "color" "blue"] [text "Press ENTER to continue"]
                 , div
                     [ style "margin" location
                     , style "position" "absolute"
-                    , style "color" "orange"
+                    , style "color" "black"
+                    , style "font-family" "lucida sans unicode,lucida grande, sans-serif"
+                    , style "font-weight" "bold"
                     ]
                     [text txt.text]
                 ]
@@ -428,13 +442,31 @@ showGameOver model =
             [ style "background" "rgba(236, 240, 241, 0.89)"
             , style "color" "#34495f"
             , style "height" "400px"
+            , style "left" "300px"
+            , style "padding" "0 140px"
+            , style "position" "absolute"
+            , style "top" "155px"
+            , style "width" "400px"
+            ]
+            [ div [style "margin" "140px 0 0 20px", style "color" "red",style "font-size" "30px",style "font-weight" "bold"] [text "Game Over"]
+            ]
+    else
+        div [] []
+
+showWin : Model -> Html Msg
+showWin model =
+    if model.isWin then
+        div
+            [ style "background" "rgba(236, 240, 241, 0.89)"
+            , style "color" "#34495f"
+            , style "height" "400px"
             , style "left" "280px"
             , style "padding" "0 140px"
             , style "position" "absolute"
             , style "top" "155px"
             , style "width" "400px"
             ]
-            [ div [style "margin" "160px 0 0 135px", style "color" "red",style "font-size" "24px"] [text "Game Over"]
+            [ div [style "margin" "140px 0 0 20px", style "color" "yellow",style "font-size" "30px",style "font-weight" "bold"] [text "You Win"]
             ]
     else
         div [] []

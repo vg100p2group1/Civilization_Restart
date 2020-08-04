@@ -18,6 +18,8 @@ updateTraining model =
             {model|trainingSession={training|step=5}}
         else if training.step == 5 && training.hasR then
             {model|trainingSession={training|step=6}}
+        else if training.step == 6 && training.hasG then
+            {model|trainingSession={training|step=7}}
         else
             model
 

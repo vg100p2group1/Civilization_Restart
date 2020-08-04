@@ -20,13 +20,14 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 30 20 "#Robot1"
-        m2=MonsterType 60 20 "#Robot1"
-        m7=MonsterType 200 20 "#Robot1"
-        m3=MonsterType 300 40 "#Robot2"
-        m4=MonsterType 600 40 "#Robot2"
-        m5=MonsterType 1000 60 "#Robot3"
-        m6=MonsterType 2000 60 "#Robot3"
+
+        m1=MonsterType 30 30 20 "#Robot1"
+        m2=MonsterType 60 60  20 "#Robot1"
+        m7=MonsterType 200 200 20 "#Robot1"
+        m3=MonsterType 300 300 40 "#Robot2"
+        m4=MonsterType 600 600 40 "#Robot2"
+        m5=MonsterType 1000 1000 60 "#Robot3"
+        m6=MonsterType 2000 2000 60 "#Robot3"
 
     in 
         [m1,m2,m7,m3,m4,m5,m6,m6,m6,m6,m5]
@@ -36,7 +37,7 @@ monsterTypeList =
 monsterGenerator : Random.Seed -> List Obstacle -> Int ->(List Monster,Random.Seed)
 monsterGenerator seed0 obstacle storey=
     let
-        (number,seed1) = Random.step (Random.int (storey //3 +4) (storey // 3  + 6)) seed0
+        (number,seed1) = Random.step (Random.int (storey //3 +7) (storey // 3  + 9)) seed0
         -- obstacle = room.obstacles
         
         (monsterList,seed2) = monsterBuilding [] number obstacle seed1 storey
@@ -71,11 +72,12 @@ monsterBuilding monsterList number obstacles seed0 storey=
                     Just a ->
                         a
                     Nothing ->
-                        MonsterType 0 0 ""
+                        MonsterType 0 0 0 ""
+
         monsterTypeTemp = getMonsterType
 
-        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
-        monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
+        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 150 150 recInit
+        monsterPos = Shape.Circle  (toFloat xTemp + 75) (toFloat yTemp + 75) 20 
 
         monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0 False
 
@@ -111,8 +113,12 @@ updateMonster_ monster bullets bombs me =
                 1 + loseHealthRate / 2
             else
                 1
+        -- Skill Explosion is Art will influence the attack of bombs
+        subMechanic = getSubSys me.skillSys 1
+        skillExplode = getSkill subMechanic (1,4)
+        explodeFactor = if skillExplode.unlocked then 800 else 200
         bulletHurt = List.sum (List.map (\b -> b.force) hitBullets)
-        bombHurt = (Basics.toFloat <| List.length hitBombs) * 50.0
+        bombHurt = (Basics.toFloat <| List.length hitBombs) * explodeFactor
         attackFactor = (getCurrentAttr Attack me.attr |> toFloat) / (getCurrentAttr Attack defaultAttr |> toFloat) * battleFervorFactor
         damage = attackFactor * (bulletHurt + bombHurt)
         newMonsterType = {monsterType_ | hp = monsterType_.hp - damage}

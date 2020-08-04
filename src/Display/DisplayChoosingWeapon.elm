@@ -56,32 +56,41 @@ showWeaponChoosingSystem model =
             [weaponToButton Pistol sys, weaponToButton Gatling sys, weaponToButton Mortar sys, weaponToButton Shotgun sys]
         ]
         ,div[style "margin-top" "165px"
-            , style "margin-left" "190px"]
-            [ div [style "margin-left" "120px", style "margin-top" "0", style "font-size" "25px", style "font-weight" "bold"] [text "Tips"]
-            , div [style "margin-left" "65px", style "margin-top" "0", style "font-size" "20px", style "font-weight" "bold"] [text getName]
+            , style "margin-left" "100px"]
+            [ div [style "margin-left" "210px", style "margin-top" "0", style "font-size" "25px", style "font-weight" "bold"] [text "Tips"]
+            , div [style "margin-left" "155px", style "margin-top" "0", style "font-size" "20px", style "font-weight" "bold"] [text getName]
             , div[ style "margin" "-5px 10px 5px -50px"
             , style "height" "100px"
-            , style "width" "400px"
+            , style "width" "600px"
             , style "background" "rgba(236, 240, 241, 0.89)"]
             [case model.myself.weaponUnlockSys.chosen of
                 Pistol -> Markdown.toHtml [] """
-* Hello
+* Simple science and technology product
+* One of standard arms in the military
+* Use little amount of bullet
+* Low ATK and low shooting speed
 """
                 Gatling ->
                     Markdown.toHtml [] """
-* Simple science and technology product
-* One of standard arms in the military
-* Use no bullets.
-* Low ATK and low shooting speed
+* A machine gun with fast rate of fire and huge damage
+* It used to be called "Death sickle"
+* In the past, three soldiers were need to to move this big guy
+* With exoskeleton armor, a well trained warrior can easily use it
 """
                 Shotgun ->
                     Markdown.toHtml [] """
-* Hello
+* Manufactured by the biggest gun producer in the M&M empire
+* It was the most popular weapon before "the end day"
+* Use three bullets every shot
+* Can make huge damage in short distance
 """
                 _ ->
                     Markdown.toHtml [] """
-                * Wow
-                """
+* The most accurate and powerful rifle gun ever made
+* Rather than a gun, some people prefer to call it a cannon
+* The main purpose of the gun was to destroy vehicles like helicopters
+* Now it becomes the best weapon to deal with huge robot monsters
+"""
             ]
 
         ]

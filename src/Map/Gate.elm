@@ -22,7 +22,7 @@ gateGenerator rooms seed0 =
         newX = toFloat (2500*x)
         newY = toFloat (2500*y)
 
-        updatedGate = recUpdate (Rectangle (gate.x+newX) (gate.y+newY) 100 100 recInit)
+        updatedGate = recUpdate (Rectangle (gate.x+newX) (gate.y+newY) 200 200 recInit)
         -- d = Debug.log "gate" updatedGate
         -- d1=Debug.log "x" x
         -- d2=Debug.log "y" y

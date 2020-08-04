@@ -2,7 +2,7 @@ module Update exposing (update)
 import Messages exposing (Msg(..),ShiftMsg(..),PageMsg(..),WeaponChoosingMsg(..))
 import Model exposing (Model,Me,State(..),Direction(..),Dialogues, Sentence, AnimationState,defaultMe,mapToViewBox,GameState(..),sentenceInit,Side(..),Page(..))
 import Shape exposing (Rec,Rectangle,Circle,CollideDirection(..),recCollisionTest,recUpdate,recInit, recCollisionTest,circleRecTest,circleCollisonTest)
-import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door)
+import Map.Map exposing (Map,mapConfig,Treasure,treasureInit,Door,Boss)
 import Config exposing (playerSpeed,viewBoxMax,bulletSpeed)
 import Weapon exposing (Bullet,bulletConfig,ShooterType(..),defaultWeapon,Weapon,generateBullet,Arsenal(..))
 import Debug
@@ -22,11 +22,12 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, getMaxAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState,skillDirectionalBlasting)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState,skillDirectionalBlasting,skillMissI, skillMissII)
 import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
 import UpdateTraining exposing (updateTraining)
+import Dialogs exposing (dialog2,dialog3,dialog4,dialog5)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -135,15 +136,20 @@ update msg model =
                         (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
                         weaponUnlockSys = meTemp.weaponUnlockSys
-                        newSys = if model.storey >= 1 && model.storey <= 4 then
+                        newSys = --if model.storey >= 1 && model.storey <= 4 then
                                     {weaponUnlockSys|active=True}
-                                 else
-                                    weaponUnlockSys
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr,weaponUnlockSys=newSys}
                         -- it should be updated when dialogues are saved in every room
-                        newDialogues = updateDialogues model
+                        newDialogues = 
+                            case model.storey of
+                                2-> dialog2
+                                4 -> dialog3
+                                6 -> Dialogs.dialog4
+                                8 -> Dialogs.dialog5
+                                _->[]
+                        win = model.storey >= 9
                     in
-                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Dialogue,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
+                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1,isWin=win},Cmd.none)
                 else 
                     case model.state of
                         PickTreasure t ->
@@ -181,11 +187,11 @@ update msg model =
         NextMsg ->
             if model.state == Dialogue then
                 (updateSentence 0 model, Cmd.none)
-            else if model.state == OnTraining && model.trainingSession.step == 6 then
+            else if model.state == OnTraining && model.trainingSession.step == 7 then
             let
                 training = model.trainingSession
             in
-                ({model|state=Others,trainingSession={training|step=7}}, Cmd.none)
+                ({model|state=Others,trainingSession={training|step=8}}, Cmd.none)
             else
                 (model, Cmd.none)
 
@@ -259,9 +265,9 @@ update msg model =
                                {model|myself={me|weaponUnlockSys={sys|active=False}},gameState=Playing,state=Others}
                            else
                                model
-
+                training = newModel.trainingSession
             in
-                (newModel, Cmd.none)
+                ({newModel|trainingSession={training|hasG=True}}, Cmd.none)
 
         Noop ->
             let 
@@ -294,6 +300,18 @@ update msg model =
                     ({model|pageState=AboutPage},Cmd.none)
                 Story ->
                     ({model|pageState=StoryPage},Cmd.none)
+        Exit ->
+            if model.state == SkillSys || model.state == SynthesisSys || model.state == Dialogue || model.state == Unlocking then
+                let
+                    me = model.myself
+                    synSys = me.synthesis
+                    skillSys = me.skillSys
+                    unlockSys = me.weaponUnlockSys
+                    newMe = {me|synthesis={synSys|active=False},skillSys={skillSys|active=False},weaponUnlockSys={unlockSys|active=False}}
+                in
+                    ({model|myself=newMe,state=Others,gameState=Playing,paused=False}, Cmd.none)
+            else
+                (model, Cmd.none)
 
 
 changeWeapon : Int -> Model -> Model
@@ -382,7 +400,7 @@ animate  model =
         me = model.myself
         attr = me.attr
         gate = model.map.gate
-        isDead = 0 == getCurrentAttr Health attr
+        isDead = 0 >= getCurrentAttr Health attr
         (newShoot, weapon,newaudio_) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
                                     fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) (model.myself.dualWield > 0) me
@@ -427,7 +445,10 @@ animate  model =
         newState = updateState model
         meHit = hit hitPlayer atFieldBullet {newMe|attr=newAttr}
         meCooling = coolSkills meHit
-
+        gameState = if newState == SkillSys || newState == Dialogue || newState == SynthesisSys || newState == Unlocking then
+                        Paused
+                    else
+                        model.gameState
 
 
         -- --debug
@@ -435,7 +456,7 @@ animate  model =
         -- number2 = Debug.log "unlocked weapons" (List.length meHit.weaponUnlockSys.unlockedWeapons)
     in
         updateTraining {model| myself = {meCooling|weapons=newWeapons,counter=newMe.counter+1,url=playerMove newMe,currentWeapon={weapon|counter=weaponCounter,period=newPeriod,shiftCounter=shiftCounter},addAudio=newaudio},
-                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,
+                viewbox=newViewbox, map = newMap, bullet= newBulletList,bulletViewbox=newBulletListViewbox,state = newState,gameState=gameState,
                 explosion=newExplosion,explosionViewbox=newExplosionViewbox, isGameOver=isDead, bomb = newBomb}
 
 
@@ -715,6 +736,8 @@ updateState model =
                         a
                     Nothing ->
                         treasureInit 
+        dialogWithBoss = 
+            checkDistance model.myself model.map.boss
         -- collideTreasure =/
         newState =
             if collideGate then
@@ -722,8 +745,12 @@ updateState model =
             else if  not (List.isEmpty collideTreasureList) then
                 PickTreasure getTreasure
             else if model.state == Dialogue then
-                Dialogue 
-            else if model.trainingSession.step <= 6 then
+                Dialogue
+            else if model.state == Unlocking then
+                Unlocking
+            else if dialogWithBoss && model.currentDialogues/=[]then
+                Dialogue
+            else if model.trainingSession.step <= 7 then
                 OnTraining
             else
                 Others
@@ -731,6 +758,17 @@ updateState model =
     in
         newState
 
+checkDistance : Me -> List Boss -> Basics.Bool
+checkDistance me boss=
+    List.any (distSmall me) boss
+
+distSmall : Me -> Boss -> Basics.Bool
+distSmall me boss = 
+    let
+        distx = abs (me.x - boss.position.edge.cx)
+        disty = abs (me.y - boss.position.edge.cy)
+    in
+        (distx <= 1200) && (disty<=1200)
 
 getCollideTreasure : List Treasure-> Me -> List Treasure
 getCollideTreasure treasureList me= 
@@ -754,9 +792,22 @@ hit bulletHit bulletAT me =
         me
     else
 -}    let
+        (missLevel,missRate) = if skillState 0 0 2 me.skillSys.subsys subSysPhantom skillMissI then
+                        if skillState 0 1 3 me.skillSys.subsys subSysPhantom skillMissII then
+                            (2,0)
+                        else
+                            (1,0.3)
+                    else  
+                        (0,1)
+        seedSource = me.counter + modBy 10007 (round (Tuple.first me.mouseData))
+        seedNow = Random.initialSeed seedSource
+        floatGenerater = Random.float 0 1
+        (randomFloat,_) = Random.step floatGenerater seedNow
+        canMiss = randomFloat < 0.1 * missLevel
         totalHurt = bulletHit
                 |> List.map .force
                 |> List.sum
+                |> (\hurt -> if canMiss then missRate * hurt else hurt)
                 |> Basics.round
         attr = me.attr
         health = getCurrentAttr Health attr
@@ -766,7 +817,7 @@ hit bulletHit bulletAT me =
                 setCurrentAttr Armor -totalHurt attr
             else if armor > 0 then      -- the armor is broken due to these bullets
                 setCurrentAttr Armor -armor attr
-                |> setCurrentAttr Health (totalHurt - armor)
+                |> setCurrentAttr Health -(totalHurt - armor)
             else
                 setCurrentAttr Health -(min totalHurt health) attr
         currentArmor = getCurrentAttr Armor attr
@@ -807,7 +858,7 @@ updateDualWield model =
         newaudio = nowaudio ++ ["./audio/DualWeapon.ogg"]
         newMe =
             if dual && me.dualWield == 0 then
-                {me|dualWield = 100,addAudio=newaudio}
+                {me|dualWield = 150,addAudio=newaudio}
             else
                 me
     in
@@ -859,7 +910,7 @@ updateATField model =
         newaudio = nowaudio ++ ["./audio/Absorb.ogg"]
         newMe =
             if unlocked && me.absoluteTerrifyField == 0 then
-                {me|absoluteTerrifyField = 50,addAudio=newaudio}
+                {me|absoluteTerrifyField = 150,addAudio=newaudio}
             else
                 me
     in
@@ -875,7 +926,7 @@ updateInvisibility model =
 
         newMe =
             if unlocked && me.invisible == 0 then
-                {me|invisible = 50,addAudio=newaudio}
+                {me|invisible = 150,addAudio=newaudio}
             else
                 me
     in
@@ -942,10 +993,10 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = cool me.dualWield 100
-        , flash = cool me.flash 100
-        , absoluteTerrifyField = cool me.absoluteTerrifyField 100
-        , invisible= cool me.invisible 100
+        {me|dualWield = cool me.dualWield 500
+        , flash = cool me.flash 500
+        , absoluteTerrifyField = cool me.absoluteTerrifyField 500
+        , invisible= cool me.invisible 500
         , directionalBlasting = cool me.directionalBlasting 1200}
 
 updateWeaponChoosing : WeaponChoosingMsg -> Model -> Model
