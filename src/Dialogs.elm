@@ -1,4 +1,4 @@
-module Dialogs exposing (initdialog,dialog2,dialog3)
+module Dialogs exposing (initdialog,dialog2,dialog3,dialog4,dialog5)
 
 import Model exposing (Sentence,sentenceInit,Side(..))
 
