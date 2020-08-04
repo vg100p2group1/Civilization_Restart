@@ -156,7 +156,7 @@ skillArmorUpgradeI =
     { id = 0
     , level = 1
     , unlocked = False
-    , desciption = "Skill: Armor Upgrade I in subsystem Mechanic"
+    , desciption = "Armor, made to fit."
     , name = "Armor Upgrade I"
     }
 
@@ -165,7 +165,7 @@ skillArmorUpgradeII =
     { id = 0
     , level = 2
     , unlocked = False
-    , desciption = "Skill: Armor Upgrade II in subsystem Mechanic"
+    , desciption = "Special armor: Strong and shiny."
     , name = "Armor Upgrade II"
     }
 
@@ -174,7 +174,7 @@ skillMoreBullets =
     { id = 0
     , level = 3
     , unlocked = False
-    , desciption = "Skill: More Bullets in subsystem Mechanic"
+    , desciption = "lock and load"
     , name = "More Bullets"
     }
 
@@ -183,7 +183,7 @@ skillDirectionalBlasting =
     { id = 1
     , level = 3
     , unlocked = False
-    , desciption = "Skill: Directional Blasing in subsystem Mechanic"
+    , desciption = "true art is an explosion"
     , name = "Directional Blasting"
     }
 
@@ -193,7 +193,7 @@ skillAbsoluteTerritoryField =
     { id = 0
     , level = 4
     , unlocked = False
-    , desciption = "Skill: Absolute Territory Field in subsystem Mechanic"
+    , desciption = "A special technology invented by the M&M empire. The Faraday cage created by the armor can absorb all the bullets."
     , name = "Absolute Territory Field"
     }
 
@@ -202,7 +202,7 @@ skillExplosionIsArt =
     { id = 1
     , level = 4
     , unlocked = False
-    , desciption = "Skill: Explosion is Art in subsystem Mechanic"
+    , desciption = "More explosion.... more true art."
     , name = "Explosion is Art"
     }
 

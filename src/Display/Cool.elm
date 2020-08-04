@@ -28,7 +28,7 @@ showSkillCooling model r=
 showDualWield : Model->Int -> Float -> Html.Html Msg 
 showDualWield model num r=
     let
-        maxNum = 100.0
+        maxNum = 500.0
         current = 
             if num<0 then
                 maxNum - toFloat (abs num)
@@ -52,7 +52,7 @@ showDualWield model num r=
 showFlash : Model -> Int -> Float -> Html.Html Msg 
 showFlash model  num r=
     let
-        maxNum = 100.0
+        maxNum = 500.0
         current = 
             if num<0 then
                 maxNum - toFloat (abs num)
@@ -72,7 +72,7 @@ showFlash model  num r=
 showAT : Model->Int -> Float -> Html.Html Msg 
 showAT model num r=
     let
-        maxNum = 100.0
+        maxNum = 500.0
         current = 
             if num<0 then
                 maxNum - toFloat (abs num)
@@ -92,7 +92,7 @@ showAT model num r=
 showInvisible : Model->Int -> Float -> Html.Html Msg 
 showInvisible model num r=
     let
-        maxNum = 100.0
+        maxNum = 500.0
         current = 
             if num<0 then
                 maxNum - toFloat (abs num)

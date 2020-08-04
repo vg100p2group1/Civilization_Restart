@@ -32,11 +32,11 @@ roomB =
 roomC : List Obstacle
 roomC= 
     let
-        a1=Rectangle 500 400 100 1200 recInit
-        a2=Rectangle 1400 400 100 1200 recInit
-        a3=Rectangle 950 400 100 1200 recInit
-        -- a4=Rectangle 1200 1400 400 200 recInit
-        roomTemp=[{obstacleConfig|position = a1},{obstacleConfig|position = a2},{obstacleConfig|position = a3}]
+        a1=Rectangle 800 400 400 200 recInit
+        a2=Rectangle 400 800 400 200 recInit
+        a3=Rectangle 1200 800 400 200 recInit
+        a4=Rectangle 800 1200 400 200 recInit
+        roomTemp=[{obstacleConfig|position = a1},{obstacleConfig|position = a2},{obstacleConfig|position = a3},{obstacleConfig|position = a4}]
     in
         List.map (\value -> {value|position = recUpdate value.position}) roomTemp
 
