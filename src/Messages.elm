@@ -40,6 +40,7 @@ type Msg
     | PageChange PageMsg
     | WeaponChoosing WeaponChoosingMsg
     | UnlockTrigger
+    | Exit
 
 type ShiftMsg
     = Previous
