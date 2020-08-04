@@ -136,10 +136,8 @@ update msg model =
                         (roomNew2,mapNew) = mapWithGate (Tuple.first roomNew) (List.length (Tuple.first roomNew)) mapConfig (initialSeed model.myself.time)
                         meTemp = model.myself
                         weaponUnlockSys = meTemp.weaponUnlockSys
-                        newSys = if model.storey >= 1 && model.storey <= 4 then
+                        newSys = --if model.storey >= 1 && model.storey <= 4 then
                                     {weaponUnlockSys|active=True}
-                                 else
-                                    weaponUnlockSys
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr,weaponUnlockSys=newSys}
                         -- it should be updated when dialogues are saved in every room
                         newDialogues = 
@@ -502,7 +500,7 @@ speedCase me map collideDoor=
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
         collideType = wallCollisionTest (Circle newXTemp newYTemp 20) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
-              ++(List.map (\t->t.position) collideDoor)
+              --++(List.map (\t->t.position) collideDoor)
             ) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"
