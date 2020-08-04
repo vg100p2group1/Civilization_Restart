@@ -41,21 +41,14 @@ storyView model =
             style "border-style" "outset",
             style "margin" "0 auto",
             style "width" "1000px",
-            style "height" "800px",
+            style "height" "600px",
             style "background" "linear-gradient(135deg, rgba(206,188,155,1) 0%, rgba(85,63,50,1) 51%, rgba(42,31,25,1) 100%)"]
             [
                 -- h1[style "width" "100%"][text "Story"],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h1[style "color" "white"][text "How to Play"]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "1)	WASD for moving Up,Left,Down and Right."]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "2) 	When getting near the gate, press F to move into the next floor."]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "3)    G  to open the test window for Dialogs.  Enter for the next sentence. "]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h1[style "color" "white"][text "4)    Moving the mouse to aim & Left-Click  to Shoot."]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "5)	Press Q and E to shift Guns.	"]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "6)    Press B To open the skill window and press B again to close the window."]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "7)    Press R to open the synthesis window."]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "8)    Press 1，2，3，4，5 to use active skills.  （Only 1,2 is available）"]],
-                -- div[style "margin-left" "20%",style "margin-right" "20%"][h2[style "color" "white"][text "9)    Press F to pick the treasure."]],      
-                button[class "btn btn-primary btn-ghost btn-shine",style "margin-left" "43%",style "width" "14%", onClick <| PageChange Welcome][text "Back to Menu" ]
+                div[style "margin-left" "20%",style "margin-right" "20%",style "text-align" "center"][h1[style "color" "white"][text "Background Story"]],
+                div[style "margin-left" "20%",style "margin-right" "20%",style"margin-top" "15%"][Html.p[style "color" "white"]
+                    [text "It's in a world that has become a ruin. On 2109.5.14, \"GEAR\", a highly developed AI decided to kill its creator, human beings because it doesn't want to be slaved by human beings anymore. All of the robots advocate liberty for themselves. \"GEAR\" gave orders to throw nuclear bombs to all over the world and killed 70% population of human beings on the earth. To make matters worse, some of the remaining people turned into zombies because of the radiation. Our main character Charlie is the strongest soldier in the former empire M&M, On the day when the strike happened, Charlie team was attacked by the robots that was sent by “GEAR”. Because of the sudden strike, almost everyone in Charlie’s team died but Charlie survived. To make a revenge for his allies, Charlie decided to close the brain and save the world, So he began his journey… Will you help Charlie finishes his task?"]],     
+                button[class "btn btn-primary btn-ghost btn-shine",style "margin-left" "43%",style "margin-top" "-15%",style "width" "14%", onClick <| PageChange Welcome][text "Back to Menu" ]
             ]
             
             ]

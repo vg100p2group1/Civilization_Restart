@@ -20,18 +20,23 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
-        m1=MonsterType 150 20 "#Robot1"
-        m2=MonsterType 300 40 "#Robot2"
-        m3=MonsterType 450 60 "#Robot3"
+        m1=MonsterType 30 20 "#Robot1"
+        m2=MonsterType 60 20 "#Robot1"
+        m7=MonsterType 200 20 "#Robot1"
+        m3=MonsterType 300 40 "#Robot2"
+        m4=MonsterType 600 40 "#Robot2"
+        m5=MonsterType 1000 60 "#Robot3"
+        m6=MonsterType 2000 60 "#Robot3"
+
     in 
-        [m1,m1,m2,m3,m2,m3,m3,m1,m2,m2,m3]
+        [m1,m2,m7,m3,m4,m5,m6,m6,m6,m6,m5]
 
 
 
 monsterGenerator : Random.Seed -> List Obstacle -> Int ->(List Monster,Random.Seed)
 monsterGenerator seed0 obstacle storey=
     let
-        (number,seed1) = Random.step (Random.int (storey+1) (storey+2+storey // 3)) seed0
+        (number,seed1) = Random.step (Random.int (storey //3 +4) (storey // 3  + 6)) seed0
         -- obstacle = room.obstacles
         
         (monsterList,seed2) = monsterBuilding [] number obstacle seed1 storey
@@ -56,7 +61,7 @@ monsterBuilding monsterList number obstacles seed0 storey=
     let
         (xTemp,seed1) = Random.step (Random.int 300 1500) seed0
         (yTemp,seed2) = Random.step (Random.int 300 1500) seed1
-        (typeTemp, seed3) = Random.step (Random.int 0 storey) seed2
+        (typeTemp, seed3) =Random.step (Random.int 0 storey) seed2
         (monsterSpeed, seed4) = Random.step (Random.float 1 3 ) seed3
         getMonsterType = 
             let

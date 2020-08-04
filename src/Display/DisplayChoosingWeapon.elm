@@ -5,65 +5,117 @@ import Html exposing (Html, div, text, button, progress,img)
 import Html.Attributes exposing (style, disabled,src,class)
 import Html.Events exposing (onClick)
 import Weapon exposing (Arsenal(..),defaultWeapon)
-
+import Markdown exposing (toHtml)
 import Messages exposing (SynthesisMsg(..),Msg(..),WeaponChoosingMsg(..))
 
 showWeaponChoosingSystem : Model -> Html Msg
 showWeaponChoosingSystem model =
     if model.myself.weaponUnlockSys.active then
     let
-        txt = "Hello"
+        getName = case model.myself.weaponUnlockSys.chosen of
+            Pistol ->
+                "Gauß Revolver"
+            Gatling ->
+                "HexTech Ripper"
+            Shotgun ->
+                "Meteor Shotgun"
+            Mortar ->
+                "Doomsday Rifle"
+            _ ->
+                "Nothing"
+
         sys = model.myself.weaponUnlockSys
     in
         div
         [ style "background" "rgba(236, 240, 241, 0.89)"
         , style "color" "#34495f"
         , style "height" "400px"
-        , style "left" "280px"
+        , style "left" "165px"
         -- , style "padding" "0 140px"
         , style "position" "absolute"
-        , style "top" "155px"
+        , style "top" "250px"
         , style "width" "680px"
         , style "background-size" "100% 100%"
+        , style "border-radius" "35px"
+        , style "box-shadow" "20px 20px 10px #888888"
+        , style "border-style" "inset"
+        , style "background-image" "url(images/InterfaceBg/b1.jpg)"
+        , style "opacity" "0.89"
         ]
         [
-          div [style "position" "absolute",style "margin-left" "290px",style "margin-top" "5px", style "color" "red",style "font-size" "25px"] [text "Unlock Weapon"]
+          div [ style "position" "absolute"
+              , style "margin-left" "200px"
+              , style "margin-top" "5px"
+              , style "font-family" ""
+              , style "font-family" "lucida sans unicode,lucida grande, sans-serif"
+              , style "text-shadow" "5px 5px 5px black"
+              , style "color" "black",style "font-size" "25px"]
+              [text "Weapon Unlocking System"]
         , div[][
-            div[style "margin" "10px 0 0 120px"]
+            div[style "margin" "0 0 0 120px"]
             [weaponToButton Pistol sys, weaponToButton Gatling sys, weaponToButton Mortar sys, weaponToButton Shotgun sys]
         ]
-        ,div[style "margin-top" "-20px"
-            , style "margin-left" "350px"]
-            [ div [style "margin-left" "65px", style "margin-top" "-30px",style "font-size" "15px" ] [text ""]
-            , div[ style "margin" "5px 10px 5px 10px"
-            , style "height" "200px"
-            , style "width" "200px"
-            , style "background" "#FFF"]
-            [text txt]
+        ,div[style "margin-top" "165px"
+            , style "margin-left" "190px"]
+            [ div [style "margin-left" "120px", style "margin-top" "0", style "font-size" "25px", style "font-weight" "bold"] [text "Tips"]
+            , div [style "margin-left" "65px", style "margin-top" "0", style "font-size" "20px", style "font-weight" "bold"] [text getName]
+            , div[ style "margin" "-5px 10px 5px -50px"
+            , style "height" "100px"
+            , style "width" "400px"
+            , style "background" "rgba(236, 240, 241, 0.89)"]
+            [case model.myself.weaponUnlockSys.chosen of
+                Pistol -> Markdown.toHtml [] """
+* Hello
+"""
+                Gatling ->
+                    Markdown.toHtml [] """
+* Simple science and technology product
+* One of standard arms in the military
+* Use no bullets.
+* Low ATK and low shooting speed
+"""
+                Shotgun ->
+                    Markdown.toHtml [] """
+* Hello
+"""
+                _ ->
+                    Markdown.toHtml [] """
+                * Wow
+                """
+            ]
 
         ]
-        , button
+        , div[style "position" "absolute"]
+        [
+          button
             [ class "btn btn-primary btn-ghost btn-shine"
             , onClick <| WeaponChoosing UnlockWeapon
-            , style "margin" "80px 0 0 250px"
+            , style "margin" "0 0 0 250px"
             , style "width" "200px"
             , style "height" "50px"
             , style "color" "black"
             , style "font-size" "20px"
+            , style "background" "linear-gradient(to right, #6699ff, #99cc99)"
+            --, style "float" "left"
             ]
             [text "Unlock"]
-
-        ,  button
+        {-
+        ,
+          button
             [ class "btn btn-primary btn-ghost btn-shine"
             , onClick <| WeaponChoosing CloseWindow
-            , style "margin" "20px 0 0 250px"
+            , style "margin" "-100px 0 0 380px"
             , style "width" "200px"
             , style "height" "50px"
             , style "color" "black"
             , style "font-size" "20px"
+            --, style "float" "left"
             ]
             [text "Back to Game"]
+        -}
         ]
+        ]
+
     else
         div[][]
 
@@ -79,7 +131,7 @@ weaponToButton weapon sys=
                 NoWeapon -> 0
         isChosen = weapon == sys.chosen
         --top = (String.fromInt ((level - 1) * 50)) ++ "px"
-        top = "100px"
+        top = "60px"
         leftAdd =
             20
 

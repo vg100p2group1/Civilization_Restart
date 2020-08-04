@@ -48,6 +48,7 @@ type alias Me =
     , time : Int
     , arsenal : List Weapon
     , weaponUnlockSys : WeaponUnlockSys
+    , addAudio : List String
     }
 
 type alias WeaponUnlockSys =
@@ -61,7 +62,7 @@ type alias WeaponUnlockSys =
 defaultWeaponUnlockSys =
     { active = False
     , canUnlockWeapon = True
-    , chosen = NoWeapon
+    , chosen = Pistol
     , unlockedWeapons = [defaultWeapon]
     , tip = ""
     }
@@ -104,6 +105,7 @@ defaultMe =
     , time = 0
     , arsenal = weaponList
     , weaponUnlockSys = defaultWeaponUnlockSys
+    ,addAudio= []
     }
 
 type alias Model =
@@ -175,6 +177,7 @@ type State = Dialogue
            | SkillSys
            | OnTraining
            | Others
+           | Unlocking
 
 type GameState = Paused
                | Playing
