@@ -807,7 +807,7 @@ updateDualWield model =
         newaudio = nowaudio ++ ["./audio/DualWeapon.ogg"]
         newMe =
             if dual && me.dualWield == 0 then
-                {me|dualWield = 100,addAudio=newaudio}
+                {me|dualWield = 150,addAudio=newaudio}
             else
                 me
     in
@@ -859,7 +859,7 @@ updateATField model =
         newaudio = nowaudio ++ ["./audio/Absorb.ogg"]
         newMe =
             if unlocked && me.absoluteTerrifyField == 0 then
-                {me|absoluteTerrifyField = 50,addAudio=newaudio}
+                {me|absoluteTerrifyField = 150,addAudio=newaudio}
             else
                 me
     in
@@ -875,7 +875,7 @@ updateInvisibility model =
 
         newMe =
             if unlocked && me.invisible == 0 then
-                {me|invisible = 50,addAudio=newaudio}
+                {me|invisible = 150,addAudio=newaudio}
             else
                 me
     in
@@ -942,10 +942,10 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = cool me.dualWield 100
-        , flash = cool me.flash 100
-        , absoluteTerrifyField = cool me.absoluteTerrifyField 100
-        , invisible= cool me.invisible 100
+        {me|dualWield = cool me.dualWield 500
+        , flash = cool me.flash 500
+        , absoluteTerrifyField = cool me.absoluteTerrifyField 500
+        , invisible= cool me.invisible 500
         , directionalBlasting = cool me.directionalBlasting 1200}
 
 updateWeaponChoosing : WeaponChoosingMsg -> Model -> Model
