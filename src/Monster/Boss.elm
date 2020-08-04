@@ -178,7 +178,7 @@ bossAct  me boss =
         
 
         checkActive = 
-            (distx <= 500) || (disty<=500)
+            (distx <= 550) || (disty<=550)
 
         firstShootingType = List.head boss.bossType.shootingType
 
