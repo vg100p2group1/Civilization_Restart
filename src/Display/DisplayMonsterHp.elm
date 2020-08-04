@@ -9,9 +9,9 @@ import Config exposing (viewBoxMax)
 showHp: Me -> Monster -> Html Msg
 showHp me monster =
     let
-         cx =  (monster.position.cx)
-         cy = (monster.position.cy)
-         r =  (monster.position.r)
+        cx =  (monster.position.cx)
+        cy =  (monster.position.cy)
+        r =  (monster.position.r)
         x = -me.x + viewBoxMax/2 + cx
         y = -me.y + viewBoxMax/2 + cy
         left = String.fromFloat(x - 2 * r - 10) ++ "px"
