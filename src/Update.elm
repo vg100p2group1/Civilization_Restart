@@ -27,6 +27,7 @@ import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
 import UpdateTraining exposing (updateTraining)
+import Dialogs exposing (dialog2,dialog3)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -141,7 +142,11 @@ update msg model =
                                     weaponUnlockSys
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr,weaponUnlockSys=newSys}
                         -- it should be updated when dialogues are saved in every room
-                        newDialogues = updateDialogues model
+                        newDialogues = 
+                            case model.storey of
+                                2-> dialog2
+                                4 -> dialog3
+                                _->[]
                     in
                         ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
                 else 
