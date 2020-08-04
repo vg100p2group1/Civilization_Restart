@@ -294,6 +294,18 @@ update msg model =
                     ({model|pageState=AboutPage},Cmd.none)
                 Story ->
                     ({model|pageState=StoryPage},Cmd.none)
+        Exit ->
+            if model.state == SkillSys || model.state == SynthesisSys || model.state == Dialogue || model.state == Unlocking then
+                let
+                    me = model.myself
+                    synSys = me.synthesis
+                    skillSys = me.skillSys
+                    unlockSys = me.weaponUnlockSys
+                    newMe = {me|synthesis={synSys|active=False},skillSys={skillSys|active=False},weaponUnlockSys={unlockSys|active=False}}
+                in
+                    ({model|myself=newMe,state=Others,gameState=Playing,paused=False}, Cmd.none)
+            else
+                (model, Cmd.none)
 
 
 changeWeapon : Int -> Model -> Model
@@ -479,7 +491,7 @@ speedCase me map collideDoor=
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
         collideType = wallCollisionTest (Circle newXTemp newYTemp 20) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
-            --  ++(List.map (\t->t.position) collideDoor)
+              ++(List.map (\t->t.position) collideDoor)
             ) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"

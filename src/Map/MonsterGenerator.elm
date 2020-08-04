@@ -20,6 +20,7 @@ monsterTypeNum = 3
 monsterTypeList : List MonsterType 
 monsterTypeList = 
     let
+
         m1=MonsterType 30 30 20 "#Robot1"
         m2=MonsterType 60 60  20 "#Robot1"
         m7=MonsterType 200 200 20 "#Robot1"
@@ -72,6 +73,7 @@ monsterBuilding monsterList number obstacles seed0 storey=
                         a
                     Nothing ->
                         MonsterType 0 0 0 ""
+
         monsterTypeTemp = getMonsterType
 
         monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit

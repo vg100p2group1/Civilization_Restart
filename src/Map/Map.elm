@@ -40,7 +40,7 @@ type alias MonsterType =
     ,   maxhp : Float
     ,   attack : Float
     ,   url : String   
-       
+
     }
 type alias Monster =
     { position : Shape.Circle

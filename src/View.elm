@@ -32,6 +32,7 @@ import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
 import Display.DisplayTraining exposing (showTraining)
+import Display.DisplayMonsterHp exposing (showMonsterHp)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
@@ -214,7 +215,7 @@ playerDemonstrate model =
             , showGameOver model
             , showWeaponChoosingSystem model
             , showTraining model
-        ]++newAudio)
+        ]++newAudio++showMonsterHp model.myself model.map.monsters)
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)
 backgroundEntire model=
