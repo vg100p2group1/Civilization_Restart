@@ -215,6 +215,7 @@ playerDemonstrate model =
             , showGameOver model
             , showWeaponChoosingSystem model
             , showTraining model
+            , showWin model
         ]++newAudio++showMonsterHp model.myself model.map.monsters)
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)
@@ -448,6 +449,24 @@ showGameOver model =
             , style "width" "400px"
             ]
             [ div [style "margin" "140px 0 0 20px", style "color" "red",style "font-size" "30px",style "font-weight" "bold"] [text "Game Over"]
+            ]
+    else
+        div [] []
+
+showWin : Model -> Html Msg
+showWin model =
+    if model.isWin then
+        div
+            [ style "background" "rgba(236, 240, 241, 0.89)"
+            , style "color" "#34495f"
+            , style "height" "400px"
+            , style "left" "280px"
+            , style "padding" "0 140px"
+            , style "position" "absolute"
+            , style "top" "155px"
+            , style "width" "400px"
+            ]
+            [ div [style "margin" "140px 0 0 20px", style "color" "yellow",style "font-size" "30px",style "font-weight" "bold"] [text "You Win"]
             ]
     else
         div [] []

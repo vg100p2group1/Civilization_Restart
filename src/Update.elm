@@ -27,7 +27,7 @@ import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
 import UpdateTraining exposing (updateTraining)
-import Dialogs exposing (dialog2,dialog3)
+import Dialogs exposing (dialog2,dialog3,dialog4,dialog5)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -144,9 +144,12 @@ update msg model =
                             case model.storey of
                                 2-> dialog2
                                 4 -> dialog3
+                                6 -> Dialogs.dialog4
+                                8 -> Dialogs.dialog5
                                 _->[]
+                        win = model.storey >= 9
                     in
-                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
+                        ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1,isWin=win},Cmd.none)
                 else 
                     case model.state of
                         PickTreasure t ->

@@ -30,6 +30,7 @@ init =
         , bomb = []
         , wholeCounter = 0
         , trainingSession = defaultTraining
+        , isWin = False
         }
 
 
