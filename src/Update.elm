@@ -904,10 +904,10 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = cool me.dualWield 100
-        , flash = cool me.flash 100
-        , absoluteTerrifyField = cool me.absoluteTerrifyField 100
-        , invisible= cool me.invisible 100
+        {me|dualWield = cool me.dualWield 500
+        , flash = cool me.flash 500
+        , absoluteTerrifyField = cool me.absoluteTerrifyField 500
+        , invisible= cool me.invisible 500
         , directionalBlasting = cool me.directionalBlasting 1200}
 
 updateWeaponChoosing : WeaponChoosingMsg -> Model -> Model
