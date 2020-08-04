@@ -37,7 +37,7 @@ monsterTypeList =
 monsterGenerator : Random.Seed -> List Obstacle -> Int ->(List Monster,Random.Seed)
 monsterGenerator seed0 obstacle storey=
     let
-        (number,seed1) = Random.step (Random.int (storey //3 +4) (storey // 3  + 6)) seed0
+        (number,seed1) = Random.step (Random.int (storey //3 +10) (storey // 3  + 15)) seed0
         -- obstacle = room.obstacles
         
         (monsterList,seed2) = monsterBuilding [] number obstacle seed1 storey
@@ -76,8 +76,8 @@ monsterBuilding monsterList number obstacles seed0 storey=
 
         monsterTypeTemp = getMonsterType
 
-        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 300 200 recInit
-        monsterPos = Shape.Circle  (toFloat xTemp + 150) (toFloat yTemp + 100) 20 
+        monsterRegion = Rectangle (toFloat xTemp) (toFloat yTemp) 150 150 recInit
+        monsterPos = Shape.Circle  (toFloat xTemp + 75) (toFloat yTemp + 75) 20 
 
         monsterNew = Map.Map.Monster monsterPos (recUpdate monsterRegion)  monsterTypeTemp 0 seed3 False 1 monsterSpeed 0 False
 

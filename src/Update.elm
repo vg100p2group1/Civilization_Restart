@@ -22,11 +22,12 @@ import Synthesis.Package exposing (packageUpdate)
 import Control.EnableDoor exposing (enableDoor)
 import Attributes exposing (setCurrentAttr,getCurrentAttr, getMaxAttr, AttrType(..),defaultAttr)
 import Init exposing (init)
-import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState,skillDirectionalBlasting)
+import Skill exposing (subSysBerserker,skillDualWield,skillAbsoluteTerritoryField,skillInvisible,subSysPhantom,subSysMechanic,skillFlash,skillState,skillDirectionalBlasting,skillMissI, skillMissII)
 import Time exposing (..)
 import Random exposing (..)
 import Bomb exposing (makeBomb, bombTick)
 import UpdateTraining exposing (updateTraining)
+import Dialogs exposing (dialog2,dialog3)
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -141,7 +142,11 @@ update msg model =
                                     weaponUnlockSys
                         meNew = {defaultMe|weapons=meTemp.weapons,currentWeapon=meTemp.currentWeapon,package=meTemp.package,skillSys=meTemp.skillSys, attr = meTemp.attr,weaponUnlockSys=newSys}
                         -- it should be updated when dialogues are saved in every room
-                        newDialogues = updateDialogues model
+                        newDialogues = 
+                            case model.storey of
+                                2-> dialog2
+                                4 -> dialog3
+                                _->[]
                     in
                         ({model|myself=meNew,rooms=(roomNew2,Tuple.second roomNew),map=mapNew,viewbox=mapNew,state=Unlocking,currentDialogues=newDialogues,gameState=Paused,storey=model.storey+1},Cmd.none)
                 else 
@@ -786,9 +791,22 @@ hit bulletHit bulletAT me =
         me
     else
 -}    let
+        (missLevel,missRate) = if skillState 0 0 2 me.skillSys.subsys subSysPhantom skillMissI then
+                        if skillState 0 1 3 me.skillSys.subsys subSysPhantom skillMissII then
+                            (2,0)
+                        else
+                            (1,0.3)
+                    else  
+                        (0,1)
+        seedSource = me.counter + modBy 10007 (round (Tuple.first me.mouseData))
+        seedNow = Random.initialSeed seedSource
+        floatGenerater = Random.float 0 1
+        (randomFloat,_) = Random.step floatGenerater seedNow
+        canMiss = randomFloat < 0.1 * missLevel
         totalHurt = bulletHit
                 |> List.map .force
                 |> List.sum
+                |> (\hurt -> if canMiss then missRate * hurt else hurt)
                 |> Basics.round
         attr = me.attr
         health = getCurrentAttr Health attr
