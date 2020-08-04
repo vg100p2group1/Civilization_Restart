@@ -435,7 +435,7 @@ showGameOver model =
             , style "top" "155px"
             , style "width" "400px"
             ]
-            [ div [style "margin" "160px 0 0 135px", style "color" "red",style "font-size" "24px"] [text "Game Over"]
+            [ div [style "margin" "140px 0 0 20px", style "color" "red",style "font-size" "30px",style "font-weight" "bold"] [text "Game Over"]
             ]
     else
         div [] []
