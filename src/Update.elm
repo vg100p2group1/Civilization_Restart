@@ -394,7 +394,7 @@ animate  model =
         me = model.myself
         attr = me.attr
         gate = model.map.gate
-        isDead = 0 == getCurrentAttr Health attr
+        isDead = 0 >= getCurrentAttr Health attr
         (newShoot, weapon,newaudio_) = if model.myself.fire then
                                  if getCurrentAttr Clip attr > 0 then
                                     fireBullet_ model.myself.currentWeapon me.mouseData (me.x,me.y) (model.myself.dualWield > 0) me
