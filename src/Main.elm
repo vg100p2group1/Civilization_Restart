@@ -44,79 +44,103 @@ subscriptions model =
 key : Bool -> Int -> Msg
 key on keycode =
     case keycode of
+        -- W
         87 ->
             MoveUp on
+        -- A
         65 ->
+        -- S
             MoveLeft on
+        -- D
         68 ->
-            MoveRight on       
+            MoveRight on
+        -- S
         83 ->
             MoveDown on
+        -- F
         70 ->
             if on then
                 FMsg
             else
                 Noop
+        -- Enter
         13 ->
             if on then
                 NextMsg
             else
                 Noop
-        71 ->
+        -- C
+        67 ->
             ShowDialogue
+        -- 1
         49 ->
             if on then
                 DualWield
             else
                 Noop
+        -- 2
         50 ->
             if on then
                 Flash
             else
                 Noop
+        -- 3
         51 ->
             if on then
                 ATField
             else
-                Noop        
+                Noop
+        -- 4
         52 ->
             if on then
                 Invisibility
             else
-                Noop 
+                Noop
+        -- 5
         53 ->
             if on then
                 PlaceBomb
             else
-                Noop 
+                Noop
+        -- E
         69 ->
             if on then
                 ChangeWeapon Previous
             else
                 Noop
+        -- Q
         81 ->
             if on then
                 ChangeWeapon Next
             else Noop
+        -- B
         66 ->
             if on then
                 SkillChange TriggerSkillWindow
             else
                 Noop
-        82 ->
+        -- V
+        86 ->
             if on then
                 SynthesisSystem TriggerSynthesisWindow
             else
                 Noop
-
+        -- SpaceBar
         32 ->
             if on then
                 ChangeGameState
             else
                 Noop
-        79 ->
+        -- G
+        71 ->
             if on then
                 UnlockTrigger
+            else
+                Noop
+        -- R
+        82 ->
+            if on then
+                Exit
             else
                 Noop
         _ ->

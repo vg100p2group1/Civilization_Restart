@@ -5,6 +5,7 @@ all:
 	cp images build/ -rf
 	cp CSS build/ -rf
 	cp video build/ -rf
+	cp audio build/ -rf
 .PHONY: clean
 clean:
 	rm build -r

@@ -136,7 +136,7 @@ type alias TrainingSession =
     , hasMovedUp : Bool
     , hasFired : Bool
     , hasB : Bool
-    , hasR: Bool
+    , hasR : Bool
     , tips : Dict Int String
     }
 
