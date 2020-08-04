@@ -251,7 +251,7 @@ skillBattleFervor =
     , level = 4
     , unlocked = False
     , desciption = "Berserkers will not be stopped by their wounds. Their enemies's lives do. You will cause more harm when your health is low."
-    , name = "  "
+    , name = "Battle Fervor"
     }
 
 skillDualWield : Skill
