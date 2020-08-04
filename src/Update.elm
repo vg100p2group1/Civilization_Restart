@@ -491,7 +491,7 @@ speedCase me map collideDoor=
         -- -- recTemp = Rec newX newY (viewBoxMax/2) (viewBoxMax/2)
 
         collideType = wallCollisionTest (Circle newXTemp newYTemp 20) (map.obstacles++(List.map (\value->value.position) map.walls)++map.roads
-            --  ++(List.map (\t->t.position) collideDoor)
+              ++(List.map (\t->t.position) collideDoor)
             ) 
         -- d = Debug.log "Type" collideType
         -- d = Debug.log "x"
@@ -778,7 +778,7 @@ hit bulletHit bulletAT me =
                 setCurrentAttr Armor -totalHurt attr
             else if armor > 0 then      -- the armor is broken due to these bullets
                 setCurrentAttr Armor -armor attr
-                |> setCurrentAttr Health (totalHurt - armor)
+                |> setCurrentAttr Health -(totalHurt - armor)
             else
                 setCurrentAttr Health -(min totalHurt health) attr
         currentArmor = getCurrentAttr Armor attr
@@ -819,7 +819,7 @@ updateDualWield model =
         newaudio = nowaudio ++ ["./audio/DualWeapon.ogg"]
         newMe =
             if dual && me.dualWield == 0 then
-                {me|dualWield = 100,addAudio=newaudio}
+                {me|dualWield = 150,addAudio=newaudio}
             else
                 me
     in
@@ -871,7 +871,7 @@ updateATField model =
         newaudio = nowaudio ++ ["./audio/Absorb.ogg"]
         newMe =
             if unlocked && me.absoluteTerrifyField == 0 then
-                {me|absoluteTerrifyField = 50,addAudio=newaudio}
+                {me|absoluteTerrifyField = 150,addAudio=newaudio}
             else
                 me
     in
@@ -887,7 +887,7 @@ updateInvisibility model =
 
         newMe =
             if unlocked && me.invisible == 0 then
-                {me|invisible = 50,addAudio=newaudio}
+                {me|invisible = 150,addAudio=newaudio}
             else
                 me
     in
@@ -954,10 +954,10 @@ coolSkills me =
             else
                 0
     in
-        {me|dualWield = cool me.dualWield 100
-        , flash = cool me.flash 100
-        , absoluteTerrifyField = cool me.absoluteTerrifyField 100
-        , invisible= cool me.invisible 100
+        {me|dualWield = cool me.dualWield 500
+        , flash = cool me.flash 500
+        , absoluteTerrifyField = cool me.absoluteTerrifyField 500
+        , invisible= cool me.invisible 500
         , directionalBlasting = cool me.directionalBlasting 1200}
 
 updateWeaponChoosing : WeaponChoosingMsg -> Model -> Model

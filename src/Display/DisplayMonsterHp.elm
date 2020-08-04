@@ -37,7 +37,7 @@ showHp me monster =
          , style "opacity" "0.8"
          , style "-moz-border-radius" "35px"
          , style "-webkit-border-radius" "35px"
-        , Html.Attributes.max (String.fromFloat monster.monsterType.maxHp)
+        , Html.Attributes.max (String.fromFloat monster.monsterType.maxhp)
         , Html.Attributes.value (String.fromFloat monster.monsterType.hp)
         {-, style "background-image" "-webkit-gradient(linear, left bottom, left top, color-stop(0, #b6bcc6), color-stop(1, #9da5b0))"
         , style "background-image" "-moz-linear-gradient(#9da5b0 0%, #b6bcc6 100%)"

@@ -18,9 +18,10 @@ bossTypeList =
         m2=bossType2
         m3=bossType3
         m4=bossType4
+        m5=bossType5
         
     in 
-        [m1,m2,m3,m4]
+        [m1,m2,m3,m4,m5]
 
 
 
@@ -107,7 +108,16 @@ bossType4 =
 
         stype3 = shootingType2 :: addDirection 9  ++ shootingType2 :: addDirection1 18
     in
-        BossType 2000 1 200 200 "#Boss3" stype3  
+        BossType 10000 1 200 200 "#Boss3" stype3
+
+bossType5 : BossType
+bossType5 = 
+    let 
+        addDirection num =
+            if num == 0 then [] else shootingType3 :: addDirection (num - 1)
+        stype4 = addDirection 5 ++ [shootingType4]
+    in
+        BossType 5000 1 200 200 "#Boss2" stype4    
 
 shootingType0 : Float -> ShootingType
 shootingType0 direction = 
@@ -123,7 +133,13 @@ shootingType2 =
 
 shootingType3 : ShootingType
 shootingType3 = 
-    ShootingType Targeted 25 60 30 20 5 7 
+    ShootingType Targeted 15 60 30 20 5 7 
+
+shootingType4 : ShootingType
+shootingType4 = 
+    ShootingType Bomb 2 0 100 0 50 7 
+
+
 
  
                 
@@ -178,7 +194,7 @@ bossAct  me boss =
         
 
         checkActive = 
-            (distx <= 500) || (disty<=500)
+            (distx <= 550) || (disty<=550)
 
         firstShootingType = List.head boss.bossType.shootingType
 
@@ -257,6 +273,8 @@ newBullet me boss =
                             (newBoss, circledShoot boss nowShootingType.bulletNum nowShootingType [] )
                         Targeted ->
                             (newBoss,targetedShoot boss nowShootingType.bulletNum nowShootingType [] newSeed me)
+                        Bomb ->
+                            (newBoss,bombShoot boss nowShootingType.bulletNum nowShootingType [] newSeed me)
                     
                     
                     else(boss,[]) 
@@ -306,6 +324,29 @@ targetedShoot boss num shootingType bullitList seed me=
         
         oneNewBullet : Bullet
         oneNewBullet = Bullet boss.position.edge.cx  boss.position.edge.cy shootingType.r (Circle boss.position.edge.cx boss.position.edge.cy 5) (10*(speedx )) (10*(speedy )) False Weapon.Monster shootingType.attack
+
+    in
+        if num==0 then bullitList
+            else targetedShoot boss (num - 1) shootingType (oneNewBullet :: bullitList ) seed1 me
+
+bombShoot : Boss -> Int -> ShootingType ->List Bullet -> Random.Seed -> Me ->List Bullet
+bombShoot boss num shootingType bullitList seed me=
+    let
+        
+
+        
+        
+
+        (xran,seed1) =  Random.step (Random.float -500 500) seed 
+        (yran,seed2) =  Random.step (Random.float -500 500) seed1 
+
+        xtemp =  boss.position.edge.cx +xran
+        ytemp= boss.position.edge.cy +yran
+
+        
+        
+        oneNewBullet : Bullet
+        oneNewBullet = Bullet xtemp ytemp shootingType.r (Circle xtemp ytemp shootingType.r ) 0 0 False Weapon.Monster shootingType.attack
 
     in
         if num==0 then bullitList
