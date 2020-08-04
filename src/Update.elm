@@ -742,7 +742,7 @@ hit bulletHit bulletAT me =
                 setCurrentAttr Armor -totalHurt attr
             else if armor > 0 then      -- the armor is broken due to these bullets
                 setCurrentAttr Armor -armor attr
-                |> setCurrentAttr Health (totalHurt - armor)
+                |> setCurrentAttr Health -(totalHurt - armor)
             else
                 setCurrentAttr Health -(min totalHurt health) attr
         currentArmor = getCurrentAttr Armor attr
