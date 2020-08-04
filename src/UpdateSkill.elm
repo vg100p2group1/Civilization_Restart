@@ -11,7 +11,7 @@ updateSkill msg model =
         me = model.myself
         sys = me.skillSys
     in
-    if model.state == Others || model.state == SkillSys then
+    if model.state == Others || model.state == SkillSys || model.state == OnTraining then
         case msg of
             TriggerSkillWindow->
                 let
@@ -25,8 +25,9 @@ updateSkill msg model =
                             {model|myself = newMe, paused = not model.paused, gameState = Playing,state=Others}
                         else
                             {model|myself = newMe, paused = not model.paused, gameState = Paused,state=SkillSys}
+                    training = newModel.trainingSession
                 in
-                    (newModel, Cmd.none)
+                    ({newModel|trainingSession={training|hasB=True}}, Cmd.none)
             SubSystemChange change ->
                 let
                     delta = if change then 1 else -1

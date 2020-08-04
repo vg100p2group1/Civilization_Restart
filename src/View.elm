@@ -7,7 +7,7 @@ import Shape exposing (Rectangle,recCollisionTest,Rec,circleRecTest,recUpdate)
 import Messages exposing (Msg(..), SkillMsg(..),PageMsg(..))
 import Attributes exposing (Attr, AttrType(..), getCurrentAttr, getMaxAttr, getAttrName)
 import Html exposing (Html, div, text, button, progress,img)
-import Html.Attributes exposing (style, disabled,src)
+import Html.Attributes exposing (style, disabled,autoplay,src)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as Mouse
 import Svg 
@@ -31,6 +31,7 @@ import Display.Cool exposing (showSkillCooling)
 import Synthesis.ShowSynthesis exposing (showSynthesis)
 import Display.DisplaySkill exposing (showSkill)
 import Display.Define exposing (defines)
+import Display.DisplayTraining exposing (showTraining)
 import Environment.ShowFloor exposing(showFloor)
 import Environment.ShowObstacle exposing (showObstacle)
 import Environment.ShowTreasure exposing (displayTreasure)
@@ -177,10 +178,20 @@ playerDemonstrate model =
     let
         gWidth = "1000"
         gHeight = "1000"
+
+        addaudio = model.myself.addAudio
+
+        newAudio = List.map generateaudio addaudio
+
+        generateaudio : String -> Html.Html Msg
+
+        generateaudio instring =
+            Html.audio[autoplay True,src instring][]
+
     in
         Html.div
         []
-        [ Html.div 
+        ([ Html.div 
             [ Html.Attributes.style "width" "1000"
             , Html.Attributes.style "height" "1000"
             -- , Html.Attributes.style "float" "left"
@@ -202,7 +213,8 @@ playerDemonstrate model =
             , showSynthesis model
             , showGameOver model
             , showWeaponChoosingSystem model
-        ]
+            , showTraining model
+        ]++newAudio)
 
 backgroundEntire : Map ->  List (Svg.Svg Msg)
 backgroundEntire model=
